@@ -1,0 +1,13 @@
+{
+  "name": "campus-legend-online-prototype",
+  "version": "0.3.0",
+  "private": true,
+  "description": "3D browser MMORPG prototype with four classes and Socket.IO player presence",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
