@@ -63,13 +63,15 @@ input,select{width:100%}#start{width:100%;margin-top:17px;background:#28648a;fon
   <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家" placeholder="輸入角色名稱"/>
   <label>選擇性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
    <label>選擇社團／職業</label><select id="class"><option value="sword">劍道部｜近戰均衡</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠距離攻擊</option><option value="psy">氣功部｜法術與恢復</option></select>
-  <button id="start">進入學園</button>
+  <button id="start">進入學園</button><div id="assetStatus" class="small" style="margin-top:9px;text-align:center">角色模型：準備載入真正骨骼 3D 校服模型</div>
   <p class="small">多人連線需啟動附帶的 Node.js 伺服器；若未啟動，仍可單人遊玩本機原型。</p>
  </div>
 </div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { io } from 'https://cdn.socket.io/4.7.5/socket.io.esm.min.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+import { clone as cloneSkeleton } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/utils/SkeletonUtils.js';
 
 const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9cc5d3);scene.fog=new THREE.Fog(0x9cc5d3,35,95);
@@ -239,8 +241,74 @@ function makeAvatar(job='sword', fallbackColor=null, gender='male'){
  g.userData.rig={armL,armR,legL,legR,torso,walk:0,actionUntil:0,gender};
  return g;
 }
+
+// v0.6: CC0 rigged school-character GLBs with real skeletons and named animations.
+const avatarLoader=new GLTFLoader();
+const schoolModelUrls={
+ male:'https://gobkit.com/freebies/human019/Schoolboy.glb',
+ female:'https://gobkit.com/freebies/human019/Schoolgirl.glb'
+};
+const schoolModelCache={};
+function getSchoolModel(genderKey){
+ const key=genderKey==='female'?'female':'male';
+ if(!schoolModelCache[key]){
+  schoolModelCache[key]=new Promise((resolve,reject)=>{
+   avatarLoader.load(schoolModelUrls[key],resolve,undefined,reject);
+  });
+ }
+ return schoolModelCache[key];
+}
+function attachClassWeapon(root,job){
+ const hand=root.getObjectByName('RightHand')||root.getObjectByName('mixamorigRightHand')||root.getObjectByName('hand_r');
+ if(!hand)return;
+ const metal=new THREE.MeshStandardMaterial({color:0xb8c5d0,metalness:.55,roughness:.38});
+ const dark=new THREE.MeshStandardMaterial({color:0x303846,roughness:.7});
+ const gold=new THREE.MeshStandardMaterial({color:0xc5a15d,metalness:.45,roughness:.4});
+ const prop=new THREE.Group();
+ if(job==='sword'){
+  const blade=new THREE.Mesh(new THREE.BoxGeometry(.055,.62,.035),metal);blade.position.y=.34;prop.add(blade);
+  const guard=new THREE.Mesh(new THREE.BoxGeometry(.22,.045,.07),gold);guard.position.y=.02;prop.add(guard);
+  const grip=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.20,8),dark);grip.position.y=-.10;prop.add(grip);
+ }else if(job==='fighter'){
+  const glove=new THREE.Mesh(new THREE.SphereGeometry(.105,12,10),dark);prop.add(glove);
+ }else if(job==='archer'){
+  const bow=new THREE.Mesh(new THREE.TorusGeometry(.28,.025,8,24,Math.PI),gold);bow.rotation.z=Math.PI/2;prop.add(bow);
+ }else{
+  const staff=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,.82,9),dark);staff.position.y=.30;prop.add(staff);
+  const orb=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),new THREE.MeshStandardMaterial({color:0x75c9ed,emissive:0x174a66,roughness:.25}));orb.position.y=.74;prop.add(orb);
+ }
+ hand.add(prop);
+}
+async function makeRiggedSchoolAvatar(job='sword',genderKey='male'){
+ const gltf=await getSchoolModel(genderKey);
+ const model=cloneSkeleton(gltf.scene);
+ model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.material){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone();}}});
+ const bounds=new THREE.Box3().setFromObject(model),size=bounds.getSize(new THREE.Vector3());
+ const scale=3.15/Math.max(size.y,.001);model.scale.setScalar(scale);
+ model.position.y=-bounds.min.y*scale;
+ const wrapper=new THREE.Group();wrapper.add(model);
+ const mixer=new THREE.AnimationMixer(model),actions={};
+ for(const clip of gltf.animations){const k=clip.name.toLowerCase();actions[k]=mixer.clipAction(clip);}
+ const rig={mixer,actions,active:null,walk:0,gender:genderKey};
+ wrapper.userData.rig=rig;
+ attachClassWeapon(model,job);
+ const idle=actions.idle||actions.stand;
+ if(idle){idle.reset().fadeIn(.15).play();rig.active=idle;}
+ return wrapper;
+}
+function setRigAction(rig,name){
+ const next=rig.actions[name];if(!next||rig.active===next)return;
+ if(rig.active)rig.active.fadeOut(.12);
+ next.reset().fadeIn(.12).play();rig.active=next;
+}
+
 function animateAvatar(avatar, dt, moving=false){
  const rig=avatar?.userData?.rig;if(!rig)return;
+ if(rig.mixer){
+  const attacking=rig.actionUntil&&performance.now()<rig.actionUntil;
+  setRigAction(rig,attacking?(rig.actions.attack?'attack':'special'):(moving?(rig.actions.walk?'walk':'run'):'idle'));
+  rig.mixer.update(dt);return;
+ }
  if(moving)rig.walk+=dt*10;
  const swing=moving?Math.sin(rig.walk)*.62:0;
  const attacking=performance.now()<rig.actionUntil;
@@ -258,7 +326,7 @@ for(let i=0;i<9;i++)addMob(-12+(i%3)*12,4+Math.floor(i/3)*8);
 function log(s){let el=$('log');el.innerHTML+=`<div>› ${s}</div>`;el.scrollTop=el.scrollHeight}
 function updateUI(){let c=classData[chosen],maxxp=level*100;hp=Math.max(0,Math.min(hp,c.hp+(level-1)*8));$('who').textContent=name;$('className').textContent=c.label;$('level').textContent='Lv.'+level;$('hpText').textContent=`${Math.round(hp)} / ${c.hp+(level-1)*8}`;$('mpText').textContent=`${Math.round(mp)} / ${c.mp+(level-1)*5}`;$('xpText').textContent=`${xp} / ${maxxp}`;$('hp').style.width=(hp/(c.hp+(level-1)*8)*100)+'%';$('mp').style.width=(mp/(c.mp+(level-1)*5)*100)+'%';$('xp').style.width=(xp/maxxp*100)+'%';$('goldText').textContent='金幣：'+gold;$('quest').textContent=`進度 ${quest} / 3`}
 function gainXP(n){xp+=n;while(xp>=level*100){xp-=level*100;level++;hp+=20;mp+=15;log(`升級！目前等級 Lv.${level}`)}updateUI()}
-function attack(skill=0){if(!player)return;let now=performance.now();if(now-attackAt<420)return;attackAt=now;if(player?.userData?.rig)player.userData.rig.actionUntil=now+330;let c=classData[chosen];if(skill){if(now-skillAt<2200||mp<18){log('技能冷卻中或 MP 不足');return}skillAt=now;mp-=18}
+function attack(skill=0){if(!player)return;let now=performance.now();if(now-attackAt<420)return;attackAt=now;if(player?.userData?.rig)player.userData.rig.actionUntil=now+650;let c=classData[chosen];if(skill){if(now-skillAt<2200||mp<18){log('技能冷卻中或 MP 不足');return}skillAt=now;mp-=18}
  let range=skill?c.range*1.35:c.range+1,damage=c.power*(skill?2.1:1);let target=null,best=range;
  for(let m of mobs){if(m.userData.dead)continue;let d=player.position.distanceTo(m.position);if(d<best){best=d;target=m}}
  if(target){target.userData.hp-=damage;target.userData.hit=performance.now();let flash=new THREE.PointLight(0xffc56b,2,4);flash.position.copy(target.position).add(new THREE.Vector3(0,1,0));scene.add(flash);setTimeout(()=>scene.remove(flash),100);
@@ -271,12 +339,12 @@ function makeDrop(d){let m=new THREE.Mesh(new THREE.TorusGeometry(.35,.1,6,12),m
 let dropMeshes=[];
 function start(){
  name=$('name').value.trim()||'新生玩家';chosen=$('class').value;gender=$('gender').value;let c=classData[chosen];hp=c.hp;mp=c.mp;
- player=makeAvatar(chosen,c.color,gender);player.position.set(0,0,12);scene.add(player);$('login').style.display='none';updateUI();log(`歡迎 ${name} 加入${c.label}！`);log('任務開始：擊倒 3 隻訓練假人。');
+ player=makeAvatar(chosen,c.color,gender);const localFallback=player;player.position.set(0,0,12);scene.add(player);$('assetStatus').textContent='角色模型：正在下載並載入骨骼 3D 校服模型…';makeRiggedSchoolAvatar(chosen,gender).then(model=>{if(player!==localFallback)return;model.position.copy(localFallback.position);model.rotation.copy(localFallback.rotation);scene.add(model);scene.remove(localFallback);player=model;$('assetStatus').textContent='角色模型：已載入真正 3D 骨骼模型';log('已載入校服 3D 骨骼人物與內建動作。');}).catch(err=>{$('assetStatus').textContent='角色模型：外部模型載入失敗，暫用本機備援人物';log('外部 3D 模型暫時無法載入，已使用備援人物。');console.warn(err)});$('login').style.display='none';updateUI();log(`歡迎 ${name} 加入${c.label}！`);log('任務開始：擊倒 3 隻訓練假人。');
  socket=io({transports:['websocket','polling'],timeout:2500});
  socket.on('connect',()=>{playerId=socket.id;$('net').textContent='連線狀態：已連線';log('已連上學園伺服器，可以遇見其他玩家。');socket.emit('join',{name,job:c.label,jobKey:chosen,genderKey:gender,color:c.color,x:player.position.x,z:player.position.z})});
  socket.on('connect_error',()=>{$('net').textContent='連線狀態：離線單人模式';});
  socket.on('disconnect',()=>{$('net').textContent='連線狀態：已中斷'});
- socket.on('players',list=>{let alive=new Set(list.map(p=>p.id));for(let [id,obj] of remote){if(!alive.has(id)){scene.remove(obj.mesh);remote.delete(id)}}for(let p of list){if(p.id===playerId)continue;let o=remote.get(p.id);if(!o){let mesh=makeAvatar(p.jobKey||'sword',p.color||0xdddddd,p.genderKey||'male');scene.add(mesh);o={mesh,label:p.name};remote.set(p.id,o)}o.mesh.position.set(p.x||0,0,p.z||0);o.mesh.rotation.y=p.rot||0;o.label=p.name} $('players').innerHTML=[...remote.values()].map(o=>'• '+o.label).join('<br>')||'目前沒有其他玩家'});
+ socket.on('players',list=>{let alive=new Set(list.map(p=>p.id));for(let [id,obj] of remote){if(!alive.has(id)){scene.remove(obj.mesh);remote.delete(id)}}for(let p of list){if(p.id===playerId)continue;let o=remote.get(p.id);if(!o){let mesh=makeAvatar(p.jobKey||'sword',p.color||0xdddddd,p.genderKey||'male');scene.add(mesh);o={mesh,label:p.name};remote.set(p.id,o);const fallback=mesh;makeRiggedSchoolAvatar(p.jobKey||'sword',p.genderKey||'male').then(rigged=>{if(remote.get(p.id)!==o||o.mesh!==fallback)return;rigged.position.copy(fallback.position);rigged.rotation.copy(fallback.rotation);scene.add(rigged);scene.remove(fallback);o.mesh=rigged;}).catch(err=>console.warn('Remote avatar model load failed',err))}o.mesh.position.set(p.x||0,0,p.z||0);o.mesh.rotation.y=p.rot||0;o.label=p.name} $('players').innerHTML=[...remote.values()].map(o=>'• '+o.label).join('<br>')||'目前沒有其他玩家'});
 }
 $('start').onclick=start;
 $('attack').onclick=()=>attack(0);$('skill1').onclick=()=>attack(1);$('skill2').onclick=()=>{if(chosen==='psy'&&mp<10){log('MP 不足');return}mp=Math.min(classData[chosen].mp+(level-1)*5,mp+12);hp=Math.min(classData[chosen].hp+(level-1)*8,hp+8);log('凝神調息：恢復生命與法力');updateUI()};$('pickup').onclick=pickup;
