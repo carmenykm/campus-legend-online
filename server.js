@@ -19,6 +19,7 @@ io.on('connection', socket => {
       name: String(data.name || '新生玩家').slice(0, 12),
       job: String(data.job || ''),
       jobKey: ['sword','fighter','archer','psy'].includes(data.jobKey) ? data.jobKey : 'sword',
+      genderKey: ['male','female'].includes(data.genderKey) ? data.genderKey : 'male',
       color: Number(data.color) || 0x4d8fc7,
       x: Number(data.x) || 0,
       z: Number(data.z) || 12,
