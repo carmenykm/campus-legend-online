@@ -100,131 +100,145 @@ const classData={
 function makeAvatar(job='sword', fallbackColor=null, gender='male'){
  const cfg=classData[job]||classData.sword;
  const female=gender==='female';
+ // v0.5.1: classic campus starter uniform. Club colour is kept to a small badge,
+ // rather than recolouring the whole uniform.
  const accent=new THREE.Color(fallbackColor??cfg.color);
- const skin=mat(female?0xf0c6a8:0xd9ad8e,.72);
- const hairColor=job==='psy'?0x29283b:job==='archer'?0x50392d:job==='fighter'?0x211e20:0x332722;
- const hair=mat(hairColor,.68),shirt=mat(0xe8e8e2,.86),navy=mat(0x202b3b,.78);
- const pants=mat(female?0x263347:(job==='fighter'?0x303b49:0x273346),.9);
- const shoe=mat(0x171d27,.62),metal=mat(0xb9c8d1,.34),gold=mat(0xc9a45f,.42),cloth=mat(accent,.78);
+ const skin=mat(female?0xe8bd9f:0xd5a783,.82);
+ const hairColor=job==='psy'?0x292633:job==='archer'?0x49352b:job==='fighter'?0x201d1c:0x33251f;
+ const hair=mat(hairColor,.88);
+ const shirt=mat(0xe7e6df,.96), shirtShade=mat(0xc9c9c1,.98);
+ const navy=mat(0x202b3d,.92), navyLight=mat(0x34445a,.94);
+ const tieMat=mat(0x202b43,.82), shoe=mat(0x17191e,.65);
+ const metal=mat(0xaeb7bf,.45), gold=mat(0xc7a45d,.5), badgeMat=new THREE.MeshStandardMaterial({color:accent,roughness:.75});
  const g=new THREE.Group();
- const add=(parent,geo,material,x,y,z,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m};
- const ell=(parent,material,x,y,z,sx,sy,sz)=>{const m=add(parent,new THREE.SphereGeometry(1,24,18),material,x,y,z);m.scale.set(sx,sy,sz);return m};
- const capsule=(parent,material,x,y,z,r,len)=>add(parent,new THREE.CapsuleGeometry(r,len,6,12),material,x,y,z);
- // Pelvis and tailored torso: smooth volumes replace the old rectangular body.
+ const add=(parent,geo,material,x,y,z,rx=0,ry=0,rz=0)=>{
+  const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);
+  m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+ };
+ const ell=(parent,material,x,y,z,sx,sy,sz)=>{
+  const m=add(parent,new THREE.SphereGeometry(1,20,14),material,x,y,z);m.scale.set(sx,sy,sz);return m;
+ };
+ const capsule=(parent,material,x,y,z,r,len)=>{
+  return add(parent,new THREE.CapsuleGeometry(r,len,5,10),material,x,y,z);
+ };
+ // Lower torso and waist.
  const pelvis=new THREE.Group();pelvis.position.y=.91;g.add(pelvis);
- ell(pelvis,pants,0,0,0,female?.29:.27,.19,.19);
- const torso=new THREE.Group();torso.position.set(0,.13,0);pelvis.add(torso);
- ell(torso,navy,0,.36,0,female?.285:.34,.48,.205);
- ell(torso,shirt,0,.39,.018,female?.27:.32,.44,.205);
- // Waist shaping and jacket side seams.
- ell(torso,navy,0,.10,0,female?.235:.285,.16,.19);
- add(torso,new THREE.BoxGeometry(.045,.58,.018),cloth, female?-.205:-.245,.39,.204,0,0,-.04);
- add(torso,new THREE.BoxGeometry(.045,.58,.018),cloth, female?.205:.245,.39,.204,0,0,.04);
- // Collar, tie and buttons.
- const collarL=add(torso,new THREE.ConeGeometry(.105,.22,4),shirt,-.105,.76,.19,-.1,0,.2);
- const collarR=add(torso,new THREE.ConeGeometry(.105,.22,4),shirt,.105,.76,.19,-.1,0,-.2);
- collarL.rotation.z=Math.PI; collarR.rotation.z=Math.PI;
- add(torso,new THREE.BoxGeometry(.075,.30,.025),mat(0x202630),0,.52,.225);
- add(torso,new THREE.ConeGeometry(.052,.13,4),mat(0x202630),0,.30,.23,Math.PI,0,0);
- for(let i=0;i<3;i++)ell(torso,gold,0,.42-i*.105,.238,.018,.018,.009);
- // Class accents are tailored onto the uniform, not used as a block torso.
- if(job==='fighter'){
-  add(torso,new THREE.BoxGeometry(.62,.12,.06),cloth,0,.13,.19);
-  add(torso,new THREE.BoxGeometry(.10,.34,.06),gold,0,.39,.218);
- } else if(job==='archer'){
-  add(torso,new THREE.BoxGeometry(.62,.10,.06),cloth,0,.72,.18);
-  add(torso,new THREE.BoxGeometry(.08,.48,.04),mat(0x52664c),-.25,.40,.21,0,0,-.12);
-  add(torso,new THREE.BoxGeometry(.08,.48,.04),mat(0x52664c),.25,.40,.21,0,0,.12);
- } else if(job==='psy'){
-  add(torso,new THREE.BoxGeometry(.60,.10,.06),cloth,0,.13,.19);
-  add(torso,new THREE.BoxGeometry(.07,.40,.035),gold,0,.40,.22);
- } else {
-  add(torso,new THREE.BoxGeometry(.60,.10,.06),mat(0x344b67),0,.13,.19);
-  add(torso,new THREE.BoxGeometry(.07,.43,.035),gold,0,.40,.22);
- }
- // Neck and shaped head with jaw, ears, nose, eyes and brows.
- capsule(g,skin,0,1.55,0,.09,.13);
- ell(g,skin,0,1.83,0,.245,.315,.225);
- ell(g,skin,0,1.70,.055,.19,.14,.19);
- ell(g,skin,-.25,1.83,0,.055,.085,.055);ell(g,skin,.25,1.83,0,.055,.085,.055);
- ell(g,skin,0,1.81,.222,.035,.055,.045);
- const eyeMat=mat(0x28252a,.45),brow=mat(0x382b28,.8);
+ ell(pelvis,navy,0,0,0,female?.255:.27,.17,.18);
+ // Tailored white shirt, tapered slightly at the waist and broader at shoulders.
+ const torso=new THREE.Group();torso.position.set(0,.10,0);pelvis.add(torso);
+ const shirtBody=add(torso,new THREE.CylinderGeometry(.235,.305,.73,16,1,false),shirt,0,.39,0);
+ shirtBody.scale.z=.76;
+ // Subtle lower hem and side seams.
+ add(torso,new THREE.TorusGeometry(.245,.012,5,24),shirtShade,0,.035,0,Math.PI/2);
  for(const side of [-1,1]){
-  ell(g,eyeMat,side*.088,1.865,.204,.026,.034,.018);
-  add(g,new THREE.BoxGeometry(.075,.018,.022),brow,side*.088,1.92,.204,0,0,side*-.08);
+  add(torso,new THREE.BoxGeometry(.012,.60,.012),shirtShade,side*.245,.39,.178);
  }
- add(g,new THREE.BoxGeometry(.07,.012,.012),mat(0x9e655d),0,1.735,.205);
- // Hair cap, fringe and back volume; female characters receive longer side/back locks.
- ell(g,hair,0,2.055,-.025,.255,.16,.235);
- ell(g,hair,0,1.91,-.17,.245,.26,.105);
+ // Short-sleeved school shirt with shaped sleeves and cuffs.
+ for(const side of [-1,1]){
+  const sleeve=add(torso,new THREE.CylinderGeometry(.105,.13,.30,12),shirt,side*.355,.64,0,0,0,side*-.20);
+  sleeve.scale.z=.86;
+  add(torso,new THREE.TorusGeometry(.103,.012,5,16),shirtShade,side*.385,.505,0,Math.PI/2,0,side*-.20);
+ }
+ // Collar flaps, central placket and visible buttons.
+ const collarL=add(torso,new THREE.BufferGeometry(),shirt,0,0,0);
+ const makePoly=(parent,pts,material)=>{
+  const geo=new THREE.BufferGeometry();
+  const verts=[];for(const p of pts)verts.push(...p);
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+  geo.setIndex([0,1,2]);geo.computeVertexNormals();
+  return add(parent,geo,material,0,0,0);
+ };
+ makePoly(torso,[[-.13,.755,.16],[-.025,.70,.205],[-.075,.56,.20]],shirt);
+ makePoly(torso,[[.13,.755,.16],[.025,.70,.205],[.075,.56,.20]],shirt);
+ add(torso,new THREE.BoxGeometry(.035,.58,.018),shirtShade,0,.39,.187);
+ // Narrow dark school tie, knot and pointed end.
+ add(torso,new THREE.BoxGeometry(.085,.09,.025),tieMat,0,.685,.211);
+ const tieShape=new THREE.Shape();tieShape.moveTo(-.035,0);tieShape.lineTo(.035,0);tieShape.lineTo(.052,-.31);tieShape.lineTo(0,-.40);tieShape.lineTo(-.052,-.31);tieShape.closePath();
+ const tieGeo=new THREE.ShapeGeometry(tieShape);
+ add(torso,tieGeo,tieMat,0,.64,.222);
+ for(let i=0;i<4;i++)ell(torso,metal,0,.49-i*.105,.205,.009,.009,.006);
+ // Small breast pocket and school crest: restrained details, not oversized class armour.
+ add(torso,new THREE.BoxGeometry(.105,.105,.012),shirtShade,.17,.48,.185);
+ add(torso,new THREE.BoxGeometry(.052,.052,.014),badgeMat,-.17,.51,.194);
+ add(torso,new THREE.BoxGeometry(.030,.030,.016),gold,-.17,.51,.205);
+ // Head, neck and ears.
+ capsule(g,skin,0,1.56,0,.085,.13);
+ ell(g,skin,0,1.83,0,.225,.285,.205);
+ ell(g,skin,-.225,1.83,0,.045,.07,.045);ell(g,skin,.225,1.83,0,.045,.07,.045);
+ ell(g,skin,0,1.79,.198,.025,.045,.035);
+ const eye=mat(0x29252a,.72);
+ for(const side of [-1,1]){
+  ell(g,eye,side*.078,1.865,.184,.020,.026,.012);
+  add(g,new THREE.BoxGeometry(.060,.012,.012),hair,side*.078,1.91,.185,0,0,side*-.08);
+ }
+ add(g,new THREE.BoxGeometry(.055,.009,.008),mat(0x985f58),0,1.70,.187);
+ // Simple period-appropriate short hair; female option has shoulder-length back hair.
+ ell(g,hair,0,2.035,-.025,.235,.145,.205);
+ ell(g,hair,0,1.91,-.16,.22,.22,.085);
  for(let i=0;i<5;i++){
-  const x=(i-2)*.085;
-  add(g,new THREE.ConeGeometry(.075,.20+(i%2)*.04,8),hair,x,1.99,.19,0,0,(i-2)*.08);
+  const x=(i-2)*.082;
+  add(g,new THREE.ConeGeometry(.062,.16+(i%2)*.025,7),hair,x,1.98,.16,0,0,(i-2)*.07);
  }
  if(female){
-  ell(g,hair,-.235,1.73,-.015,.075,.34,.09);
-  ell(g,hair,.235,1.73,-.015,.075,.34,.09);
-  ell(g,hair,0,1.57,-.13,.22,.29,.10);
+  ell(g,hair,-.215,1.72,-.02,.060,.29,.075);
+  ell(g,hair,.215,1.72,-.02,.060,.29,.075);
+  ell(g,hair,0,1.60,-.12,.19,.22,.085);
  }else{
-  ell(g,hair,-.22,1.85,-.015,.065,.18,.08);
-  ell(g,hair,.22,1.85,-.015,.065,.18,.08);
+  ell(g,hair,-.20,1.84,-.01,.05,.13,.06);
+  ell(g,hair,.20,1.84,-.01,.05,.13,.06);
  }
- // Articulated arms with shoulder caps, forearms and hands.
+ // Articulated arms: exposed forearms and small hands, matching the short-sleeved uniform.
  const armL=new THREE.Group(),armR=new THREE.Group();
- armL.position.set(-.37,1.40,0);armR.position.set(.37,1.40,0);g.add(armL,armR);
- for(const [arm,side] of [[armL,-1],[armR,1]]){
-  ell(arm,navy,0,-.10,0,.145,.17,.15);
-  capsule(arm,shirt,0,-.29,0,.095,.28);
-  const elbow=new THREE.Group();elbow.position.set(0,-.43,0);arm.add(elbow);
-  capsule(elbow,shirt,0,-.17,0,.078,.25);
-  ell(elbow,skin,0,-.37,.018,.078,.085,.075);
-  if(job==='fighter'){
-   capsule(elbow,mat(0x8d4239),0,-.22,.03,.09,.18);
-   add(elbow,new THREE.TorusGeometry(.09,.025,8,16),gold,0,-.12,.03,Math.PI/2);
-  }
+ armL.position.set(-.36,1.40,0);armR.position.set(.36,1.40,0);g.add(armL,armR);
+ for(const arm of [armL,armR]){
+  capsule(arm,skin,0,-.22,.005,.073,.27);
+  const elbow=new THREE.Group();elbow.position.set(0,-.40,0);arm.add(elbow);
+  capsule(elbow,skin,0,-.17,0,.065,.23);
+  ell(elbow,skin,0,-.33,.012,.065,.075,.06);
   arm.userData.elbow=elbow;
  }
- // Legs: skirt and visible stockings for female avatars, tailored trousers for male.
+ // School trousers or pleated plaid skirt with dark stockings.
  const legL=new THREE.Group(),legR=new THREE.Group();
- legL.position.set(-.16,.84,0);legR.position.set(.16,.84,0);g.add(legL,legR);
+ legL.position.set(-.145,.84,0);legR.position.set(.145,.84,0);g.add(legL,legR);
  if(female){
-  const skirt=add(g,new THREE.CylinderGeometry(.22,.34,.34,24,1),navy,0,1.02,0);
-  skirt.material=navy;
-  for(let i=0;i<6;i++){
-   const a=i*Math.PI/3;
-   add(g,new THREE.BoxGeometry(.018,.27,.22),cloth,Math.sin(a)*.29,.99,Math.cos(a)*.17,0,a,0);
+  const skirt=add(g,new THREE.CylinderGeometry(.235,.345,.32,24,1),navy,0,1.00,0);
+  skirt.scale.z=.78;
+  // Fine pleat seams and restrained tartan lines.
+  for(let i=0;i<12;i++){
+   const a=i*Math.PI/6;
+   const x=Math.sin(a)*.285,z=Math.cos(a)*.225;
+   add(g,new THREE.BoxGeometry(.009,.25,.012),navyLight,x,1.00,z,0,a,0);
+  }
+  for(let i=-2;i<=2;i++){
+   add(g,new THREE.BoxGeometry(.012,.30,.48),shirtShade,i*.085,1.00,0,0,0,0).visible=false;
   }
  }
  for(const leg of [legL,legR]){
-  capsule(leg,pants,0,-.20,0,female?.105:.125,.34);
-  const knee=new THREE.Group();knee.position.y=-.43;leg.add(knee);
-  capsule(knee,female?skin:pants,0,-.17,0,female?.085:.105,.28);
-  if(female)add(knee, new THREE.CylinderGeometry(.09,.095,.27,12),mat(0x28394c),0,-.17,0);
-  add(knee,new THREE.BoxGeometry(.22,.11,.38),shoe,0,-.39,.055);
+  capsule(leg,female?navy:navy,0,-.20,0,female?.095:.115,.34);
+  const knee=new THREE.Group();knee.position.y=-.42;leg.add(knee);
+  capsule(knee,female?mat(0x29364a):navy,0,-.16,0,female?.078:.095,.27);
+  add(knee,new THREE.BoxGeometry(.19,.105,.34),shoe,0,-.36,.045);
+  // Small shoe sole.
+  add(knee,new THREE.BoxGeometry(.195,.025,.35),mat(0x080a0e),0,-.415,.045);
   leg.userData.knee=knee;
  }
- // Neckline trim and belt.
- add(g,new THREE.TorusGeometry(.105,.018,8,20),gold,0,1.61,0,Math.PI/2);
- add(g,new THREE.BoxGeometry(.42,.07,.30),gold,0,.99,0);
- // Job equipment attached to hands/back.
+ // Waist belt and modest buckle.
+ add(g,new THREE.BoxGeometry(.48,.055,.31),navyLight,0,.91,0);
+ add(g,new THREE.BoxGeometry(.065,.055,.018),gold,0,.91,.164);
+ // Keep the original class weapon silhouettes; uniform remains the visual priority.
  if(job==='sword'){
-  add(armR,new THREE.BoxGeometry(.055,.88,.035),metal,.02,-.55,.02,0,0,-.12);
-  add(armR,new THREE.BoxGeometry(.24,.055,.07),gold,.02,-.24,.02,0,0,-.12);
-  add(armR,new THREE.CylinderGeometry(.027,.027,.18,10),shoe,.02,-.13,.02,0,0,-.12);
-  add(g,new THREE.BoxGeometry(.08,.78,.09),mat(0x303c4c),-.29,1.12,-.20,0,0,-.22);
- } else if(job==='fighter'){
-  ell(armL,mat(0x7d3934),0,-.48,.04,.13,.11,.13);ell(armR,mat(0x7d3934),0,-.48,.04,.13,.11,.13);
-  add(armL,new THREE.TorusGeometry(.11,.03,8,16),gold,0,-.37,.04,Math.PI/2);
-  add(armR,new THREE.TorusGeometry(.11,.03,8,16),gold,0,-.37,.04,Math.PI/2);
- } else if(job==='archer'){
-  add(g,new THREE.BoxGeometry(.22,.44,.16),mat(0x465b42),-.30,1.19,-.22);
-  for(let i=0;i<3;i++)add(g,new THREE.CylinderGeometry(.014,.014,.58,7),gold,-.36+i*.05,1.48,-.25,0,0,.1);
-  add(armR,new THREE.TorusGeometry(.40,.028,8,22,Math.PI),mat(0x805a36),0,-.42,.03,0,0,-Math.PI/2);
-  add(armR,new THREE.CylinderGeometry(.01,.01,.78,7),shirt,0,-.42,.03,0,0,Math.PI/2);
- } else if(job==='psy'){
-  add(armR,new THREE.CylinderGeometry(.03,.04,1.35,10),mat(0x594a43),0,-.55,.02,0,0,-.08);
-  ell(armR,mat(0x7dc9db,.25),.06,-1.22,.02,.12,.12,.12);
-  add(armR,new THREE.TorusGeometry(.16,.022,8,18),gold,.06,-1.22,.02,Math.PI/2);
+  add(armR,new THREE.BoxGeometry(.045,.78,.028),metal,.015,-.52,.015,0,0,-.12);
+  add(armR,new THREE.BoxGeometry(.19,.045,.055),gold,.015,-.20,.015,0,0,-.12);
+  add(armR,new THREE.CylinderGeometry(.022,.022,.15,8),shoe,.015,-.11,.015,0,0,-.12);
+ }else if(job==='fighter){
+  ell(armL,mat(0x303847),0,-.40,.035,.10,.09,.10);
+  ell(armR,mat(0x303847),0,-.40,.035,.10,.09,.10);
+ }else if(job==='archer'){
+  add(g,new THREE.BoxGeometry(.16,.34,.12),navyLight,-.27,1.15,-.18);
+  add(armR,new THREE.TorusGeometry(.34,.022,7,20,Math.PI),mat(0x755438),0,-.38,.02,0,0,-Math.PI/2);
+ }else if(job==='psy'){
+  add(armR,new THREE.CylinderGeometry(.025,.03,1.05,8),mat(0x51483f),0,-.48,.02,0,0,-.08);
+  ell(armR,mat(0x79c4d8,.3),.04,-1.02,.02,.085,.085,.085);
  }
  g.userData.rig={armL,armR,legL,legR,torso,walk:0,actionUntil:0,gender};
  return g;
