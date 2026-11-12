@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>校園傳說 Online — 3D 網頁 MMORPG 原型</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101923;color:#eef4f7;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
+#game{position:fixed;inset:0}canvas{display:block}
+.panel{background:rgba(10,19,29,.86);border:1px solid rgba(160,203,222,.3);border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 8px 30px #0005}
+#hud{position:fixed;left:12px;top:12px;width:min(310px,calc(100vw - 24px));padding:12px;pointer-events:none}
+#brand{font-weight:900;letter-spacing:1px;font-size:17px;color:#d7f0ff}
+.small{font-size:12px;color:#b8c8d3}
+.bar{height:9px;background:#263440;border-radius:9px;overflow:hidden;margin:5px 0 8px}.fill{height:100%;width:100%;transition:width .15s}
+#hp{background:#e35c63}#mp{background:#4d9ee8}#xp{background:#d6a943}
+#stats{display:flex;justify-content:space-between;font-size:12px}
+#controls{position:fixed;left:12px;bottom:12px;padding:10px 12px;font-size:12px;line-height:1.6}
+#right{position:fixed;right:12px;top:12px;padding:10px 12px;width:190px}
+#players{font-size:12px;line-height:1.7;max-height:120px;overflow:auto}
+#log{position:fixed;left:12px;bottom:112px;width:min(340px,calc(100vw - 24px));height:92px;overflow:auto;padding:9px;font-size:12px;line-height:1.5;color:#d6e3eb;pointer-events:none}
+#actions{position:fixed;right:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:55vw}
+button,select,input{font:inherit;color:#eef4f7;background:#203443;border:1px solid #557082;border-radius:8px;padding:9px 11px}
+button{cursor:pointer}button:hover{background:#31536a}button:disabled{opacity:.45}
+#login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(130deg,#0b1723dd,#152c3add);z-index:5;padding:16px}
+#login .card{width:min(430px,100%);padding:22px}
+h1{margin:0 0 5px;font-size:25px}p{color:#bfd0dc;font-size:13px;line-height:1.6}
+label{display:block;margin:13px 0 5px;font-size:13px;color:#c5d7e2}
+input,select{width:100%}#start{width:100%;margin-top:17px;background:#28648a;font-weight:800}
+#mobile{display:none;position:fixed;left:15px;bottom:16px;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:4px}
+#mobile button{padding:0;font-size:18px;opacity:.8;touch-action:none}
+@media(max-width:700px){#right{width:145px}#controls{display:none}#log{bottom:130px}#actions{bottom:12px;right:10px;max-width:48vw}#actions button{padding:8px;font-size:12px}#mobile{display:grid}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud" class="panel">
+ <div id="brand">校園傳說 ONLINE <span class="small">｜角色重製測試版</span></div>
+ <div id="who" class="small">尚未登入</div>
+ <div id="stats"><span id="level">Lv.1</span><span id="className">劍道部</span><span id="coords">0, 0</span></div>
+ <div class="small">HP <span id="hpText">100 / 100</span></div><div class="bar"><div id="hp" class="fill"></div></div>
+ <div class="small">MP <span id="mpText">50 / 50</span></div><div class="bar"><div id="mp" class="fill"></div></div>
+ <div class="small">EXP <span id="xpText">0 / 100</span></div><div class="bar"><div id="xp" class="fill"></div></div>
+ <div class="small" id="goldText">金幣：0</div>
+</div>
+<div id="right" class="panel">
+ <b style="font-size:13px">學園在線</b><div id="net" class="small">連線狀態：準備中</div>
+ <div class="small" style="margin-top:8px">附近玩家</div><div id="players">目前沒有其他玩家</div>
+ <div class="small" style="margin-top:8px">任務：擊倒 3 隻訓練假人</div><div id="quest" class="small">進度 0 / 3</div>
+</div>
+<div id="log" class="panel"></div>
+<div id="controls" class="panel">移動：W A S D ／ 方向鍵<br>攻擊：滑鼠左鍵或空白鍵<br>技能：1 ／ 2　　拾取：E<br>鏡頭：滑鼠拖曳旋轉、滾輪縮放</div>
+<div id="actions">
+ <button id="attack">普通攻擊</button><button id="skill1">技能 1</button><button id="skill2">技能 2</button><button id="pickup">拾取</button>
+</div>
+<div id="mobile">
+ <span></span><button data-key="w">▲</button><span></span>
+ <button data-key="a">◀</button><button data-key="s">▼</button><button data-key="d">▶</button>
+</div>
+<div id="login">
+ <div class="card panel">
+  <h1>校園傳說 Online</h1><div class="small">以經典校園 MMORPG 為方向的原創 3D 網頁原型</div>
+  <p>建立角色，進入學園廣場。這是第一個可玩測試版：支援 3D 移動、四種職業、打怪升級，以及透過 WebSocket 同步其他在線玩家。</p>
+  <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家" placeholder="輸入角色名稱"/>
+  <label>選擇社團／職業</label><select id="class"><option value="sword">劍道部｜近戰均衡</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠距離攻擊</option><option value="psy">氣功部｜法術與恢復</option></select>
+  <button id="start">進入學園</button>
+  <p class="small">多人連線需啟動附帶的 Node.js 伺服器；若未啟動，仍可單人遊玩本機原型。</p>
+ </div>
+</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { io } from 'https://cdn.socket.io/4.7.5/socket.io.esm.min.js';
+
+const $=id=>document.getElementById(id);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9cc5d3);scene.fog=new THREE.Fog(0x9cc5d3,35,95);
+const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,180);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;$('game').appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xd9f2ff,0x526047,2));
+const sun=new THREE.DirectionalLight(0xfff0d8,2.2);sun.position.set(-15,28,12);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const mat=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(130,130),mat(0x557b58));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const grid=new THREE.GridHelper(120,60,0x789b79,0x789b79);grid.position.y=.015;scene.add(grid);
+function box(x,y,z,sx,sy,sz,color){let m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+function tree(x,z){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.8,7),mat(0x65452c));trunk.position.set(x,.9,z);trunk.castShadow=true;scene.add(trunk);let crown=new THREE.Mesh(new THREE.SphereGeometry(1.1,9,7),mat(0x2f7149));crown.position.set(x,2.2,z);crown.castShadow=true;scene.add(crown)}
+// campus buildings and courtyard
+box(-16,3,-22,18,6,10,0xc5b99b);box(-16,6.4,-22,19,1,11,0x495c70);
+box(16,2.5,-22,14,5,10,0xd0c6ac);box(16,5.3,-22,15,1,11,0x536577);
+for(let x=-23;x<=23;x+=4){box(x,1.1,-16,.5,2,.35,0x35495a)}
+box(0,.18,-8,15,.35,1.4,0xb6a47e);
+for(let i=0;i<18;i++){tree(-30+(i%6)*12,8+Math.floor(i/6)*12)}
+// paths and lamp posts
+for(let z=-4;z<26;z+=9){box(-9,2,z,.22,4,.22,0x394650);let l=new THREE.Mesh(new THREE.SphereGeometry(.35,10,8),mat(0xffe6a1));l.position.set(-9,4.1,z);scene.add(l);box(9,2,z,.22,4,.22,0x394650)}
+// player avatar
+const classData={
+ sword:{label:'劍道部',color:0x4d8fc7,hp:120,mp:45,power:18,range:3.2,skill:'拔刀斬'},
+ fighter:{label:'格鬥部',color:0xd66a52,hp:135,mp:35,power:23,range:2.8,skill:'旋風拳'},
+ archer:{label:'弓箭部',color:0x62a76b,hp:95,mp:60,power:17,range:10,skill:'穿透箭'},
+ psy:{label:'氣功部',color:0x9a75ce,hp:100,mp:85,power:15,range:9,skill:'氣功波'}
+};
+function makeAvatar(job='sword', fallbackColor=null){
+ const cfg=classData[job]||classData.sword;
+ const accent=new THREE.Color(fallbackColor??cfg.color);
+ const skin=mat(0xe7b995), hair=mat(job==='psy'?0x252b3b:job==='archer'?0x49352b:job==='fighter'?0x211e20:0x2c2524);
+ const navy=mat(0x202e42), shirt=mat(0xe8e9e5), pants=mat(job==='fighter'?0x303b49:0x273346), shoe=mat(0x171d27), metal=mat(0xb7c4cd), gold=mat(0xc9a45f), cloth=mat(accent);
+ const g=new THREE.Group();
+ const add=(parent,geo,material,x,y,z,rx=0,ry=0,rz=0)=>{const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m};
+ const sphere=(parent,material,x,y,z,sx,sy,sz)=>{const m=add(parent,new THREE.SphereGeometry(1,12,10),material,x,y,z);m.scale.set(sx,sy,sz);return m};
+ // Human-shaped, articulated base rig: head, torso, upper/lower arms and legs.
+ const pelvis=new THREE.Group();pelvis.position.y=.88;g.add(pelvis);
+ add(pelvis,new THREE.BoxGeometry(.58,.27,.34),pants,0,0,0);
+ const torso=new THREE.Group();torso.position.set(0,.16,0);pelvis.add(torso);
+ add(torso,new THREE.BoxGeometry(.72,.78,.38),job==='fighter'?cloth:navy,0,.38,0);
+ add(torso,new THREE.BoxGeometry(.28,.62,.035),shirt,0,.39,.205);
+ add(torso,new THREE.BoxGeometry(.12,.34,.045),job==='fighter'?gold:mat(0x9a3340),0,.45,.232);
+ // Collar and school crest, replacing the fantasy robe silhouette with campus uniform tailoring.
+ add(torso,new THREE.BoxGeometry(.18,.13,.08),shirt,-.12,.75,.18,-.35,0,-.25);
+ add(torso,new THREE.BoxGeometry(.18,.13,.08),shirt,.12,.75,.18,-.35,0,.25);
+ add(torso,new THREE.BoxGeometry(.12,.13,.025),gold,-.25,.47,.205);
+ // Class-specific uniform construction.
+ if(job==='fighter'){
+   add(torso,new THREE.BoxGeometry(.16,.65,.4),skin,-.29,.42,0);
+   add(torso,new THREE.BoxGeometry(.16,.65,.4),skin,.29,.42,0);
+   add(torso,new THREE.BoxGeometry(.78,.12,.42),cloth,0,.05,0);
+   add(torso,new THREE.BoxGeometry(.13,.5,.05),gold,.0,.42,.22);
+ } else if(job==='archer'){
+   add(torso,new THREE.BoxGeometry(.82,.16,.43),cloth,0,.72,0);
+   add(torso,new THREE.BoxGeometry(.12,.74,.045),mat(0x52664c),-.27,.38,.22,0,0,-.16);
+   add(torso,new THREE.BoxGeometry(.12,.74,.045),mat(0x52664c),.27,.38,.22,0,0,.16);
+   add(torso,new THREE.BoxGeometry(.18,.18,.08),gold,0,.2,.23);
+ } else if(job==='psy'){
+   add(torso,new THREE.BoxGeometry(.82,.18,.44),cloth,0,.05,0);
+   add(torso,new THREE.BoxGeometry(.1,.5,.045),gold,0,.38,.22);
+   add(torso,new THREE.BoxGeometry(.48,.12,.04),mat(0x4d5875),0,.18,.23);
+ } else {
+   add(torso,new THREE.BoxGeometry(.78,.12,.42),mat(0x344b67),0,.04,0);
+   add(torso,new THREE.BoxGeometry(.12,.52,.04),gold,0,.39,.22);
+ }
+ // Head, ears, neck, eyes, nose and hair cap/fringe.
+ add(g,new THREE.CylinderGeometry(.11,.12,.18,10),skin,0,1.54,0);
+ sphere(g,skin,0,1.86,0,.29,.36,.27);
+ sphere(g,hair,0,2.08,-.015,.31,.2,.29);
+ add(g,new THREE.BoxGeometry(.43,.12,.16),hair,0,2.02,.22,-.08,0,0);
+ sphere(g,hair,-.23,1.91,.02,.09,.2,.1);sphere(g,hair,.23,1.91,.02,.09,.2,.1);
+ sphere(g,mat(0x292b30),-.105,1.88,.251,.035,.045,.025);sphere(g,mat(0x292b30),.105,1.88,.251,.035,.045,.025);
+ sphere(g,skin,0,1.79,.26,.045,.06,.035);
+ // Jointed arms and legs, allowing walk/run/attack poses.
+ const armL=new THREE.Group(),armR=new THREE.Group();armL.position.set(-.43,1.39,0);armR.position.set(.43,1.39,0);g.add(armL,armR);
+ for(const [arm,side] of [[armL,-1],[armR,1]]){
+   add(arm,new THREE.CapsuleGeometry(.105,.29,4,8),job==='fighter'?skin:navy,0,-.22,0,0,0,side*.08);
+   const elbow=new THREE.Group();elbow.position.set(0,-.43,0);arm.add(elbow);
+   add(elbow,new THREE.CapsuleGeometry(.085,.28,4,8),job==='fighter'?skin:shirt,0,-.18,0);
+   add(elbow,new THREE.SphereGeometry(.105,10,8),skin,0,-.39,.015);
+   if(job==='fighter')add(elbow,new THREE.TorusGeometry(.105,.035,6,12),mat(0x9a493e),0,-.18,.02,Math.PI/2);
+   arm.userData.elbow=elbow;
+ }
+ const legL=new THREE.Group(),legR=new THREE.Group();legL.position.set(-.2,.8,0);legR.position.set(.2,.8,0);g.add(legL,legR);
+ for(const leg of [legL,legR]){
+   add(leg,new THREE.CapsuleGeometry(.13,.34,4,8),pants,0,-.23,0);
+   const knee=new THREE.Group();knee.position.y=-.48;leg.add(knee);
+   add(knee,new THREE.CapsuleGeometry(.105,.31,4,8),pants,0,-.2,0);
+   add(knee,new THREE.BoxGeometry(.27,.13,.43),shoe,0,-.43,.08);
+   leg.userData.knee=knee;
+ }
+ // Equipment is attached to the appropriate hand/back; shapes remain readable at game camera distance.
+ if(job==='sword'){
+   const blade=add(armR,new THREE.BoxGeometry(.075,.92,.035),metal,.02,-.56,.02,0,0,-.12);blade.material=metal;
+   add(armR,new THREE.BoxGeometry(.28,.065,.08),gold,.02,-.25,.02,0,0,-.12);
+   add(armR,new THREE.CylinderGeometry(.035,.035,.2,8),shoe,.02,-.14,.02,0,0,-.12);
+   add(g,new THREE.BoxGeometry(.1,.86,.12),mat(0x303c4c),-.29,1.13,-.22,0,0,-.22);
+ } else if(job==='fighter'){
+   sphere(armL,mat(0x7d3934),0,-.48,.04,.14,.12,.14);sphere(armR,mat(0x7d3934),0,-.48,.04,.14,.12,.14);
+   add(armL,new THREE.TorusGeometry(.12,.035,6,12),gold,0,-.37,.04,Math.PI/2);
+   add(armR,new THREE.TorusGeometry(.12,.035,6,12),gold,0,-.37,.04,Math.PI/2);
+ } else if(job==='archer'){
+   add(g,new THREE.BoxGeometry(.24,.48,.2),mat(0x465b42),-.34,1.2,-.24,0,0,-.12);
+   for(let i=0;i<3;i++)add(g,new THREE.CylinderGeometry(.018,.018,.62,5),gold,-.39+i*.05,1.52,-.27,0,0,.1);
+   add(armR,new THREE.TorusGeometry(.43,.035,7,18,Math.PI),mat(0x805a36),0,-.42,.03,0,0,-Math.PI/2);
+   add(armR,new THREE.CylinderGeometry(.012,.012,.86,5),shirt,0,-.42,.03,0,0,Math.PI/2);
+ } else if(job==='psy'){
+   add(armR,new THREE.CylinderGeometry(.035,.045,1.5,8),mat(0x594a43),0,-.58,.02,0,0,-.08);
+   sphere(armR,mat(0x7dc9db),.06,-1.35,.02,.13,.13,.13);
+   add(armR,new THREE.TorusGeometry(.18,.025,6,16),gold,.06,-1.35,.02,Math.PI/2,0,0);
+ }
+ g.userData.rig={armL,armR,legL,legR,torso,walk:0,actionUntil:0};
+ return g;
+}
+function animateAvatar(avatar, dt, moving=false){
+ const rig=avatar?.userData?.rig;if(!rig)return;
+ if(moving)rig.walk+=dt*10;
+ const swing=moving?Math.sin(rig.walk)*.62:0;
+ const attacking=performance.now()<rig.actionUntil;
+ rig.legL.rotation.x=swing;rig.legR.rotation.x=-swing;
+ rig.legL.userData.knee.rotation.x=Math.max(0,-swing)*.7;rig.legR.userData.knee.rotation.x=Math.max(0,swing)*.7;
+ rig.armL.rotation.x=-swing*.65;rig.armR.rotation.x=swing*.65;
+ if(attacking){const t=(rig.actionUntil-performance.now())/330;rig.armR.rotation.x=-1.2*Math.sin(Math.PI*Math.max(0,Math.min(1,t)));rig.torso.rotation.y=.16*Math.sin(Math.PI*Math.max(0,Math.min(1,t)));}
+ else rig.torso.rotation.y=0;
+}
+
+let player,playerId=null,socket=null,chosen='sword',name='新生玩家',level=1,xp=0,gold=0,hp=100,mp=50,camYaw=0,camDist=11,attackAt=0,skillAt=0,quest=0;
+let remote=new Map(),mobs=[],drops=[],keys={};
+function addMob(x,z){const g=new THREE.Group();let torso=new THREE.Mesh(new THREE.BoxGeometry(.9,1.2,.55),mat(0x987c58));torso.position.y=.85;g.add(torso);let head=new THREE.Mesh(new THREE.SphereGeometry(.32,10,8),mat(0xc8a27a));head.position.y=1.65;g.add(head);g.position.set(x,0,z);g.userData={hp:50,max:50,dead:false,hit:0};scene.add(g);mobs.push(g);return g}
+for(let i=0;i<9;i++)addMob(-12+(i%3)*12,4+Math.floor(i/3)*8);
+function log(s){let el=$('log');el.innerHTML+=`<div>› ${s}</div>`;el.scrollTop=el.scrollHeight}
+function updateUI(){let c=classData[chosen],maxxp=level*100;hp=Math.max(0,Math.min(hp,c.hp+(level-1)*8));$('who').textContent=name;$('className').textContent=c.label;$('level').textContent='Lv.'+level;$('hpText').textContent=`${Math.round(hp)} / ${c.hp+(level-1)*8}`;$('mpText').textContent=`${Math.round(mp)} / ${c.mp+(level-1)*5}`;$('xpText').textContent=`${xp} / ${maxxp}`;$('hp').style.width=(hp/(c.hp+(level-1)*8)*100)+'%';$('mp').style.width=(mp/(c.mp+(level-1)*5)*100)+'%';$('xp').style.width=(xp/maxxp*100)+'%';$('goldText').textContent='金幣：'+gold;$('quest').textContent=`進度 ${quest} / 3`}
+function gainXP(n){xp+=n;while(xp>=level*100){xp-=level*100;level++;hp+=20;mp+=15;log(`升級！目前等級 Lv.${level}`)}updateUI()}
+function attack(skill=0){if(!player)return;let now=performance.now();if(now-attackAt<420)return;attackAt=now;if(player?.userData?.rig)player.userData.rig.actionUntil=now+330;let c=classData[chosen];if(skill){if(now-skillAt<2200||mp<18){log('技能冷卻中或 MP 不足');return}skillAt=now;mp-=18}
+ let range=skill?c.range*1.35:c.range+1,damage=c.power*(skill?2.1:1);let target=null,best=range;
+ for(let m of mobs){if(m.userData.dead)continue;let d=player.position.distanceTo(m.position);if(d<best){best=d;target=m}}
+ if(target){target.userData.hp-=damage;target.userData.hit=performance.now();let flash=new THREE.PointLight(0xffc56b,2,4);flash.position.copy(target.position).add(new THREE.Vector3(0,1,0));scene.add(flash);setTimeout(()=>scene.remove(flash),100);
+ if(target.userData.hp<=0){target.userData.dead=true;target.visible=false;gainXP(35);gold+=8;quest=Math.min(3,quest+1);drops.push({x:target.position.x,z:target.position.z,kind:'coin'});log(`擊倒訓練假人！獲得 35 EXP、8 金幣`);updateUI()}else log(`${skill?c.skill:'普通攻擊'}命中！造成 ${Math.round(damage)} 傷害`)}
+ else log('附近沒有可攻擊的訓練假人');updateUI();
+ if(socket?.connected)socket.emit('combat',{type:skill?'skill':'attack',x:player.position.x,z:player.position.z});
+}
+function pickup(){if(!player)return;let idx=drops.findIndex(d=>Math.hypot(d.x-player.position.x,d.z-player.position.z)<2.5);if(idx>=0){drops.splice(idx,1);gold+=5;log('拾取地上的補給品：+5 金幣');updateUI()}else log('附近沒有可拾取物品')}
+function makeDrop(d){let m=new THREE.Mesh(new THREE.TorusGeometry(.35,.1,6,12),mat(0xffd45c));m.rotation.x=Math.PI/2;m.position.set(d.x,.35,d.z);scene.add(m);return m}
+let dropMeshes=[];
+function start(){
+ name=$('name').value.trim()||'新生玩家';chosen=$('class').value;let c=classData[chosen];hp=c.hp;mp=c.mp;
+ player=makeAvatar(chosen,c.color);player.position.set(0,0,12);scene.add(player);$('login').style.display='none';updateUI();log(`歡迎 ${name} 加入${c.label}！`);log('任務開始：擊倒 3 隻訓練假人。');
+ socket=io({transports:['websocket','polling'],timeout:2500});
+ socket.on('connect',()=>{playerId=socket.id;$('net').textContent='連線狀態：已連線';log('已連上學園伺服器，可以遇見其他玩家。');socket.emit('join',{name,job:c.label,jobKey:chosen,color:c.color,x:player.position.x,z:player.position.z})});
+ socket.on('connect_error',()=>{$('net').textContent='連線狀態：離線單人模式';});
+ socket.on('disconnect',()=>{$('net').textContent='連線狀態：已中斷'});
+ socket.on('players',list=>{let alive=new Set(list.map(p=>p.id));for(let [id,obj] of remote){if(!alive.has(id)){scene.remove(obj.mesh);remote.delete(id)}}for(let p of list){if(p.id===playerId)continue;let o=remote.get(p.id);if(!o){let mesh=makeAvatar(p.jobKey||'sword',p.color||0xdddddd);scene.add(mesh);o={mesh,label:p.name};remote.set(p.id,o)}o.mesh.position.set(p.x||0,0,p.z||0);o.mesh.rotation.y=p.rot||0;o.label=p.name} $('players').innerHTML=[...remote.values()].map(o=>'• '+o.label).join('<br>')||'目前沒有其他玩家'});
+}
+$('start').onclick=start;
+$('attack').onclick=()=>attack(0);$('skill1').onclick=()=>attack(1);$('skill2').onclick=()=>{if(chosen==='psy'&&mp<10){log('MP 不足');return}mp=Math.min(classData[chosen].mp+(level-1)*5,mp+12);hp=Math.min(classData[chosen].hp+(level-1)*8,hp+8);log('凝神調息：恢復生命與法力');updateUI()};$('pickup').onclick=pickup;
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();attack(0)}if(e.key==='1')attack(1);if(e.key==='2'){$('skill2').click()}if(e.key.toLowerCase()==='e')pickup()});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.querySelectorAll('#mobile button').forEach(b=>{let k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});
+let dragging=false,lastX=0;renderer.domElement.addEventListener('pointerdown',e=>{if(e.button===2){dragging=true;lastX=e.clientX}else if(e.button===0&&player)attack(0)});
+addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging){camYaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());renderer.domElement.addEventListener('wheel',e=>{camDist=Math.max(6,Math.min(20,camDist+e.deltaY*.01))},{passive:true});
+const clock=new THREE.Clock();let sendTimer=0;
+function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.05);
+ if(player){let f=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),s=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);let v=new THREE.Vector3(s,0,-f);if(v.lengthSq()){v.normalize().applyAxisAngle(new THREE.Vector3(0,1,0),camYaw);player.position.addScaledVector(v,7*dt);player.position.x=Math.max(-48,Math.min(48,player.position.x));player.position.z=Math.max(-45,Math.min(48,player.position.z));player.rotation.y=Math.atan2(v.x,v.z)}
+ animateAvatar(player,dt,!!(f||s));
+ let desired=new THREE.Vector3(player.position.x+Math.sin(camYaw)*camDist,camDist*.85,player.position.z+Math.cos(camYaw)*camDist);camera.position.lerp(desired,.12);camera.lookAt(player.position.x,1,player.position.z);
+ sendTimer+=dt;if(sendTimer>.08){sendTimer=0;if(socket?.connected)socket.emit('move',{x:player.position.x,z:player.position.z,rot:player.rotation.y})}
+ }
+ for(let m of mobs){if(m.userData.dead)continue;if(performance.now()-m.userData.hit<150){m.scale.setScalar(1.06)}else m.scale.setScalar(1);if(player){let d=m.position.distanceTo(player.position);if(d<2.3&&Math.random()<.003){hp=Math.max(0,hp-3);updateUI();if(hp<=0){player.position.set(0,0,12);hp=classData[chosen].hp;log('你暫時失去戰鬥能力，已返回廣場。');updateUI()}}}}
+ for(let d of drops){if(!d.mesh){d.mesh=makeDrop(d)}d.mesh.rotation.z+=dt*1.5}
+ renderer.render(scene,camera)
+}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
