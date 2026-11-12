@@ -30,6 +30,9 @@ input,select{width:100%}#start{width:100%;margin-top:17px;background:#28648a;fon
 #mobile button{padding:0;font-size:18px;opacity:.8;touch-action:none}
 @media(max-width:700px){#right{width:145px}#controls{display:none}#log{bottom:130px}#actions{bottom:12px;right:10px;max-width:48vw}#actions button{padding:8px;font-size:12px}#mobile{display:grid}}
 </style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
 </head>
 <body>
 <div id="game"></div>
@@ -362,6 +365,7 @@ function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta
  sendTimer+=dt;if(sendTimer>.08){sendTimer=0;if(socket?.connected)socket.emit('move',{x:player.position.x,z:player.position.z,rot:player.rotation.y})}
  }
  for(let m of mobs){if(m.userData.dead)continue;if(performance.now()-m.userData.hit<150){m.scale.setScalar(1.06)}else m.scale.setScalar(1);if(player){let d=m.position.distanceTo(player.position);if(d<2.3&&Math.random()<.003){hp=Math.max(0,hp-3);updateUI();if(hp<=0){player.position.set(0,0,12);hp=classData[chosen].hp;log('你暫時失去戰鬥能力，已返回廣場。');updateUI()}}}}
+ for(const o of remote.values())animateAvatar(o.mesh,dt,false);
  for(let d of drops){if(!d.mesh){d.mesh=makeDrop(d)}d.mesh.rotation.z+=dt*1.5}
  renderer.render(scene,camera)
 }animate();
