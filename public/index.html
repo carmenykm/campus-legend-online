@@ -34,7 +34,7 @@ input,select{width:100%}#start{width:100%;margin-top:17px;background:#28648a;fon
 <body>
 <div id="game"></div>
 <div id="hud" class="panel">
- <div id="brand">校園傳說 ONLINE <span class="small">｜角色重製測試版</span></div>
+ <div id="brand">校園傳說 ONLINE <span class="small">｜校服模組測試版</span></div>
  <div id="who" class="small">尚未登入</div>
  <div id="stats"><span id="level">Lv.1</span><span id="className">劍道部</span><span id="coords">0, 0</span></div>
  <div class="small">HP <span id="hpText">100 / 100</span></div><div class="bar"><div id="hp" class="fill"></div></div>
@@ -140,7 +140,6 @@ function makeAvatar(job='sword', fallbackColor=null, gender='male'){
   add(torso,new THREE.TorusGeometry(.103,.012,5,16),shirtShade,side*.385,.505,0,Math.PI/2,0,side*-.20);
  }
  // Collar flaps, central placket and visible buttons.
- const collarL=add(torso,new THREE.BufferGeometry(),shirt,0,0,0);
  const makePoly=(parent,pts,material)=>{
   const geo=new THREE.BufferGeometry();
   const verts=[];for(const p of pts)verts.push(...p);
@@ -208,9 +207,6 @@ function makeAvatar(job='sword', fallbackColor=null, gender='male'){
    const a=i*Math.PI/6;
    const x=Math.sin(a)*.285,z=Math.cos(a)*.225;
    add(g,new THREE.BoxGeometry(.009,.25,.012),navyLight,x,1.00,z,0,a,0);
-  }
-  for(let i=-2;i<=2;i++){
-   add(g,new THREE.BoxGeometry(.012,.30,.48),shirtShade,i*.085,1.00,0,0,0,0).visible=false;
   }
  }
  for(const leg of [legL,legR]){
