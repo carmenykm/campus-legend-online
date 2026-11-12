@@ -1,8 +1,8 @@
 {
   "name": "campus-legend-online-prototype",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "private": true,
-  "description": "3D campus MMORPG prototype with male/female avatars and four classes",
+  "description": "3D campus MMORPG prototype with classic school uniform avatar module",
   "scripts": {
     "start": "node server.js"
   },
