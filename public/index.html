@@ -169,7 +169,7 @@ function initMap(zone=currentMap){
   [[5,6,7,5],[28,6,7,5],[5,19,7,5],[28,19,7,5]].forEach(q=>{rectTiles(q[0],q[1],q[2],q[3],2);block(q[0]*T,q[1]*T,q[2]*T,q[3]*T)});
   decor.push({x:20*T,y:8*T,type:'sign',text:'劍道修練場'});
  }else if(zone===2){
-  rectTiles(2,2,36,26,5);rectTiles(4,13,32,4,1);rectTiles(18,3,4,24,1);
+  rectTiles(2,2,36,26,0);rectTiles(4,13,32,4,1);rectTiles(18,3,4,24,1);
   for(let y=4;y<26;y+=4)for(let x=4+(y%8);x<36;x+=7)if(x<17||x>22)tile(x,y,3);
   rectTiles(6,5,4,3,4);rectTiles(29,21,4,3,4);decor.push({x:20*T,y:10*T,type:'sign',text:'森林深處'});
  }else{
