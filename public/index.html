@@ -46,7 +46,7 @@ button:active{transform:translateY(2px);box-shadow:0 1px 0 #102630;background:#5
 #stick{position:absolute;left:50%;top:50%;width:54px;height:54px;border:3px solid #f3dda0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f1d58b,#986b43 72%,#593f32);box-shadow:0 3px 0 #142630,inset 0 0 0 2px #d7b979;transform:translate(-50%,-50%);pointer-events:none}
 #joyHint{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font-size:9px;color:#fff0c9;white-space:nowrap;text-shadow:1px 1px #142b34;pointer-events:none}
 #login{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:radial-gradient(ellipse at center,#456d62dd,#10242eee)}
-#login .card{width:min(430px,100%);padding:18px 20px}
+#login .card{width:min(430px,100%);max-height:94vh;overflow-y:auto;padding:18px 20px}#styleChoices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}.style-choice{min-width:0;padding:7px 2px;background:#294653;border:2px solid #78918b;border-radius:4px;color:#fff0c9;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px}.style-choice.active{border-color:#ffe28b;background:#526b50;box-shadow:inset 0 0 0 1px #fff0b2}.style-choice canvas{width:38px;height:57px;image-rendering:pixelated;background:#8fb77a;border:1px solid #d7c68d}.style-choice span{white-space:nowrap}
 h1{margin:0;color:#ffe9a7;font-size:24px;text-shadow:2px 2px #142b34}
 p{font-size:12px;line-height:1.55;color:#e2e4cc}
 label{display:block;font-size:12px;margin:10px 0 4px;color:#ffe9a7}
@@ -99,6 +99,7 @@ input,select{width:100%;padding:9px}
   <p>踏入熟悉的校園，選擇你的社團職業，探索廣場、挑戰訓練假人並提升等級。</p>
   <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家">
   <label>性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
+  <label>選擇人物造型</label><div id="styleChoices" aria-label="人物造型選擇"><button type="button" class="style-choice active" data-style="red"><canvas width="48" height="72"></canvas><span>紅帽冒險家</span></button><button type="button" class="style-choice" data-style="green"><canvas width="48" height="72"></canvas><span>綠野旅人</span></button><button type="button" class="style-choice" data-style="blue"><canvas width="48" height="72"></canvas><span>藍衣學員</span></button><button type="button" class="style-choice" data-style="violet"><canvas width="48" height="72"></canvas><span>紫髮術士</span></button></div>
   <label>選擇職業</label><select id="class"><option value="sword">劍道部｜均衡近戰</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠程攻擊</option><option value="psy">氣功部｜氣功術法</option></select>
   <button id="start">進入學園</button>
   <p class="small">支援 Android 手機觸控。可離線單人遊玩；啟動伺服器後可同步其他在線玩家。</p>
@@ -118,6 +119,10 @@ const jobs={
  archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
+const trainerStyles={red:{hair:'#30241f',shirt:'#e7e5d4',pants:'#34537b',accent:'#d64b42',hat:'#d64b42',name:'紅帽冒險家'},green:{hair:'#50372a',shirt:'#e8dfb8',pants:'#52764b',accent:'#6c9a55',hat:'#6c9a55',name:'綠野旅人'},blue:{hair:'#263d59',shirt:'#e8e8ed',pants:'#315a83',accent:'#4e91c9',hat:'#315a83',name:'藍衣學員'},violet:{hair:'#563d68',shirt:'#e9dff0',pants:'#57416f',accent:'#a27ac4',hat:'#a27ac4',name:'紫髮術士'}};
+let selectedStyle='red';
+function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8fb77a';g.fillRect(0,0,48,72);const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(12+x*3,7+y*3,3,3)};const rows=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTAAAA TT'.replaceAll(' ',''),'.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];const colors={H:p.hair,S:'#f0bd91',E:'#302a2b',T:p.shirt,A:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch])px(x,y,colors[ch])}));g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(12,10,24,3);}
+function refreshStyleChoices(){document.querySelectorAll('.style-choice').forEach(b=>{b.classList.toggle('active',b.dataset.style===selectedStyle);paintStylePreview(b.querySelector('canvas'),b.dataset.style)})}
 const skillArt={
  sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','破空斬'],['▣','格擋'],['➶','突進斬'],['✧','劍影'],['☄','劍舞']],
  fighter:[['✊','重拳'],['✦','連打'],['✹','旋風拳'],['☄','爆裂擊'],['▣','鐵布衫'],['➤','衝拳'],['◉','震地'],['✧','狂怒']],
@@ -226,12 +231,12 @@ function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({leve
 function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
  loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
- player={id:'local',name,job,gender,x:10*T+8,y:17*T,dir:'up',frame:0,walk:0,flash:0};camera.x=player.x;camera.y=player.y;applySkillArt();
+ player={id:'local',name,job,gender,styleKey:selectedStyle,x:10*T+8,y:17*T,dir:'up',frame:0,walk:0,flash:0};camera.x=player.x;camera.y=player.y;applySkillArt();
  save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
  $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
  try{
   if(typeof io==='function'){socket=io({transports:['websocket','polling'],timeout:2500});
-   socket.on('connect',()=>{playerId=socket.id;$('net').textContent='多人連線中';socket.emit('join',{name:player.name,job:jobs[player.job].name,jobKey:player.job,genderKey:player.gender,color:0x4d8fc7,x:player.x/T,z:player.y/T});say('已連上學園伺服器。')});
+   socket.on('connect',()=>{playerId=socket.id;$('net').textContent='多人連線中';socket.emit('join',{name:player.name,job:jobs[player.job].name,jobKey:player.job,genderKey:player.gender,styleKey:player.styleKey,color:0x4d8fc7,x:player.x/T,z:player.y/T});say('已連上學園伺服器。')});
    socket.on('connect_error',()=>{$('net').textContent='離線單人模式'});
    socket.on('disconnect',()=>{$('net').textContent='連線中斷'});
    socket.on('players',syncPlayers);
@@ -245,8 +250,8 @@ function initMobs(){
 }
 function syncPlayers(list){
  const seen=new Set();
- list.forEach(p=>{if(p.id===playerId)return;seen.add(p.id);let r=remotes.get(p.id);if(!r){r={x:(p.x||0)*T,y:(p.z||0)*T,name:p.name||'玩家',job:p.jobKey||'sword',gender:p.genderKey||'male',dir:'down',frame:0};remotes.set(p.id,r)}
- r.tx=(p.x||0)*T;r.ty=(p.z||0)*T;r.name=p.name||'玩家';r.job=p.jobKey||'sword';r.gender=p.genderKey||'male';});
+ list.forEach(p=>{if(p.id===playerId)return;seen.add(p.id);let r=remotes.get(p.id);if(!r){r={x:(p.x||0)*T,y:(p.z||0)*T,name:p.name||'玩家',job:p.jobKey||'sword',gender:p.genderKey||'male',styleKey:p.styleKey||'red',dir:'down',frame:0};remotes.set(p.id,r)}
+ r.tx=(p.x||0)*T;r.ty=(p.z||0)*T;r.name=p.name||'玩家';r.job=p.jobKey||'sword';r.gender=p.genderKey||'male';r.styleKey=p.styleKey||'red';});
  for(const id of remotes.keys())if(!seen.has(id))remotes.delete(id);
  $('players').textContent=Array.from(remotes.values()).map(r=>'• '+r.name).join('、')||'目前沒有其他玩家';
 }
@@ -343,14 +348,17 @@ function drawAvatar(a,sx,sy,local){
  // Four-frame walk cycle. Local player advances through walk; remote players use frame time.
  const moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
  const stepA=frame===1,stepB=frame===3,side=dir==='left'||dir==='right',flip=dir==='right';
- const palette={K:'#26333b',H:a.gender==='female'?'#49302b':'#30241f',S:'#f0bd91',E:'#302a2b',T:'#eee8d5',C:c.color,P:'#344c70',B:'#292b35'};
+ const look=trainerStyles[a.styleKey]||trainerStyles.red;
+ const palette={K:'#26333b',H:look.hair,S:'#f0bd91',E:'#302a2b',T:look.shirt,C:c.color,P:look.pants,B:'#292b35'};
  const front=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
  const back=['..HHHH..','..HHHH..','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
  const profile=['..HHHH..','.HHHHHH.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
  let rows=dir==='up'?back:(side?profile:front);
- if(a.gender==='female'){
-  rows=rows.slice();rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';rows[3]='HHSSSSHH';rows[4]='HHSEESHH';
- }
+ rows=rows.slice();
+ if(a.gender==='female'){rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';rows[3]='HHSSSSHH';rows[4]='HHSEESHH';}
+ if(a.styleKey==='green'){rows[0]='.HHHHHH.';rows[1]='HHHHHHHH';}
+ if(a.styleKey==='blue'){rows[0]='..HHHH..';rows[1]='.HHHHHH.';}
+ if(a.styleKey==='violet'){rows[0]='HH....HH';rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';}
  const colors={K:palette.K,H:palette.H,S:palette.S,E:palette.E,T:palette.T,C:palette.C,P:palette.P,B:palette.B};
  // Small ground shadow, then the sprite is painted as hard-edged 2px clusters.
  ctx.fillStyle='#365f42';ctx.fillRect(sx-8,sy+6,16,3);ctx.fillStyle='#294d38';ctx.fillRect(sx-5,sy+8,10,1);
@@ -374,6 +382,11 @@ function drawAvatar(a,sx,sy,local){
   if(ch==='C'&&a.job==='fighter')color='#cf8745';
   pixel(rx,ry,color);
  }});
+ // Original trainer-inspired headwear and hair silhouette for the selected appearance.
+ if(a.styleKey==='red'||a.styleKey==='green'||a.styleKey==='blue'){
+  ctx.fillStyle=look.hat;ctx.fillRect(sx-6,sy-19,12,3);ctx.fillRect(sx-8,sy-17,16,2);
+  ctx.fillStyle=look.accent;ctx.fillRect(sx-2,sy-18,4,2);
+ }else{ctx.fillStyle=look.hair;ctx.fillRect(sx-10,sy-14,3,8);ctx.fillRect(sx+7,sy-14,3,8);ctx.fillStyle=look.accent;ctx.fillRect(sx+5,sy-17,4,3)}
  // Animate sleeves and legs in alternating poses; feet remain aligned to the pixel grid.
  const armColor=a.job==='fighter'?'#c99b62':palette.T;
  if(moving){
@@ -550,7 +563,9 @@ swipeArea.addEventListener('pointerup',e=>{if(!swipeStart||e.pointerId!==swipeSt
 swipeArea.addEventListener('pointercancel',()=>{swipeStart=null});
 $('rest').addEventListener('pointerdown',e=>{e.preventDefault();rest()});
 $('pickup').addEventListener('pointerdown',e=>{e.preventDefault();pickup()});
-$('start').onclick=start;
+document.querySelectorAll('.style-choice').forEach(b=>b.addEventListener('click',()=>{selectedStyle=b.dataset.style;refreshStyleChoices()}));
+ $('gender').addEventListener('change',refreshStyleChoices);refreshStyleChoices();
+ $('start').onclick=start;
 addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true;if(e.key==='j'||e.key===' '){e.preventDefault();attack(false)}if(e.key==='k')attack(true,skillPage*4);if(e.key==='e')pickup()});
 addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
 document.addEventListener('contextmenu',e=>e.preventDefault());
