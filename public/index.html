@@ -131,7 +131,9 @@ function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
  const row=trainerSpriteRows[p.key]??0;
  // Native-sized 2x atlas cells; keep integer destination dimensions for crisp pixels.
  const col=dir==='up'?4:((dir==='left'||dir==='right')?7:1);
- const sw=trainerAtlas.naturalWidth/9,sh=trainerAtlas.naturalHeight/13;
+ // Original atlas is 118x208: 9 columns x 13 rows of 13x16 pixel cels.
+ // Draw at exact integer 2x scale with smoothing disabled.
+ const sw=13,sh=16;
  const dw=26*z,dh=32*z;
  const dx=Math.round(x),dy=Math.round(y);
  g.save();
