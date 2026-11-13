@@ -221,7 +221,7 @@ function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({leve
 function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
  loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
- player={id:'local',name,job,gender,x:10*T+8,y:15*T,dir:'up',frame:0,walk:0,flash:0};camera.x=player.x;camera.y=player.y;applySkillArt();
+ player={id:'local',name,job,gender,x:10*T+8,y:17*T,dir:'up',frame:0,walk:0,flash:0};camera.x=player.x;camera.y=player.y;applySkillArt();
  save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
  $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
  try{
@@ -235,8 +235,8 @@ function start(){
  }catch(e){$('net').textContent='離線單人模式'}
 }
 function initMobs(){
- mobs=[];const sets=[[[12,11],[15,19],[25,11],[29,19],[20,22]],[[10,10],[29,10],[10,20],[29,20],[20,14]],[[8,9],[13,20],[26,9],[31,20],[20,23],[20,8]],[[8,8],[12,21],[27,8],[31,21],[20,12],[20,23]]];
- const pts=sets[currentMap],base=[55,70,85,110][currentMap];pts.forEach((p,i)=>mobs.push({x:p[0]*T+8,y:p[1]*T+8,hp:base,max:base,alive:true,dir:'down',hit:0,phase:i*.7}));
+ mobs=[];const sets=[[[5,6],[14,6],[5,14],[14,14]],[[5,6],[14,6],[5,13],[14,13]],[[5,5],[14,5],[5,14],[14,14]],[[5,5],[14,5],[5,14],[14,14]]];
+ const pts=sets[currentMap],base=[55,70,85,95][currentMap];pts.forEach((p,i)=>mobs.push({x:p[0]*T+8,y:p[1]*T+8,hp:base,max:base,alive:true,dir:'down',hit:0,phase:i*.7}));
 }
 function syncPlayers(list){
  const seen=new Set();
