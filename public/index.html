@@ -129,16 +129,17 @@ function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
  if(!trainerAtlas.complete||!trainerAtlas.naturalWidth)return;
  const row=trainerSpriteRows[p.key]??0;
- // Use one fixed cel per facing direction. The source sheet has distinct pose
- // cels in each group; cycling them without a verified animation sequence caused flicker.
+ // Native-sized 2x atlas cells; keep integer destination dimensions for crisp pixels.
  const col=dir==='up'?4:((dir==='left'||dir==='right')?7:1);
  const sw=trainerAtlas.naturalWidth/9,sh=trainerAtlas.naturalHeight/13;
- const dw=16*z,dh=24*z;
+ const dw=26*z,dh=32*z;
+ const dx=Math.round(x),dy=Math.round(y);
  g.save();
- if(dir==='right'){g.translate(x+dw,y);g.scale(-1,1);g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,0,0,dw,dh)}
- else g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,x,y,dw,dh);
+ g.imageSmoothingEnabled=false;
+ if(dir==='right'){g.translate(dx+dw,dy);g.scale(-1,1);g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,0,0,dw,dh)}
+ else g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,dx,dy,dw,dh);
  g.restore();
-}function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,7,8,2)}
+}function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,-1,4,1)}
 function refreshStyleChoices(){
  const gender=$('gender').value,root=$('styleChoices');root.innerHTML='';
  const choices=Object.values(trainerStyles).filter(p=>p.gender===gender);
@@ -369,8 +370,9 @@ function drawTree(sx,sy){
 function drawAvatar(a,sx,sy,local){
  const dir=a.dir||'down';
  const look=trainerStyles[a.styleKey]||trainerStyles.m1;
- drawPixelTrainer(ctx,look,sx-8,sy-24,1,dir,0,a.job||'sword');
- if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-28,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-26,8,1)}
+ // Anchor sprite by its feet: center on the character's ground position.
+ drawPixelTrainer(ctx,look,sx-13,sy-32,1,dir,0,a.job||'sword');
+ if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-36,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-34,8,1)}
 }function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
  ctx.fillStyle='#315a3d';ctx.fillRect(sx-9,sy+7,18,3);ctx.fillStyle='#254a35';ctx.fillRect(sx-5,sy+9,10,1);
