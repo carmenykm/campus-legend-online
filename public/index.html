@@ -29,7 +29,7 @@ canvas{display:block;width:100vw;height:100vh;object-fit:contain;image-rendering
 .skill{width:56px;height:56px;border:2px solid #d9e9ff;background:radial-gradient(circle at 32% 24%,#a9d9ee 0 7%,#527eaa 40%,#263f68 76%,#14263e);box-shadow:0 4px 0 #10232b,inset 0 0 0 2px #a8c7df55,0 0 0 2px #172c42;transition:filter .08s,transform .08s}
 .skill:before{content:"";position:absolute;inset:4px;border:1px solid #ffffff66;border-radius:50%;pointer-events:none}
 .skill:active{filter:brightness(1.35);transform:scale(.94)}
-#skill1{left:108px;bottom:4px}#skill2{left:42px;bottom:52px}#skill3{left:84px;bottom:116px}#skill4{left:148px;bottom:120px;width:62px;height:62px;border-color:#f7d68d;background:radial-gradient(circle at 32% 24%,#f8df9b 0 7%,#bd8b4c 40%,#6d493c 76%,#34283a);box-shadow:0 4px 0 #251d25,inset 0 0 0 2px #f8e5b477,0 0 12px #f4c66b66}
+#skill1{left:100px;bottom:4px}#skill2{left:42px;bottom:52px}#skill3{left:84px;bottom:116px}#skill4{left:148px;bottom:120px;width:62px;height:62px;border-color:#f7d68d;background:radial-gradient(circle at 32% 24%,#f8df9b 0 7%,#bd8b4c 40%,#6d493c 76%,#34283a);box-shadow:0 4px 0 #251d25,inset 0 0 0 2px #f8e5b477,0 0 12px #f4c66b66}
 #skill4 b{font-size:25px}
 .utility{width:44px;height:44px;border:2px solid #d8c58e;background:radial-gradient(circle at 35% 28%,#8ba68a,#3d655c 75%,#25433e);box-shadow:0 3px 0 #10232b}
 #rest{left:0;bottom:0}#pickup{left:50px;bottom:0}
@@ -52,7 +52,7 @@ input,select{width:100%;padding:9px}
 #toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:8px 14px;background:#142f3beF;border:2px solid #f0d68d;border-radius:4px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
 #help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
 @media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#combatCluster{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
-@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:5px;bottom:5px;width:202px;height:206px}#combatCluster button b{font-size:18px}#combatCluster button span{font-size:8px}#attack{width:66px;height:66px}#attack b{font-size:26px!important}.skill{width:48px;height:48px}#skill1{left:93px;bottom:4px}#skill2{left:38px;bottom:50px}#skill3{left:76px;bottom:108px}#skill4{left:128px;bottom:112px;width:54px;height:54px}#skill4 b{font-size:21px}.utility{width:38px;height:38px}#pickup{left:43px;bottom:0}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
+@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:5px;bottom:5px;width:202px;height:206px}#combatCluster button b{font-size:18px}#combatCluster button span{font-size:8px}#attack{width:66px;height:66px}#attack b{font-size:26px!important}.skill{width:48px;height:48px}#skill1{left:86px;bottom:4px}#skill2{left:38px;bottom:50px}#skill3{left:76px;bottom:108px}#skill4{left:128px;bottom:112px;width:54px;height:54px}#skill4 b{font-size:21px}.utility{width:38px;height:38px}#pickup{left:43px;bottom:0}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
 </style>
 </head>
 <body>
@@ -113,6 +113,16 @@ const jobs={
  archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
+const skillArt={
+ sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','奧義斬']],
+ fighter:[['✊','重拳'],['✦','連打'],['✹','旋風拳'],['☄','爆裂擊']],
+ archer:[['➶','速射'],['➤','穿透箭'],['✧','箭雨'],['◎','狙擊']],
+ psy:[['✧','氣彈'],['◉','念力波'],['✹','氣旋'],['☯','氣功爆發']]
+};
+function applySkillArt(){
+ const art=skillArt[player.job];
+ art.forEach((item,i)=>{const button=$('skill'+(i+1));button.querySelector('b').textContent=item[0];button.querySelector('span').textContent=item[1]});
+}
 let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
 let last=0,attackCooldown=0,skillCooldown=[0,0,0,0],toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
@@ -172,7 +182,7 @@ function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({leve
 function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
  loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
- player={id:'local',name,job,gender,x:MW*T/2,y:29*T,dir:'down',frame:0,walk:0,flash:0};
+ player={id:'local',name,job,gender,x:MW*T/2,y:29*T,dir:'down',frame:0,walk:0,flash:0};applySkillArt();
  save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
  $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
  try{
