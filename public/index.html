@@ -26,9 +26,12 @@ button{font-weight:800;box-shadow:0 3px 0 #102630;touch-action:none}
 button:active{transform:translateY(2px);box-shadow:0 1px 0 #102630;background:#557b75}
 .action{width:58px;height:54px;padding:3px;font-size:10px}
 .action b{display:block;font-size:17px;color:#ffe9a7}
-#pad{position:fixed;left:12px;bottom:12px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;gap:3px;z-index:4}
-#pad button{padding:0;font-size:18px;opacity:.88}
-#pad .blank{visibility:hidden}
+#joystick{position:fixed;left:16px;bottom:16px;width:132px;height:132px;border:3px solid #d9c68b;border-radius:50%;background:radial-gradient(circle,#426b68aa 0 42%,#1a3544cc 70%);box-shadow:inset 0 0 0 3px #142c37,0 4px 0 #10232b;z-index:4;touch-action:none;user-select:none}
+#joystick:before,#joystick:after{content:"";position:absolute;background:#d9c68b55;pointer-events:none}
+#joystick:before{left:50%;top:9px;bottom:9px;width:1px}
+#joystick:after{top:50%;left:9px;right:9px;height:1px}
+#stick{position:absolute;left:50%;top:50%;width:54px;height:54px;border:3px solid #f3dda0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f1d58b,#986b43 72%,#593f32);box-shadow:0 3px 0 #142630,inset 0 0 0 2px #d7b979;transform:translate(-50%,-50%);pointer-events:none}
+#joyHint{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font-size:9px;color:#fff0c9;white-space:nowrap;text-shadow:1px 1px #142b34;pointer-events:none}
 #login{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:radial-gradient(ellipse at center,#456d62dd,#10242eee)}
 #login .card{width:min(430px,100%);padding:18px 20px}
 h1{margin:0;color:#ffe9a7;font-size:24px;text-shadow:2px 2px #142b34}
@@ -38,8 +41,8 @@ input,select{width:100%;padding:9px}
 #start{width:100%;margin-top:14px;background:#8b583e;font-size:15px}
 #toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:8px 14px;background:#142f3beF;border:2px solid #f0d68d;border-radius:4px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
 #help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
-@media(min-width:800px){#pad{left:22px;bottom:22px;transform:scale(1.08);transform-origin:bottom left}#actions{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
-@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:67px;font-size:9px}#actions{right:7px;bottom:8px;gap:4px}.action{width:49px;height:49px;font-size:9px}#pad{left:7px;bottom:8px;grid-template-columns:37px 37px 37px;grid-template-rows:37px 37px 37px}#pad button{font-size:16px}#help{display:none}}
+@media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#actions{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
+@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#actions{right:7px;bottom:8px;gap:4px}.action{width:49px;height:49px;font-size:9px}#joystick{left:9px;bottom:13px;width:118px;height:118px}#stick{width:48px;height:48px}#help{display:none}}
 </style>
 </head>
 <body>
@@ -61,10 +64,8 @@ input,select{width:100%;padding:9px}
 </div>
 <div id="log" class="panel">歡迎來到校園傳說 Online！</div>
 <div id="toast"></div>
-<div id="pad">
- <button class="blank"> </button><button data-dir="up">▲</button><button class="blank"> </button>
- <button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button>
- <button class="blank"> </button><button data-dir="down2">▼</button><button class="blank"> </button>
+<div id="joystick" aria-label="虛擬搖桿，拖曳控制角色移動">
+ <div id="stick"></div><div id="joyHint">移動搖桿</div>
 </div>
 <div id="actions">
  <button class="action" id="attack"><b>⚔</b>攻擊</button>
@@ -72,7 +73,7 @@ input,select{width:100%;padding:9px}
  <button class="action" id="rest"><b>✚</b>恢復</button>
  <button class="action" id="pickup"><b>＋</b>拾取</button>
 </div>
-<div id="help">鍵盤：WASD／方向鍵　J攻擊　K技能　E拾取</div>
+<div id="help">拖曳左下搖桿移動　J攻擊　K技能　E拾取</div>
 <div id="login">
  <div class="card panel">
   <h1>校園傳說 Online</h1>
@@ -99,7 +100,7 @@ const jobs={
  archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
-let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={},player=null,socket=null,playerId=null;
+let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
 let last=0,attackCooldown=0,skillCooldown=0,toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
 let particles=[];
@@ -283,8 +284,10 @@ function pickup(){if(!player)return;let i=drops.findIndex(d=>Math.hypot(d.x-play
 function rest(){if(!player)return;let m=statMax();save.hp=Math.min(m.hp,save.hp+25);save.mp=Math.min(m.mp,save.mp+20);say('原地調息，恢復生命與法力。');updateUI()}
 function update(dt){
  if(!player)return;
- let dx=0,dy=0;if(keys.ArrowUp||keys.w||touch.up)dy--;if(keys.ArrowDown||keys.s||touch.down)dy++;if(keys.ArrowLeft||keys.a||touch.left)dx--;if(keys.ArrowRight||keys.d||touch.right)dx++;
- if(dx||dy){let l=Math.hypot(dx,dy);move(dx/l*48*dt,dy/l*48*dt)}
+ let dx=touch.x,dy=touch.y;
+ if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;
+ const magnitude=Math.min(1,Math.hypot(dx,dy));
+ if(magnitude>.12){let l=Math.hypot(dx,dy);move(dx/l*48*magnitude*dt,dy/l*48*magnitude*dt)}
  if(attackCooldown>0)attackCooldown-=dt;if(skillCooldown>0)skillCooldown-=dt;
  mobs.forEach(m=>{if(!m.alive)return;m.phase+=dt;if(Math.hypot(m.x-player.x,m.y-player.y)<21&&Math.random()<dt*.35){save.hp=Math.max(0,save.hp-3);if(save.hp===0){let c=jobs[player.job];save.hp=c.hp;player.x=MW*T/2;player.y=29*T;say('體力耗盡，已返回學園廣場。');toast('返回廣場')}updateUI()}});
  drops.forEach(d=>d.life-=dt);drops=drops.filter(d=>d.life>0);
@@ -302,7 +305,18 @@ function render(){
 }
 function loop(t){let dt=Math.min(.05,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
 function bindHold(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();fn(false)}))}
-document.querySelectorAll('[data-dir]').forEach(b=>{const d=b.dataset.dir==='down2'?'down':b.dataset.dir;bindHold(b,v=>touch[d]=v)});
+const joy=$('joystick'),stick=$('stick');let joyPointer=null,joyRect=null;
+function updateJoy(e){
+ if(!joyRect)return;const cx=joyRect.left+joyRect.width/2,cy=joyRect.top+joyRect.height/2;
+ let dx=e.clientX-cx,dy=e.clientY-cy,limit=joyRect.width*.34,len=Math.hypot(dx,dy);
+ if(len>limit){dx=dx/len*limit;dy=dy/len*limit}
+ touch.x=dx/limit;touch.y=dy/limit;
+ stick.style.transform='translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px))';
+}
+function resetJoy(){joyPointer=null;joyRect=null;touch.x=0;touch.y=0;stick.style.transform='translate(-50%,-50%)'}
+joy.addEventListener('pointerdown',e=>{e.preventDefault();joyPointer=e.pointerId;joyRect=joy.getBoundingClientRect();joy.setPointerCapture(e.pointerId);updateJoy(e)});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer){e.preventDefault();updateJoy(e)}});
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>joy.addEventListener(ev,e=>{if(e.pointerId===joyPointer)resetJoy()}));
 $('attack').addEventListener('pointerdown',e=>{e.preventDefault();attack(false)});
 $('skill').addEventListener('pointerdown',e=>{e.preventDefault();attack(true)});
 $('rest').addEventListener('pointerdown',e=>{e.preventDefault();rest()});
