@@ -124,61 +124,22 @@ let selectedStyle='m1';
 function drawTrainerMini(g,p,x,y,z){
  drawPixelTrainer(g,p,x,y,z,'down',0,'sword');
 }
+const trainerAtlas=new Image();
+trainerAtlas.onload=()=>{refreshStyleChoices()};
+trainerAtlas.src='/assets/emerald_trainers.png';
+const trainerSpriteRows={m1:0,m2:1,m3:2,m4:3,m5:4,m6:5,m7:6,m8:7,f1:8,f2:9,f3:10,f4:11,f5:12,f6:8,f7:9,f8:10};
+function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')}
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
- const r=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(x+a*z,y+b*z,w*z,h*z)};
- const dark='#292b35',skin='#efbd98',hair=p.hair||'#49372e',side=dir==='left'||dir==='right',back=dir==='up',flip=dir==='right';
- const shirt=p.shirt||'#6688a0',pants=p.pants||'#40536b',accent=p.accent||'#e9ca7a';
- // compact 16x24 GBA-style trainer silhouette and ground shadow
- r(2,22,12,1,'#315b43');r(4,23,8,1,'#294a38');
- // legs and shoes
- const step=frame%2?1:0;
- r(5,18,3,4,pants);r(9,18,3,4,pants);
- if(frame%4===1){r(5,20,3,2,pants);r(9,18,3,2,pants)}
- r(4,22,4,2,dark);r(9,22,4,2,dark);
- // body / outfit
- r(3,12,10,7,dark);r(4,12,8,7,shirt);r(3,14,2,4,shirt);r(11,14,2,4,shirt);
- r(5,12,6,2,accent);r(7,14,2,3,'#f0d6a0');
- if(p.gender==='female'){r(3,17,10,2,accent);r(4,18,8,1,shirt)}
- else{r(5,18,6,1,pants)}
- // neck and head base
- r(6,10,4,3,skin);
- r(3,2,10,10,dark);r(4,2,8,10,skin);r(2,4,2,6,skin);r(12,4,2,6,skin);
- // hair silhouette variations
- if(p.hairType===0){r(2,1,12,4,hair);r(3,3,10,2,hair);r(2,5,2,3,hair)}
- if(p.hairType===1){r(2,1,12,4,hair);r(3,2,10,2,hair);r(11,5,3,7,hair)}
- if(p.hairType===2){r(3,0,10,4,hair);r(2,3,3,5,hair);r(7,0,3,2,accent)}
- if(p.hairType===3){r(2,1,12,4,hair);r(2,5,3,7,hair);r(11,5,3,7,hair);r(8,0,4,2,hair)}
- if(p.hairType===4){r(2,1,12,4,hair);r(2,5,3,8,hair);r(11,5,3,8,hair);r(6,0,4,2,accent)}
- if(p.hairType===5){r(3,0,10,4,hair);r(2,4,3,4,hair);r(11,4,3,4,hair)}
- if(p.hairType===6){r(2,2,12,3,hair);r(3,0,3,4,hair);r(7,0,3,4,hair);r(11,1,3,4,hair)}
- if(p.hairType===7){r(2,1,12,4,hair);r(2,5,3,8,hair);r(11,5,3,8,hair);r(5,0,6,2,hair)}
- if(back){
-  r(2,3,12,9,hair);r(3,6,10,6,hair);r(4,12,8,7,shirt);r(6,13,4,2,accent);
- }else if(side){
-  const faceX=flip?8:3,farX=flip?3:10;
-  r(faceX,4,4,7,skin);r(farX,5,2,3,dark);r(flip?11:2,4,3,7,hair);
-  r(flip?9:5,7,1,2,dark);
-  r(flip?9:5,10,2,1,'#a95e58');
- }else{
-  r(3,4,10,7,skin);
-  // two clearly separated eyes, matching the source sheet's tiny GBA face scale
-  r(4,7,2,2,'#fff8e9');r(10,7,2,2,'#fff8e9');r(5,7,1,2,dark);r(10,7,1,2,dark);
-  if(p.expression===2||p.expression===6){r(4,6,3,1,dark);r(9,6,3,1,dark)}
-  else{r(4,6,3,1,hair);r(9,6,3,1,hair)}
-  if(p.expression===1){r(7,10,3,1,'#a94e57')}
-  else if(p.expression===3){r(7,9,2,2,'#783d45')}
-  else if(p.expression===4){r(7,10,2,1,'#a94e57');r(3,10,2,1,'#df8b83');r(11,10,2,1,'#df8b83')}
-  else if(p.expression===5){r(7,10,2,1,'#783d45');r(11,5,1,1,'#fff0a0')}
-  else if(p.expression===6){r(7,9,3,1,'#783d45')}
-  else{r(7,10,2,1,'#a94e57')}
- }
- // class accessory retained as a small readable pixel accent
- if(job==='sword'){r(flip?14:1,12,1,8,'#dce5e7');r(flip?13:2,14,2,1,'#9b7545')}
- if(job==='archer'){r(flip?14:1,12,1,8,'#9d7545');r(flip?13:2,12,1,1,'#ead8a4')}
- if(job==='fighter'){r(2,14,2,2,'#f0d18a');r(12,14,2,2,'#f0d18a')}
- if(job==='psy'){r(13,3,1,1,'#9ce7f1');r(14,2,1,1,'#e7f8ff')}
- // movement alternates feet without blurring the 1-pixel outline
- if(frame%4===1){r(4,22,4,1,dark);r(9,21,4,1,dark)}
+ if(!trainerAtlas.complete||!trainerAtlas.naturalWidth)return;
+ const row=trainerSpriteRows[p.key]??0;
+ const group=dir==='up'?1:(dir==='left'||dir==='right'?2:0);
+ const col=group*3+(frame%3);
+ const sw=trainerAtlas.naturalWidth/9,sh=trainerAtlas.naturalHeight/13;
+ const dw=16*z,dh=24*z;
+ g.save();
+ if(dir==='right'){g.translate(x+dw,y);g.scale(-1,1);g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,0,0,dw,dh)}
+ else g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,x,y,dw,dh);
+ g.restore();
 }function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,7,8,2)}
 function refreshStyleChoices(){
  const gender=$('gender').value,root=$('styleChoices');root.innerHTML='';
