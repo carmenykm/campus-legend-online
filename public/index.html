@@ -121,9 +121,6 @@ const jobs={
 };
 const trainerStyles={m1:{"key":"m1","gender":"male","name":"赤焰","mood":"自信","hair":"#30241f","shirt":"#d94d45","pants":"#31527a","accent":"#f2cf78","hairType":0,"expression":0},m2:{"key":"m2","gender":"male","name":"陽光","mood":"開朗","hair":"#76502f","shirt":"#e9c66c","pants":"#527d4b","accent":"#fff0b0","hairType":1,"expression":1},m3:{"key":"m3","gender":"male","name":"冷峻","mood":"嚴肅","hair":"#263b55","shirt":"#526d91","pants":"#293d58","accent":"#d7a64c","hairType":2,"expression":2},m4:{"key":"m4","gender":"male","name":"頑皮","mood":"調皮","hair":"#4b3527","shirt":"#67a6a0","pants":"#475a72","accent":"#f2d47b","hairType":3,"expression":3},m5:{"key":"m5","gender":"male","name":"害羞","mood":"害羞","hair":"#684a43","shirt":"#d9b4a0","pants":"#61516f","accent":"#e98f91","hairType":4,"expression":4},m6:{"key":"m6","gender":"male","name":"疑惑","mood":"困惑","hair":"#353b43","shirt":"#8c9aab","pants":"#3f5260","accent":"#d7e0dc","hairType":5,"expression":5},m7:{"key":"m7","gender":"male","name":"熱血","mood":"憤怒","hair":"#3d2924","shirt":"#c65b35","pants":"#4c3b3b","accent":"#f0b44f","hairType":6,"expression":6},m8:{"key":"m8","gender":"male","name":"沉穩","mood":"冷靜","hair":"#51443b","shirt":"#718b65","pants":"#394f43","accent":"#d8c995","hairType":7,"expression":7},f1:{"key":"f1","gender":"female","name":"星晴","mood":"自信","hair":"#382a35","shirt":"#d95b78","pants":"#51446e","accent":"#f4d18a","hairType":0,"expression":0},f2:{"key":"f2","gender":"female","name":"甜心","mood":"開朗","hair":"#8a593c","shirt":"#e9bd65","pants":"#6c7650","accent":"#fff0b0","hairType":1,"expression":1},f3:{"key":"f3","gender":"female","name":"冰羽","mood":"嚴肅","hair":"#293d5c","shirt":"#6688b5","pants":"#34475f","accent":"#d5e6ed","hairType":2,"expression":2},f4:{"key":"f4","gender":"female","name":"莓果","mood":"調皮","hair":"#63384b","shirt":"#b86e91","pants":"#594866","accent":"#f2c2d2","hairType":3,"expression":3},f5:{"key":"f5","gender":"female","name":"櫻雪","mood":"害羞","hair":"#754b54","shirt":"#e5b4b9","pants":"#78627c","accent":"#fff0df","hairType":4,"expression":4},f6:{"key":"f6","gender":"female","name":"知性","mood":"困惑","hair":"#34394a","shirt":"#8296a8","pants":"#455a70","accent":"#dce5ec","hairType":5,"expression":5},f7:{"key":"f7","gender":"female","name":"烈陽","mood":"憤怒","hair":"#4a3028","shirt":"#d66b4e","pants":"#57414b","accent":"#f5c56d","hairType":6,"expression":6},f8:{"key":"f8","gender":"female","name":"月影","mood":"冷靜","hair":"#50415d","shirt":"#8878a7","pants":"#49435d","accent":"#e5d8f1","hairType":7,"expression":7}};
 let selectedStyle='m1';
-function drawTrainerMini(g,p,x,y,z){
- drawPixelTrainer(g,p,x,y,z,'down',0,'sword');
-}
 const trainerAtlas=new Image();
 trainerAtlas.onload=()=>{refreshStyleChoices()};
 trainerAtlas.src='/assets/emerald_trainers.png';
@@ -132,8 +129,9 @@ function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
  if(!trainerAtlas.complete||!trainerAtlas.naturalWidth)return;
  const row=trainerSpriteRows[p.key]??0;
- const group=dir==='up'?1:(dir==='left'||dir==='right'?2:0);
- const col=group*3+(frame%3);
+ // Use one fixed cel per facing direction. The source sheet has distinct pose
+ // cels in each group; cycling them without a verified animation sequence caused flicker.
+ const col=dir==='up'?4:((dir==='left'||dir==='right')?7:1);
  const sw=trainerAtlas.naturalWidth/9,sh=trainerAtlas.naturalHeight/13;
  const dw=16*z,dh=24*z;
  g.save();
@@ -369,9 +367,9 @@ function drawTree(sx,sy){
  ctx.fillStyle='#75a65d';ctx.fillRect(sx-3,sy-13,4,3);
 }
 function drawAvatar(a,sx,sy,local){
- const dir=a.dir||'down',moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
+ const dir=a.dir||'down';
  const look=trainerStyles[a.styleKey]||trainerStyles.m1;
- drawPixelTrainer(ctx,look,sx-8,sy-24,1,dir,frame,a.job||'sword');
+ drawPixelTrainer(ctx,look,sx-8,sy-24,1,dir,0,a.job||'sword');
  if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-28,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-26,8,1)}
 }function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
