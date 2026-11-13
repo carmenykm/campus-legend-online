@@ -314,7 +314,7 @@ function drawWorld(){
  particles.forEach(p=>{ctx.fillStyle=p.color;ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(p.text,p.x-camX,p.y-camY-p.life*12)});
 }
 function attack(skill,slot=0,target=null,fromAuto=false){
- if(!player)return;slot=Math.max(0,Math.min(7,slot|0));
+ if(!player)return;pendingPickup=null;slot=Math.max(0,Math.min(7,slot|0));
  if(skill?skillCooldown[slot]>0:attackCooldown>0){pendingCombat=null;return}
  const c=jobs[player.job],multipliers=[1.5,1.8,2.2,2.5,1.35,1.7,2.05,2.35],costs=[8,10,13,16,7,11,14,18];
  const range=skill?c.range*(1.12+(slot%4)*.12):c.range+15;
@@ -343,7 +343,7 @@ function attack(skill,slot=0,target=null,fromAuto=false){
 }
 function levelCheck(){while(save.xp>=save.level*100){save.xp-=save.level*100;save.level++;let m=statMax();save.hp=m.hp;save.mp=m.mp;say('升級！目前 Lv.'+save.level);toast('LEVEL UP! Lv.'+save.level)}}
 function pickup(target=null){
- if(!player)return;
+ if(!player)return;pendingCombat=null;
  if(!target){let nearest=Infinity;for(const d of drops){const distance=Math.hypot(d.x-player.x,d.y-player.y);if(distance<nearest){nearest=distance;target=d}}}
  if(!target||!drops.includes(target)){pendingPickup=null;say('附近沒有可拾取物品');return}
  const distance=Math.hypot(target.x-player.x,target.y-player.y);
