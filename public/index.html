@@ -339,35 +339,52 @@ function drawTree(sx,sy){
  ctx.fillStyle='#75a65d';ctx.fillRect(sx-3,sy-13,4,3);
 }
 function drawAvatar(a,sx,sy,local){
- const c=jobs[a.job]||jobs.sword,step=Math.floor((a.walk||a.frame||0))%2,dir=a.dir||'down';
- const palette={K:'#26333b',H:a.gender==='female'?'#49302b':'#30241f',S:'#f0bd91',E:'#302a2b',T:'#eee8d5',C:c.color,P:'#344c70',B:'#292b35',A:'#f4d47a'};
- const front=[
-  '..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','.TTTTTT.','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'
- ];
- const back=[
-  '..HHHH..','..HHHH..','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','.TTTTTT.','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'
- ];
- const side=[
-  '..HHHH..','.HHHHHH.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','.TTTTTT.','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'
- ];
- let rows=dir==='up'?back:(dir==='left'||dir==='right'?side:front);
- if(a.gender==='female')rows=rows.slice(),rows[1]='.HHHHHH.',rows[2]='HHHHHHHH',rows[3]='HHSSSSHH',rows[4]='HHSEESHH';
- const colors={K:palette.K,H:palette.H,S:palette.S,E:palette.E,T:palette.T,C:palette.C,P:palette.P,B:palette.B,A:palette.A};
- // Pixel-art shadow and 2x2 pixel character sprite.
+ const c=jobs[a.job]||jobs.sword,dir=a.dir||'down';
+ // Four-frame walk cycle. Local player advances through walk; remote players use frame time.
+ const moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
+ const stepA=frame===1,stepB=frame===3,side=dir==='left'||dir==='right',flip=dir==='right';
+ const palette={K:'#26333b',H:a.gender==='female'?'#49302b':'#30241f',S:'#f0bd91',E:'#302a2b',T:'#eee8d5',C:c.color,P:'#344c70',B:'#292b35'};
+ const front=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ const back=['..HHHH..','..HHHH..','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ const profile=['..HHHH..','.HHHHHH.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ let rows=dir==='up'?back:(side?profile:front);
+ if(a.gender==='female'){
+  rows=rows.slice();rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';rows[3]='HHSSSSHH';rows[4]='HHSEESHH';
+ }
+ const colors={K:palette.K,H:palette.H,S:palette.S,E:palette.E,T:palette.T,C:palette.C,P:palette.P,B:palette.B};
+ // Small ground shadow, then the sprite is painted as hard-edged 2px clusters.
  ctx.fillStyle='#365f42';ctx.fillRect(sx-8,sy+6,16,3);ctx.fillStyle='#294d38';ctx.fillRect(sx-5,sy+8,10,1);
- // Weapon silhouette sits behind the character.
+ // Side-facing sprites are mirrored rather than drawn as identical left/right profiles.
+ const mirror=side&&flip;
+ const pixel=(rx,ry,color)=>{const px=mirror?7-rx:rx;ctx.fillStyle=color;ctx.fillRect(sx-8+px*2,sy-18+ry*2,2,2)};
+ // Weapon behind body, with direction-aware placement.
+ const weaponSide=side?(flip?-1:1):1;
  if(a.job==='sword'){
-  ctx.fillStyle='#38414a';ctx.fillRect(sx+8,sy-12,3,22);ctx.fillStyle='#dce8e8';ctx.fillRect(sx+9,sy-13,2,17);ctx.fillStyle='#9b7545';ctx.fillRect(sx+7,sy+1,6,2);
+  ctx.fillStyle='#38414a';ctx.fillRect(sx+weaponSide*7-1,sy-12,3,22);
+  ctx.fillStyle='#dce8e8';ctx.fillRect(sx+weaponSide*7,sy-13,2,17);
+  ctx.fillStyle='#9b7545';ctx.fillRect(sx+weaponSide*5,sy+1,6,2);
  }else if(a.job==='archer'){
-  ctx.fillStyle='#68462f';ctx.fillRect(sx+8,sy-12,2,20);ctx.fillStyle='#d9c18b';ctx.fillRect(sx+10,sy-10,1,16);ctx.fillStyle='#8b603b';ctx.fillRect(sx+7,sy-2,4,2);
+  ctx.fillStyle='#68462f';ctx.fillRect(sx+weaponSide*8-1,sy-12,2,20);
+  ctx.fillStyle='#d9c18b';ctx.fillRect(sx+weaponSide*9,sy-10,1,16);
+  ctx.fillStyle='#8b603b';ctx.fillRect(sx+weaponSide*6,sy-2,4,2);
  }
  rows.forEach((row,ry)=>{for(let rx=0;rx<row.length;rx++){const ch=row[rx];if(ch==='.')continue;let color=colors[ch]||palette.K;
   if(ch==='C'&&a.job==='psy')color='#8b78d1';
   if(ch==='C'&&a.job==='archer')color='#5c9857';
   if(ch==='C'&&a.job==='fighter')color='#cf8745';
-  ctx.fillStyle=color;ctx.fillRect(sx-8+rx*2,sy-18+ry*2+(step&&ry>=9&&rx<4?1:0),2,2);
+  pixel(rx,ry,color);
  }});
- // Small class-specific details make each department readable at game scale.
+ // Animate sleeves and legs in alternating poses; feet remain aligned to the pixel grid.
+ const armColor=a.job==='fighter'?'#c99b62':palette.T;
+ if(moving){
+  const swing=stepA?1:(stepB?-1:0);
+  pixel(0,7,armColor);pixel(7,7,armColor);
+  pixel(0,8,armColor);pixel(7,8,armColor);
+  ctx.fillStyle=palette.P;
+  if(swing>0){ctx.fillRect(sx-6,sy+1,4,3);ctx.fillRect(sx+2,sy+3,4,3)}
+  else if(swing<0){ctx.fillRect(sx-6,sy+3,4,3);ctx.fillRect(sx+2,sy+1,4,3)}
+ }
+ // Class-specific uniform trim and accessories.
  if(a.job==='fighter'){ctx.fillStyle='#f0d18a';ctx.fillRect(sx-10,sy-7,3,4);ctx.fillRect(sx+7,sy-7,3,4)}
  if(a.job==='psy'){ctx.fillStyle='#9ce7f1';ctx.fillRect(sx+7,sy-15,2,2);ctx.fillStyle='#e7f8ff';ctx.fillRect(sx+8,sy-16,1,1)}
  if(a.job==='archer'){ctx.fillStyle='#9d7545';ctx.fillRect(sx-11,sy-7,2,13)}
