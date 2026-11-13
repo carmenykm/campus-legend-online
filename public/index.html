@@ -95,11 +95,11 @@ input,select{width:100%;padding:9px}
 <div id="login">
  <div class="card panel">
   <h1>校園傳說 Online</h1>
-  <div style="color:#f4d98c;font-size:12px;font-weight:800">2D CLASSIC PIXEL ADVENTURE</div>
+  <div style="color:#f4d98c;font-size:12px;font-weight:800">GBC 風格・復古像素冒險</div>
   <p>踏入熟悉的校園，選擇你的社團職業，探索廣場、挑戰訓練假人並提升等級。</p>
   <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家">
   <label>性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
-  <label>選擇人物造型</label><div id="styleChoices" aria-label="人物造型選擇"><button type="button" class="style-choice active" data-style="red"><canvas width="48" height="72"></canvas><span>紅帽冒險家</span></button><button type="button" class="style-choice" data-style="green"><canvas width="48" height="72"></canvas><span>綠野旅人</span></button><button type="button" class="style-choice" data-style="blue"><canvas width="48" height="72"></canvas><span>藍衣學員</span></button><button type="button" class="style-choice" data-style="violet"><canvas width="48" height="72"></canvas><span>紫髮術士</span></button></div>
+  <label>選擇訓練家造型</label><div id="styleChoices" aria-label="人物造型選擇"><button type="button" class="style-choice active" data-style="red"><canvas width="48" height="72"></canvas><span>紅帽少年</span></button><button type="button" class="style-choice" data-style="green"><canvas width="48" height="72"></canvas><span>森林旅人</span></button><button type="button" class="style-choice" data-style="blue"><canvas width="48" height="72"></canvas><span>金版冒險家</span></button><button type="button" class="style-choice" data-style="violet"><canvas width="48" height="72"></canvas><span>水晶旅者</span></button></div>
   <label>選擇職業</label><select id="class"><option value="sword">劍道部｜均衡近戰</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠程攻擊</option><option value="psy">氣功部｜氣功術法</option></select>
   <button id="start">進入學園</button>
   <p class="small">支援 Android 手機觸控。可離線單人遊玩；啟動伺服器後可同步其他在線玩家。</p>
@@ -119,9 +119,9 @@ const jobs={
  archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
-const trainerStyles={red:{hair:'#30241f',shirt:'#e7e5d4',pants:'#34537b',accent:'#d64b42',hat:'#d64b42',name:'紅帽冒險家'},green:{hair:'#50372a',shirt:'#e8dfb8',pants:'#52764b',accent:'#6c9a55',hat:'#6c9a55',name:'綠野旅人'},blue:{hair:'#263d59',shirt:'#e8e8ed',pants:'#315a83',accent:'#4e91c9',hat:'#315a83',name:'藍衣學員'},violet:{hair:'#563d68',shirt:'#e9dff0',pants:'#57416f',accent:'#a27ac4',hat:'#a27ac4',name:'紫髮術士'}};
+const trainerStyles={red:{hair:'#30241f',shirt:'#f0e4c0',pants:'#31527a',accent:'#bd4540',hat:'#bd4540',name:'紅帽少年'},green:{hair:'#4b3527',shirt:'#e8d9a7',pants:'#456b43',accent:'#6e9b58',hat:'#527d4b',name:'森林旅人'},blue:{hair:'#263b55',shirt:'#e5e8df',pants:'#344e72',accent:'#d7a64c',hat:'#344e72',name:'金版冒險家'},violet:{hair:'#573c66',shirt:'#e7d9e9',pants:'#56446d',accent:'#d6a6cf',hat:'#76517f',name:'水晶旅者'}};
 let selectedStyle='red';
-function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8fb77a';g.fillRect(0,0,48,72);const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(12+x*3,7+y*3,3,3)};const rows=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTAAAA TT'.replaceAll(' ',''),'.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];const colors={H:p.hair,S:'#f0bd91',E:'#302a2b',T:p.shirt,A:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch])px(x,y,colors[ch])}));g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(12,10,24,3);}
+function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(12+x*3,7+y*3,3,3)};const rows=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];const colors={H:p.hair,S:'#e9b98d',E:'#292b2b',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch])px(x,y,colors[ch])}));if(styleKey==='red'){g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(9,11,30,3);g.fillStyle='#e8d8b0';g.fillRect(21,8,6,2);}else if(styleKey==='green'){g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(12,10,24,3);g.fillStyle='#d4d18b';g.fillRect(21,6,6,3);}else if(styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(15,6,18,4);g.fillRect(12,9,24,3);g.fillStyle='#e4bd66';g.fillRect(21,7,6,2);}else{g.fillStyle=p.hair;g.fillRect(9,10,6,15);g.fillRect(33,10,6,15);g.fillStyle=p.accent;g.fillRect(27,8,9,3);}}
 function refreshStyleChoices(){document.querySelectorAll('.style-choice').forEach(b=>{b.classList.toggle('active',b.dataset.style===selectedStyle);paintStylePreview(b.querySelector('canvas'),b.dataset.style)})}
 const skillArt={
  sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','破空斬'],['▣','格擋'],['➶','突進斬'],['✧','劍影'],['☄','劍舞']],
@@ -350,9 +350,9 @@ function drawAvatar(a,sx,sy,local){
  const stepA=frame===1,stepB=frame===3,side=dir==='left'||dir==='right',flip=dir==='right';
  const look=trainerStyles[a.styleKey]||trainerStyles.red;
  const palette={K:'#26333b',H:look.hair,S:'#f0bd91',E:'#302a2b',T:look.shirt,C:c.color,P:look.pants,B:'#292b35'};
- const front=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
- const back=['..HHHH..','..HHHH..','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
- const profile=['..HHHH..','.HHHHHH.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ const front=['..KKKK..','.KHHHHK.','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ const back=['..KKKK..','.KHHHHK.','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
+ const profile=['..KKKK..','.KHHHHK.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
  let rows=dir==='up'?back:(side?profile:front);
  rows=rows.slice();
  if(a.gender==='female'){rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';rows[3]='HHSSSSHH';rows[4]='HHSEESHH';}
@@ -386,6 +386,8 @@ function drawAvatar(a,sx,sy,local){
  if(a.styleKey==='red'||a.styleKey==='green'||a.styleKey==='blue'){
   ctx.fillStyle=look.hat;ctx.fillRect(sx-6,sy-19,12,3);ctx.fillRect(sx-8,sy-17,16,2);
   ctx.fillStyle=look.accent;ctx.fillRect(sx-2,sy-18,4,2);
+  if(a.styleKey==='green'){ctx.fillStyle='#d4d18b';ctx.fillRect(sx-2,sy-20,4,2)}
+  if(a.styleKey==='blue'){ctx.fillStyle='#e4bd66';ctx.fillRect(sx-2,sy-19,4,2)}
  }else{ctx.fillStyle=look.hair;ctx.fillRect(sx-10,sy-14,3,8);ctx.fillRect(sx+7,sy-14,3,8);ctx.fillStyle=look.accent;ctx.fillRect(sx+5,sy-17,4,3)}
  // Animate sleeves and legs in alternating poses; feet remain aligned to the pixel grid.
  const armColor=a.job==='fighter'?'#c99b62':palette.T;
