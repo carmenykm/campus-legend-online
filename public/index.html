@@ -273,8 +273,8 @@ function initMobs(){
 }
 function syncPlayers(list){
  const seen=new Set();
- list.forEach(p=>{if(p.id===playerId)return;seen.add(p.id);let r=remotes.get(p.id);if(!r){r={x:(p.x||0)*T,y:(p.z||0)*T,name:p.name||'玩家',job:p.jobKey||'sword',gender:p.genderKey||'male',styleKey:p.styleKey||'red',dir:'down',frame:0};remotes.set(p.id,r)}
- r.tx=(p.x||0)*T;r.ty=(p.z||0)*T;r.name=p.name||'玩家';r.job=p.jobKey||'sword';r.gender=p.genderKey||'male';r.styleKey=p.styleKey||'red';});
+ list.forEach(p=>{if(p.id===playerId)return;seen.add(p.id);let r=remotes.get(p.id);if(!r){r={x:(p.x||0)*T,y:(p.z||0)*T,name:p.name||'玩家',job:p.jobKey||'sword',gender:p.genderKey||'male',styleKey:p.styleKey||'m1',dir:'down',frame:0};remotes.set(p.id,r)}
+ r.tx=(p.x||0)*T;r.ty=(p.z||0)*T;r.name=p.name||'玩家';r.job=p.jobKey||'sword';r.gender=p.genderKey||'male';r.styleKey=p.styleKey||'m1';});
  for(const id of remotes.keys())if(!seen.has(id))remotes.delete(id);
  $('players').textContent=Array.from(remotes.values()).map(r=>'• '+r.name).join('、')||'目前沒有其他玩家';
 }
