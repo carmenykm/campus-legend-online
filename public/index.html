@@ -157,35 +157,40 @@ const mapNames=['學院門口','學院','學習1館','學習2館'];let currentMa
  function tile(x,y,v){if(x>=0&&y>=0&&x<MW&&y<MH)map[y][x]=v}
  function rectTiles(x,y,w,h,v){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)tile(i,j,v)}
  function block(x,y,w,h){obstacles.push({x:x*T,y:y*T,w:w*T,h:h*T})}
+ function addBuilding(tx,ty,tw,th,style){
+  block(tx*T,ty*T,tw*T,th*T);
+  decor.push({type:'building',x:tx*T,y:ty*T,w:tw*T,h:th*T,style});
+ }
  function initMap(zone=currentMap){
   currentMap=zone;MW=20;MH=20;map=Array.from({length:MH},()=>Array(MW).fill(0));obstacles=[];decor=[];
   rectTiles(0,0,MW,1,3);rectTiles(0,MH-1,MW,1,3);rectTiles(0,0,1,MH,3);rectTiles(MW-1,0,1,MH,3);
   if(zone===0){
-   // 學院門口：校門廣場與三條通往校園建築的道路
+   // 校門廣場：中央十字道路，左右分流至兩棟學習館
    rectTiles(8,1,4,18,1);rectTiles(1,8,18,4,1);
-   rectTiles(2,5,4,2,2);block(2*T,5*T,4*T,2*T);rectTiles(14,5,4,2,2);block(14*T,5*T,4*T,2*T);rectTiles(2,13,4,2,2);block(2*T,13*T,4*T,2*T);rectTiles(14,13,4,2,2);block(14*T,13*T,4*T,2*T);
-   rectTiles(2,3,4,4,5);rectTiles(14,3,4,4,5);rectTiles(2,13,4,4,5);rectTiles(14,13,4,4,5);
-   decor.push({x:10*T,y:4*T,type:'sign',text:'學院正門'},{x:4*T,y:10*T,type:'sign',text:'學習1館'},{x:16*T,y:10*T,type:'sign',text:'學習2館'});
+   addBuilding(2,3,5,4,0);addBuilding(13,3,5,4,1);
+   addBuilding(2,13,5,4,2);addBuilding(13,13,5,4,3);
+   rectTiles(1,3,1,4,5);rectTiles(18,3,1,4,5);rectTiles(1,13,1,4,5);rectTiles(18,13,1,4,5);
+   decor.push({type:'gate',x:7*T,y:0,w:6*T,h:3*T});
   }else if(zone===1){
-   // 學院內部：中央中庭、教學樓與通往門口的南側出口
-   rectTiles(2,2,16,16,0);rectTiles(8,2,4,16,1);rectTiles(2,8,16,4,1);
-   rectTiles(3,3,4,4,2);block(3*T,3*T,4*T,4*T);rectTiles(13,3,4,4,2);block(13*T,3*T,4*T,4*T);
-   rectTiles(3,13,4,3,2);block(3*T,13*T,4*T,3*T);rectTiles(13,13,4,3,2);block(13*T,13*T,4*T,3*T);
-   decor.push({x:5*T,y:5*T,type:'sign',text:'行政大樓'},{x:15*T,y:5*T,type:'sign',text:'教學大樓'},{x:10*T,y:10*T,type:'sign',text:'中央中庭'});
+   // 學院中庭與教學主樓
+   rectTiles(8,2,4,16,1);rectTiles(2,8,16,4,1);
+   addBuilding(2,2,5,5,1);addBuilding(13,2,5,5,0);
+   addBuilding(2,13,5,5,2);addBuilding(13,13,5,5,3);
+   rectTiles(9,18,2,1,6);
   }else if(zone===2){
-   // 學習1館：課室走廊與練習空間
-   rectTiles(2,2,16,16,0);rectTiles(2,8,16,4,1);rectTiles(8,2,4,16,1);
-   rectTiles(3,3,4,4,2);block(3*T,3*T,4*T,4*T);rectTiles(13,3,4,4,2);block(13*T,3*T,4*T,4*T);
-   rectTiles(3,13,4,4,2);block(3*T,13*T,4*T,4*T);rectTiles(13,13,4,4,2);block(13*T,13*T,4*T,4*T);
-   decor.push({x:10*T,y:5*T,type:'sign',text:'學習1館'},{x:10*T,y:10*T,type:'sign',text:'課程走廊'});
+   // 學習1館：課室、走廊與明亮的教學空間
+   rectTiles(2,8,16,4,1);rectTiles(8,2,4,16,1);
+   addBuilding(2,2,5,5,0);addBuilding(13,2,5,5,1);
+   addBuilding(2,13,5,5,2);addBuilding(13,13,5,5,0);
+   rectTiles(18,9,1,2,6);
   }else{
-   // 學習2館：圖書室、實習教室與中央通道
-   rectTiles(2,2,16,16,0);rectTiles(8,2,4,16,1);rectTiles(2,8,16,4,1);
-   rectTiles(3,3,4,4,2);block(3*T,3*T,4*T,4*T);rectTiles(13,3,4,4,2);block(13*T,3*T,4*T,4*T);
-   rectTiles(3,13,4,4,2);block(3*T,13*T,4*T,4*T);rectTiles(13,13,4,4,2);block(13*T,13*T,4*T,4*T);
-   decor.push({x:10*T,y:5*T,type:'sign',text:'學習2館'},{x:10*T,y:10*T,type:'sign',text:'實習走廊'});
+   // 學習2館：實習教室與圖書空間
+   rectTiles(2,8,16,4,1);rectTiles(8,2,4,16,1);
+   addBuilding(2,2,5,5,2);addBuilding(13,2,5,5,3);
+   addBuilding(2,13,5,5,1);addBuilding(13,13,5,5,0);
+   rectTiles(1,9,1,2,6);
   }
-  // 入口傳送點：門口上方進學院，左右分別通往兩棟學習館
+  // 門口上方進學院，左右兩側分別通往學習1館與學習2館
   if(zone===0){tile(10,1,6);tile(1,10,6);tile(18,10,6)}
   else if(zone===1)tile(10,18,6);
   else if(zone===2)tile(18,10,6);
@@ -268,6 +273,41 @@ function drawTile(v,x,y,tx,ty){
  else if(v===5){ctx.fillStyle='#6b9e59';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e0c57f';ctx.fillRect(x+3,y+3,10,10);ctx.fillStyle='#477b4a';ctx.fillRect(x+5,y+2,7,8)}
  else if(v===6){ctx.fillStyle='#243e50';ctx.fillRect(x,y,T,T);ctx.fillStyle='#f5d477';ctx.fillRect(x+3,y+2,10,12);ctx.fillStyle='#fff1b0';ctx.fillRect(x+6,y+4,4,8)}
 }
+function drawCampusBuilding(d,sx,sy){
+ const w=d.w,h=d.h,pal=[
+  ['#d8c49a','#9b6246','#754733','#f1dfb8'],
+  ['#d5d9d1','#637b80','#405b64','#e8f0dc'],
+  ['#dfc49a','#a77b4c','#785536','#f4e1b6'],
+  ['#c8d0d8','#65758b','#414e69','#e8edf4']
+ ][d.style%4];
+ // building shadow and stone foundation
+ ctx.fillStyle='#263c32';ctx.fillRect(sx+3,sy+5,w,h);
+ ctx.fillStyle=pal[0];ctx.fillRect(sx,sy+10,w,h-10);
+ ctx.fillStyle=pal[3];ctx.fillRect(sx+3,sy+13,w-6,h-16);
+ // broad layered roof
+ ctx.fillStyle=pal[2];ctx.fillRect(sx-3,sy+5,w+6,9);
+ ctx.fillStyle=pal[1];ctx.fillRect(sx-1,sy,w+2,8);
+ ctx.fillStyle=pal[2];ctx.fillRect(sx+3,sy+8,w-6,3);
+ // windows and central entrance
+ for(let wx=sx+9;wx<sx+w-7;wx+=18){
+  ctx.fillStyle='#394e5b';ctx.fillRect(wx,sy+25,9,12);
+  ctx.fillStyle='#a9d2cf';ctx.fillRect(wx+2,sy+27,5,8);
+  ctx.fillStyle='#f5e5b6';ctx.fillRect(wx+4,sy+27,1,8);
+ }
+ const door=sx+w/2-5;
+ ctx.fillStyle='#594536';ctx.fillRect(door,sy+h-19,10,19);
+ ctx.fillStyle='#d6b77c';ctx.fillRect(door+2,sy+h-17,6,15);
+ ctx.fillStyle='#fff0bd';ctx.fillRect(door+7,sy+h-10,1,2);
+ ctx.fillStyle='#e8d5a5';ctx.fillRect(sx+4,sy+h-4,w-8,3);
+}
+function drawCampusGate(d,sx,sy){
+ ctx.fillStyle='#263a36';ctx.fillRect(sx+4,sy+3,d.w-8,8);
+ ctx.fillStyle='#a87945';ctx.fillRect(sx+4,sy+1,7,d.h-1);
+ ctx.fillRect(sx+d.w-11,sy+1,7,d.h-1);
+ ctx.fillStyle='#e2c17c';ctx.fillRect(sx+2,sy,d.w-4,5);
+ ctx.fillRect(sx+4,sy+7,5,3);ctx.fillRect(sx+d.w-9,sy+7,5,3);
+ ctx.fillStyle='#6c4935';ctx.fillRect(sx+10,sy+5,d.w-20,3);
+}
 function drawBuildingSign(d,sx,sy){
  ctx.fillStyle='#63452f';ctx.fillRect(sx-18,sy-7,36,12);ctx.fillStyle='#f4df9c';ctx.fillRect(sx-17,sy-6,34,9);ctx.fillStyle='#57422f';ctx.font='6px monospace';ctx.textAlign='center';ctx.fillText(d.text,sx,sy+1)
 }
@@ -315,7 +355,7 @@ function drawWorld(){
  const sx0=Math.floor(camX/T),sy0=Math.floor(camY/T),sx1=sx0+Math.ceil(W/T)+1,sy1=sy0+Math.ceil(H/T)+1;
  for(let y=sy0;y<sy1;y++)for(let x=sx0;x<sx1;x++)drawTile((map[y]||[])[x]||0,x*T-camX,y*T-camY,x,y);
  // Building signs and campus furniture
- decor.forEach(d=>{let x=d.x-camX,y=d.y-camY;if(x<-20||x>W+20||y<-20||y>H+20)return;if(d.type==='flower'){ctx.fillStyle=d.c;ctx.fillRect(x,y,3,3)}else if(d.type==='sign')drawBuildingSign(d,x,y)});
+ decor.forEach(d=>{let x=d.x-camX,y=d.y-camY;if(x<-100||x>W+100||y<-100||y>H+100)return;if(d.type==='flower'){ctx.fillStyle=d.c;ctx.fillRect(x,y,3,3)}else if(d.type==='building')drawCampusBuilding(d,x,y);else if(d.type==='gate')drawCampusGate(d,x,y)});
  // Training posts, benches and lamp posts
  for(let i=0;i<5;i++){let x=(22+i*7)*T-camX,y=27*T-camY;ctx.fillStyle='#66452e';ctx.fillRect(x-2,y-9,4,17);ctx.fillStyle='#b38b55';ctx.fillRect(x-6,y-10,12,4);ctx.fillStyle='#e1d0a2';ctx.fillRect(x-1,y-8,2,3)}
  // Trees and garden borders
