@@ -1,374 +1,318 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>校園傳說 Online — 3D 網頁 MMORPG 原型</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#172b38">
+<title>校園傳說 Online 2D — GBC 像素冒險</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101923;color:#eef4f7;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
-#game{position:fixed;inset:0}canvas{display:block}
-.panel{background:rgba(10,19,29,.86);border:1px solid rgba(160,203,222,.3);border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 8px 30px #0005}
-#hud{position:fixed;left:12px;top:12px;width:min(310px,calc(100vw - 24px));padding:12px;pointer-events:none}
-#brand{font-weight:900;letter-spacing:1px;font-size:17px;color:#d7f0ff}
-.small{font-size:12px;color:#b8c8d3}
-.bar{height:9px;background:#263440;border-radius:9px;overflow:hidden;margin:5px 0 8px}.fill{height:100%;width:100%;transition:width .15s}
-#hp{background:#e35c63}#mp{background:#4d9ee8}#xp{background:#d6a943}
-#stats{display:flex;justify-content:space-between;font-size:12px}
-#controls{position:fixed;left:12px;bottom:12px;padding:10px 12px;font-size:12px;line-height:1.6}
-#right{position:fixed;right:12px;top:12px;padding:10px 12px;width:190px}
-#players{font-size:12px;line-height:1.7;max-height:120px;overflow:auto}
-#log{position:fixed;left:12px;bottom:112px;width:min(340px,calc(100vw - 24px));height:92px;overflow:auto;padding:9px;font-size:12px;line-height:1.5;color:#d6e3eb;pointer-events:none}
-#actions{position:fixed;right:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:55vw}
-button,select,input{font:inherit;color:#eef4f7;background:#203443;border:1px solid #557082;border-radius:8px;padding:9px 11px}
-button{cursor:pointer}button:hover{background:#31536a}button:disabled{opacity:.45}
-#login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(130deg,#0b1723dd,#152c3add);z-index:5;padding:16px}
-#login .card{width:min(430px,100%);padding:22px}
-h1{margin:0 0 5px;font-size:25px}p{color:#bfd0dc;font-size:13px;line-height:1.6}
-label{display:block;margin:13px 0 5px;font-size:13px;color:#c5d7e2}
-input,select{width:100%}#start{width:100%;margin-top:17px;background:#28648a;font-weight:800}
-#mobile{display:none;position:fixed;left:15px;bottom:16px;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:4px}
-#mobile button{padding:0;font-size:18px;opacity:.8;touch-action:none}
-@media(max-width:700px){#right{width:145px}#controls{display:none}#log{bottom:130px}#actions{bottom:12px;right:10px;max-width:48vw}#actions button{padding:8px;font-size:12px}#mobile{display:grid}}
+:root{color-scheme:dark;--ink:#f5edcf;--panel:#203b48;--edge:#d9c68b;--gold:#f2d47b}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#172b38;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;touch-action:none}
+#stage{position:fixed;inset:0;display:grid;place-items:center;background:#101e28}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;background:#6a9b62}
+.panel{background:linear-gradient(#315565,#1d3946);border:3px solid var(--edge);box-shadow:inset 0 0 0 2px #132b35,0 4px 0 #10232b;border-radius:5px}
+#hud{position:fixed;left:8px;top:8px;width:min(265px,66vw);padding:8px 10px;z-index:2;pointer-events:none;text-shadow:1px 1px #172b38}
+#brand{font-weight:950;font-size:14px;letter-spacing:1px;color:#ffe9a7}
+#stats{font-size:11px;display:flex;justify-content:space-between;gap:8px;margin-top:3px}
+.bar{height:7px;background:#142c37;border:1px solid #8b9c85;margin:3px 0 4px}.fill{height:100%;width:100%}#hp{background:#e75e62}#mp{background:#60b7dc}#xp{background:#f0cb61}
+.small{font-size:10px;color:#e3e0c7}
+#right{position:fixed;right:8px;top:8px;width:155px;padding:8px;z-index:2;font-size:11px}
+#right strong{color:#ffe9a7}
+#quest{margin-top:6px;color:#dce8ba}
+#log{position:fixed;left:8px;bottom:8px;width:min(310px,66vw);height:75px;padding:6px 8px;font-size:10px;line-height:1.45;overflow:hidden;z-index:2;pointer-events:none;background:#183541eF}
+#actions{position:fixed;right:10px;bottom:12px;display:flex;gap:6px;z-index:4;align-items:end}
+button,select,input{font:inherit;color:#fff4d0;background:#315565;border:2px solid #d9c68b;border-radius:4px;padding:8px 10px}
+button{font-weight:800;box-shadow:0 3px 0 #102630;touch-action:none}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #102630;background:#557b75}
+.action{width:58px;height:54px;padding:3px;font-size:10px}
+.action b{display:block;font-size:17px;color:#ffe9a7}
+#pad{position:fixed;left:12px;bottom:12px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;gap:3px;z-index:4}
+#pad button{padding:0;font-size:18px;opacity:.88}
+#pad .blank{visibility:hidden}
+#login{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:radial-gradient(ellipse at center,#456d62dd,#10242eee)}
+#login .card{width:min(430px,100%);padding:18px 20px}
+h1{margin:0;color:#ffe9a7;font-size:24px;text-shadow:2px 2px #142b34}
+p{font-size:12px;line-height:1.55;color:#e2e4cc}
+label{display:block;font-size:12px;margin:10px 0 4px;color:#ffe9a7}
+input,select{width:100%;padding:9px}
+#start{width:100%;margin-top:14px;background:#8b583e;font-size:15px}
+#toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:8px 14px;background:#142f3beF;border:2px solid #f0d68d;border-radius:4px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+#help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
+@media(min-width:800px){#pad{left:22px;bottom:22px;transform:scale(1.08);transform-origin:bottom left}#actions{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
+@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:67px;font-size:9px}#actions{right:7px;bottom:8px;gap:4px}.action{width:49px;height:49px;font-size:9px}#pad{left:7px;bottom:8px;grid-template-columns:37px 37px 37px;grid-template-rows:37px 37px 37px}#pad button{font-size:16px}#help{display:none}}
 </style>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
-</script>
 </head>
 <body>
-<div id="game"></div>
+<div id="stage"><canvas id="game" width="320" height="240" aria-label="校園傳說 Online 2D 遊戲畫面"></canvas></div>
 <div id="hud" class="panel">
- <div id="brand">校園傳說 ONLINE <span class="small">｜校服模組測試版</span></div>
- <div id="who" class="small">尚未登入</div>
- <div id="stats"><span id="level">Lv.1</span><span id="className">劍道部</span><span id="coords">0, 0</span></div>
- <div class="small">HP <span id="hpText">100 / 100</span></div><div class="bar"><div id="hp" class="fill"></div></div>
- <div class="small">MP <span id="mpText">50 / 50</span></div><div class="bar"><div id="mp" class="fill"></div></div>
- <div class="small">EXP <span id="xpText">0 / 100</span></div><div class="bar"><div id="xp" class="fill"></div></div>
- <div class="small" id="goldText">金幣：0</div>
+ <div id="brand">校園傳說 ONLINE <span class="small">2D</span></div>
+ <div class="small" id="who">尚未登入</div>
+ <div id="stats"><span id="lv">Lv.1</span><span id="job">劍道部</span><span id="pos">0,0</span></div>
+ <div class="small">HP <span id="hpText">100/100</span></div><div class="bar"><div class="fill" id="hp"></div></div>
+ <div class="small">MP <span id="mpText">50/50</span></div><div class="bar"><div class="fill" id="mp"></div></div>
+ <div class="small">EXP <span id="xpText">0/100</span></div><div class="bar"><div class="fill" id="xp"></div></div>
+ <div class="small" id="gold">金幣 0</div>
 </div>
 <div id="right" class="panel">
- <b style="font-size:13px">學園在線</b><div id="net" class="small">連線狀態：準備中</div>
- <div class="small" style="margin-top:8px">附近玩家</div><div id="players">目前沒有其他玩家</div>
- <div class="small" style="margin-top:8px">任務：擊倒 3 隻訓練假人</div><div id="quest" class="small">進度 0 / 3</div>
+ <strong>學園廣場</strong><div class="small" id="net">單人模式</div>
+ <div class="small" style="margin-top:6px">附近玩家</div><div id="players" class="small">目前沒有其他玩家</div>
+ <div id="quest">任務：擊倒訓練假人 0/3</div>
+ <div class="small" id="clock">早上 08:00</div>
 </div>
-<div id="log" class="panel"></div>
-<div id="controls" class="panel">移動：W A S D ／ 方向鍵<br>攻擊：滑鼠左鍵或空白鍵<br>技能：1 ／ 2　　拾取：E<br>鏡頭：滑鼠拖曳旋轉、滾輪縮放</div>
+<div id="log" class="panel">歡迎來到校園傳說 Online！</div>
+<div id="toast"></div>
+<div id="pad">
+ <button class="blank"> </button><button data-dir="up">▲</button><button class="blank"> </button>
+ <button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button>
+ <button class="blank"> </button><button data-dir="down2">▼</button><button class="blank"> </button>
+</div>
 <div id="actions">
- <button id="attack">普通攻擊</button><button id="skill1">技能 1</button><button id="skill2">技能 2</button><button id="pickup">拾取</button>
+ <button class="action" id="attack"><b>⚔</b>攻擊</button>
+ <button class="action" id="skill"><b>✦</b>技能</button>
+ <button class="action" id="rest"><b>✚</b>恢復</button>
+ <button class="action" id="pickup"><b>＋</b>拾取</button>
 </div>
-<div id="mobile">
- <span></span><button data-key="w">▲</button><span></span>
- <button data-key="a">◀</button><button data-key="s">▼</button><button data-key="d">▶</button>
-</div>
+<div id="help">鍵盤：WASD／方向鍵　J攻擊　K技能　E拾取</div>
 <div id="login">
  <div class="card panel">
-  <h1>校園傳說 Online</h1><div class="small">以經典校園 MMORPG 為方向的原創 3D 網頁原型</div>
-  <p>建立角色，進入學園廣場。這是第一個可玩測試版：支援 3D 移動、四種職業、打怪升級，以及透過 WebSocket 同步其他在線玩家。</p>
-  <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家" placeholder="輸入角色名稱"/>
-  <label>選擇性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
-   <label>選擇社團／職業</label><select id="class"><option value="sword">劍道部｜近戰均衡</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠距離攻擊</option><option value="psy">氣功部｜法術與恢復</option></select>
-  <button id="start">進入學園</button><div id="assetStatus" class="small" style="margin-top:9px;text-align:center">角色模型：準備載入真正骨骼 3D 校服模型</div>
-  <p class="small">多人連線需啟動附帶的 Node.js 伺服器；若未啟動，仍可單人遊玩本機原型。</p>
+  <h1>校園傳說 Online</h1>
+  <div style="color:#f4d98c;font-size:12px;font-weight:800">2D CLASSIC PIXEL ADVENTURE</div>
+  <p>踏入熟悉的校園，選擇你的社團職業，探索廣場、挑戰訓練假人並提升等級。</p>
+  <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家">
+  <label>性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
+  <label>選擇職業</label><select id="class"><option value="sword">劍道部｜均衡近戰</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠程攻擊</option><option value="psy">氣功部｜氣功術法</option></select>
+  <button id="start">進入學園</button>
+  <p class="small">支援 Android 手機觸控。可離線單人遊玩；啟動伺服器後可同步其他在線玩家。</p>
  </div>
 </div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { io } from 'https://cdn.socket.io/4.7.5/socket.io.esm.min.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-import { clone as cloneSkeleton } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/utils/SkeletonUtils.js';
-
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});
+ctx.imageSmoothingEnabled=false;
+const W=320,H=240,T=16,MW=72,MH=56;
 const $=id=>document.getElementById(id);
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9cc5d3);scene.fog=new THREE.Fog(0x9cc5d3,35,95);
-const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,180);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;$('game').appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xd9f2ff,0x526047,2));
-const sun=new THREE.DirectionalLight(0xfff0d8,2.2);sun.position.set(-15,28,12);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
-const mat=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(130,130),mat(0x557b58));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
-const grid=new THREE.GridHelper(120,60,0x789b79,0x789b79);grid.position.y=.015;scene.add(grid);
-function box(x,y,z,sx,sy,sz,color){let m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
-function tree(x,z){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.8,7),mat(0x65452c));trunk.position.set(x,.9,z);trunk.castShadow=true;scene.add(trunk);let crown=new THREE.Mesh(new THREE.SphereGeometry(1.1,9,7),mat(0x2f7149));crown.position.set(x,2.2,z);crown.castShadow=true;scene.add(crown)}
-// campus buildings and courtyard
-box(-16,3,-22,18,6,10,0xc5b99b);box(-16,6.4,-22,19,1,11,0x495c70);
-box(16,2.5,-22,14,5,10,0xd0c6ac);box(16,5.3,-22,15,1,11,0x536577);
-for(let x=-23;x<=23;x+=4){box(x,1.1,-16,.5,2,.35,0x35495a)}
-box(0,.18,-8,15,.35,1.4,0xb6a47e);
-for(let i=0;i<18;i++){tree(-30+(i%6)*12,8+Math.floor(i/6)*12)}
-// paths and lamp posts
-for(let z=-4;z<26;z+=9){box(-9,2,z,.22,4,.22,0x394650);let l=new THREE.Mesh(new THREE.SphereGeometry(.35,10,8),mat(0xffe6a1));l.position.set(-9,4.1,z);scene.add(l);box(9,2,z,.22,4,.22,0x394650)}
-// player avatar
-const classData={
- sword:{label:'劍道部',color:0x4d8fc7,hp:120,mp:45,power:18,range:3.2,skill:'拔刀斬'},
- fighter:{label:'格鬥部',color:0xd66a52,hp:135,mp:35,power:23,range:2.8,skill:'旋風拳'},
- archer:{label:'弓箭部',color:0x62a76b,hp:95,mp:60,power:17,range:10,skill:'穿透箭'},
- psy:{label:'氣功部',color:0x9a75ce,hp:100,mp:85,power:15,range:9,skill:'氣功波'}
+const jobs={
+ sword:{name:'劍道部',hp:120,mp:45,power:20,range:30,color:'#d34d45',skill:'拔刀斬'},
+ fighter:{name:'格鬥部',hp:135,mp:35,power:24,range:24,color:'#d98b3c',skill:'旋風拳'},
+ archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
+ psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
-function makeAvatar(job='sword', fallbackColor=null, gender='male'){
- const cfg=classData[job]||classData.sword;
- const female=gender==='female';
- // v0.5.1: classic campus starter uniform. Club colour is kept to a small badge,
- // rather than recolouring the whole uniform.
- const accent=new THREE.Color(fallbackColor??cfg.color);
- const skin=mat(female?0xe8bd9f:0xd5a783,.82);
- const hairColor=job==='psy'?0x292633:job==='archer'?0x49352b:job==='fighter'?0x201d1c:0x33251f;
- const hair=mat(hairColor,.88);
- const shirt=mat(0xe7e6df,.96), shirtShade=mat(0xc9c9c1,.98);
- const navy=mat(0x202b3d,.92), navyLight=mat(0x34445a,.94);
- const tieMat=mat(0x202b43,.82), shoe=mat(0x17191e,.65);
- const metal=mat(0xaeb7bf,.45), gold=mat(0xc7a45d,.5), badgeMat=new THREE.MeshStandardMaterial({color:accent,roughness:.75});
- const g=new THREE.Group();
- const add=(parent,geo,material,x,y,z,rx=0,ry=0,rz=0)=>{
-  const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);
-  m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
- };
- const ell=(parent,material,x,y,z,sx,sy,sz)=>{
-  const m=add(parent,new THREE.SphereGeometry(1,20,14),material,x,y,z);m.scale.set(sx,sy,sz);return m;
- };
- const capsule=(parent,material,x,y,z,r,len)=>{
-  return add(parent,new THREE.CapsuleGeometry(r,len,5,10),material,x,y,z);
- };
- // Lower torso and waist.
- const pelvis=new THREE.Group();pelvis.position.y=.91;g.add(pelvis);
- ell(pelvis,navy,0,0,0,female?.255:.27,.17,.18);
- // Tailored white shirt, tapered slightly at the waist and broader at shoulders.
- const torso=new THREE.Group();torso.position.set(0,.10,0);pelvis.add(torso);
- const shirtBody=add(torso,new THREE.CylinderGeometry(.235,.305,.73,16,1,false),shirt,0,.39,0);
- shirtBody.scale.z=.76;
- // Subtle lower hem and side seams.
- add(torso,new THREE.TorusGeometry(.245,.012,5,24),shirtShade,0,.035,0,Math.PI/2);
- for(const side of [-1,1]){
-  add(torso,new THREE.BoxGeometry(.012,.60,.012),shirtShade,side*.245,.39,.178);
+let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={},player=null,socket=null,playerId=null;
+let last=0,attackCooldown=0,skillCooldown=0,toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
+let save={level:1,xp:0,gold:0,hp:100,mp:50};
+let particles=[];
+const rand=(x,y)=>{let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n)};
+function tile(x,y,v){if(x>=0&&y>=0&&x<MW&&y<MH)map[y][x]=v}
+function rectTiles(x,y,w,h,v){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)tile(i,j,v)}
+function block(x,y,w,h){obstacles.push({x:x*T,y:y*T,w:w*T,h:h*T})}
+function initMap(){
+ map=Array.from({length:MH},(_,y)=>Array.from({length:MW},(_,x)=>0));
+ // Central courtyard and crossing paths.
+ rectTiles(4,4,64,48,0);
+ rectTiles(5,25,62,5,1);rectTiles(33,5,6,45,1);
+ rectTiles(8,13,56,2,1);rectTiles(8,41,56,2,1);
+ // School buildings, with doors facing the courtyard.
+ rectTiles(9,6,17,7,2);rectTiles(46,6,17,7,2);
+ rectTiles(9,43,17,8,2);rectTiles(46,43,17,8,2);
+ block(9*T,6*T,17*T,7*T);block(46*T,6*T,17*T,7*T);
+ block(9*T,43*T,17*T,8*T);block(46*T,43*T,17*T,8*T);
+ // Open door gaps at the building fronts.
+ for(let x=16;x<19;x++){tile(x,13,1);tile(x,42,1)}
+ for(let x=52;x<55;x++)tile(x,13,1);
+ // Small garden ponds and flower beds.
+ rectTiles(5,17,5,4,4);rectTiles(62,17,5,4,4);
+ rectTiles(5,35,5,4,5);rectTiles(62,35,5,4,5);
+ // Border trees and scattered campus landscaping.
+ for(let x=4;x<68;x+=2){tile(x,4,3);tile(x,51,3)}
+ for(let y=6;y<51;y+=3){tile(4,y,3);tile(67,y,3)}
+ for(let x=12;x<61;x+=6){tile(x,22,3);tile(x,33,3)}
+ // Keep central paths open.
+ rectTiles(29,23,14,10,1);
+ // Decorations.
+ decor=[];
+ for(let y=6;y<51;y++)for(let x=5;x<67;x++){
+  if(map[y][x]===0&&rand(x,y)>.975)decor.push({x:x*T+8,y:y*T+8,type:'flower',c:rand(x+5,y)>0.5?'#f4d47a':'#eaa0a4'});
  }
- // Short-sleeved school shirt with shaped sleeves and cuffs.
- for(const side of [-1,1]){
-  const sleeve=add(torso,new THREE.CylinderGeometry(.105,.13,.30,12),shirt,side*.355,.64,0,0,0,side*-.20);
-  sleeve.scale.z=.86;
-  add(torso,new THREE.TorusGeometry(.103,.012,5,16),shirtShade,side*.385,.505,0,Math.PI/2,0,side*-.20);
- }
- // Collar flaps, central placket and visible buttons.
- const makePoly=(parent,pts,material)=>{
-  const geo=new THREE.BufferGeometry();
-  const verts=[];for(const p of pts)verts.push(...p);
-  geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
-  geo.setIndex([0,1,2]);geo.computeVertexNormals();
-  return add(parent,geo,material,0,0,0);
- };
- makePoly(torso,[[-.13,.755,.16],[-.025,.70,.205],[-.075,.56,.20]],shirt);
- makePoly(torso,[[.13,.755,.16],[.025,.70,.205],[.075,.56,.20]],shirt);
- add(torso,new THREE.BoxGeometry(.035,.58,.018),shirtShade,0,.39,.187);
- // Narrow dark school tie, knot and pointed end.
- add(torso,new THREE.BoxGeometry(.085,.09,.025),tieMat,0,.685,.211);
- const tieShape=new THREE.Shape();tieShape.moveTo(-.035,0);tieShape.lineTo(.035,0);tieShape.lineTo(.052,-.31);tieShape.lineTo(0,-.40);tieShape.lineTo(-.052,-.31);tieShape.closePath();
- const tieGeo=new THREE.ShapeGeometry(tieShape);
- add(torso,tieGeo,tieMat,0,.64,.222);
- for(let i=0;i<4;i++)ell(torso,metal,0,.49-i*.105,.205,.009,.009,.006);
- // Small breast pocket and school crest: restrained details, not oversized class armour.
- add(torso,new THREE.BoxGeometry(.105,.105,.012),shirtShade,.17,.48,.185);
- add(torso,new THREE.BoxGeometry(.052,.052,.014),badgeMat,-.17,.51,.194);
- add(torso,new THREE.BoxGeometry(.030,.030,.016),gold,-.17,.51,.205);
- // Head, neck and ears.
- capsule(g,skin,0,1.56,0,.085,.13);
- ell(g,skin,0,1.83,0,.225,.285,.205);
- ell(g,skin,-.225,1.83,0,.045,.07,.045);ell(g,skin,.225,1.83,0,.045,.07,.045);
- ell(g,skin,0,1.79,.198,.025,.045,.035);
- const eye=mat(0x29252a,.72);
- for(const side of [-1,1]){
-  ell(g,eye,side*.078,1.865,.184,.020,.026,.012);
-  add(g,new THREE.BoxGeometry(.060,.012,.012),hair,side*.078,1.91,.185,0,0,side*-.08);
- }
- add(g,new THREE.BoxGeometry(.055,.009,.008),mat(0x985f58),0,1.70,.187);
- // Simple period-appropriate short hair; female option has shoulder-length back hair.
- ell(g,hair,0,2.035,-.025,.235,.145,.205);
- ell(g,hair,0,1.91,-.16,.22,.22,.085);
- for(let i=0;i<5;i++){
-  const x=(i-2)*.082;
-  add(g,new THREE.ConeGeometry(.062,.16+(i%2)*.025,7),hair,x,1.98,.16,0,0,(i-2)*.07);
- }
- if(female){
-  ell(g,hair,-.215,1.72,-.02,.060,.29,.075);
-  ell(g,hair,.215,1.72,-.02,.060,.29,.075);
-  ell(g,hair,0,1.60,-.12,.19,.22,.085);
- }else{
-  ell(g,hair,-.20,1.84,-.01,.05,.13,.06);
-  ell(g,hair,.20,1.84,-.01,.05,.13,.06);
- }
- // Articulated arms: exposed forearms and small hands, matching the short-sleeved uniform.
- const armL=new THREE.Group(),armR=new THREE.Group();
- armL.position.set(-.36,1.40,0);armR.position.set(.36,1.40,0);g.add(armL,armR);
- for(const arm of [armL,armR]){
-  capsule(arm,skin,0,-.22,.005,.073,.27);
-  const elbow=new THREE.Group();elbow.position.set(0,-.40,0);arm.add(elbow);
-  capsule(elbow,skin,0,-.17,0,.065,.23);
-  ell(elbow,skin,0,-.33,.012,.065,.075,.06);
-  arm.userData.elbow=elbow;
- }
- // School trousers or pleated plaid skirt with dark stockings.
- const legL=new THREE.Group(),legR=new THREE.Group();
- legL.position.set(-.145,.84,0);legR.position.set(.145,.84,0);g.add(legL,legR);
- if(female){
-  const skirt=add(g,new THREE.CylinderGeometry(.235,.345,.32,24,1),navy,0,1.00,0);
-  skirt.scale.z=.78;
-  // Fine pleat seams and restrained tartan lines.
-  for(let i=0;i<12;i++){
-   const a=i*Math.PI/6;
-   const x=Math.sin(a)*.285,z=Math.cos(a)*.225;
-   add(g,new THREE.BoxGeometry(.009,.25,.012),navyLight,x,1.00,z,0,a,0);
-  }
- }
- for(const leg of [legL,legR]){
-  capsule(leg,female?navy:navy,0,-.20,0,female?.095:.115,.34);
-  const knee=new THREE.Group();knee.position.y=-.42;leg.add(knee);
-  capsule(knee,female?mat(0x29364a):navy,0,-.16,0,female?.078:.095,.27);
-  add(knee,new THREE.BoxGeometry(.19,.105,.34),shoe,0,-.36,.045);
-  // Small shoe sole.
-  add(knee,new THREE.BoxGeometry(.195,.025,.35),mat(0x080a0e),0,-.415,.045);
-  leg.userData.knee=knee;
- }
- // Waist belt and modest buckle.
- add(g,new THREE.BoxGeometry(.48,.055,.31),navyLight,0,.91,0);
- add(g,new THREE.BoxGeometry(.065,.055,.018),gold,0,.91,.164);
- // Keep the original class weapon silhouettes; uniform remains the visual priority.
- if(job==='sword'){
-  add(armR,new THREE.BoxGeometry(.045,.78,.028),metal,.015,-.52,.015,0,0,-.12);
-  add(armR,new THREE.BoxGeometry(.19,.045,.055),gold,.015,-.20,.015,0,0,-.12);
-  add(armR,new THREE.CylinderGeometry(.022,.022,.15,8),shoe,.015,-.11,.015,0,0,-.12);
- }else if(job==='fighter'){
-  ell(armL,mat(0x303847),0,-.40,.035,.10,.09,.10);
-  ell(armR,mat(0x303847),0,-.40,.035,.10,.09,.10);
- }else if(job==='archer'){
-  add(g,new THREE.BoxGeometry(.16,.34,.12),navyLight,-.27,1.15,-.18);
-  add(armR,new THREE.TorusGeometry(.34,.022,7,20,Math.PI),mat(0x755438),0,-.38,.02,0,0,-Math.PI/2);
- }else if(job==='psy'){
-  add(armR,new THREE.CylinderGeometry(.025,.03,1.05,8),mat(0x51483f),0,-.48,.02,0,0,-.08);
-  ell(armR,mat(0x79c4d8,.3),.04,-1.02,.02,.085,.085,.085);
- }
- g.userData.rig={armL,armR,legL,legR,torso,walk:0,actionUntil:0,gender};
- return g;
+ // Building signs and benches are drawn as scenery, not collision.
+ decor.push({x:17*T,y:10*T,type:'sign',text:'劍道館'});
+ decor.push({x:54*T,y:10*T,type:'sign',text:'社團大樓'});
+ decor.push({x:17*T,y:47*T,type:'sign',text:'教學大樓'});
+ decor.push({x:54*T,y:47*T,type:'sign',text:'圖書館'});
 }
-
-// v0.6: CC0 rigged school-character GLBs with real skeletons and named animations.
-const avatarLoader=new GLTFLoader();
-const schoolModelUrls={
- male:'https://gobkit.com/freebies/human019/Schoolboy.glb',
- female:'https://gobkit.com/freebies/human019/Schoolgirl.glb'
-};
-const schoolModelCache={};
-function getSchoolModel(genderKey){
- const key=genderKey==='female'?'female':'male';
- if(!schoolModelCache[key]){
-  schoolModelCache[key]=new Promise((resolve,reject)=>{
-   avatarLoader.load(schoolModelUrls[key],resolve,undefined,reject);
-  });
- }
- return schoolModelCache[key];
+function say(s){logLines.unshift(s);logLines=logLines.slice(0,5);$('log').innerHTML=logLines.map(x=>'› '+x).join('<br>')}
+function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTimer=1.6}
+function statMax(){const c=jobs[player.job];return {hp:c.hp+(save.level-1)*8,mp:c.mp+(save.level-1)*5}}
+function updateUI(){
+ if(!player)return;const c=jobs[player.job],m=statMax();
+ $('who').textContent=player.name+'｜'+(player.gender==='female'?'女':'男');
+ $('lv').textContent='Lv.'+save.level;$('job').textContent=c.name;
+ $('hpText').textContent=Math.ceil(save.hp)+'/'+m.hp;$('mpText').textContent=Math.ceil(save.mp)+'/'+m.mp;
+ $('xpText').textContent=save.xp+'/'+(save.level*100);$('gold').textContent='金幣 '+save.gold;
+ $('hp').style.width=(100*save.hp/m.hp)+'%';$('mp').style.width=(100*save.mp/m.mp)+'%';$('xp').style.width=(100*save.xp/(save.level*100))+'%';
+ $('quest').textContent='任務：擊倒訓練假人 '+quest+'/3';
+ $('pos').textContent=Math.floor(player.x/T)+','+Math.floor(player.y/T);
 }
-function attachClassWeapon(root,job){
- const hand=root.getObjectByName('RightHand')||root.getObjectByName('mixamorigRightHand')||root.getObjectByName('hand_r');
- if(!hand)return;
- const metal=new THREE.MeshStandardMaterial({color:0xb8c5d0,metalness:.55,roughness:.38});
- const dark=new THREE.MeshStandardMaterial({color:0x303846,roughness:.7});
- const gold=new THREE.MeshStandardMaterial({color:0xc5a15d,metalness:.45,roughness:.4});
- const prop=new THREE.Group();
- if(job==='sword'){
-  const blade=new THREE.Mesh(new THREE.BoxGeometry(.055,.62,.035),metal);blade.position.y=.34;prop.add(blade);
-  const guard=new THREE.Mesh(new THREE.BoxGeometry(.22,.045,.07),gold);guard.position.y=.02;prop.add(guard);
-  const grip=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.20,8),dark);grip.position.y=-.10;prop.add(grip);
- }else if(job==='fighter'){
-  const glove=new THREE.Mesh(new THREE.SphereGeometry(.105,12,10),dark);prop.add(glove);
- }else if(job==='archer'){
-  const bow=new THREE.Mesh(new THREE.TorusGeometry(.28,.025,8,24,Math.PI),gold);bow.rotation.z=Math.PI/2;prop.add(bow);
- }else{
-  const staff=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,.82,9),dark);staff.position.y=.30;prop.add(staff);
-  const orb=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),new THREE.MeshStandardMaterial({color:0x75c9ed,emissive:0x174a66,roughness:.25}));orb.position.y=.74;prop.add(orb);
- }
- hand.add(prop);
-}
-async function makeRiggedSchoolAvatar(job='sword',genderKey='male'){
- const gltf=await getSchoolModel(genderKey);
- const model=cloneSkeleton(gltf.scene);
- model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.material){o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone();}}});
- const bounds=new THREE.Box3().setFromObject(model),size=bounds.getSize(new THREE.Vector3());
- const scale=3.15/Math.max(size.y,.001);model.scale.setScalar(scale);
- model.position.y=-bounds.min.y*scale;
- const wrapper=new THREE.Group();wrapper.add(model);
- const mixer=new THREE.AnimationMixer(model),actions={};
- for(const clip of gltf.animations){const k=clip.name.toLowerCase();actions[k]=mixer.clipAction(clip);}
- const rig={mixer,actions,active:null,walk:0,gender:genderKey};
- wrapper.userData.rig=rig;
- attachClassWeapon(model,job);
- const idle=actions.idle||actions.stand;
- if(idle){idle.reset().fadeIn(.15).play();rig.active=idle;}
- return wrapper;
-}
-function setRigAction(rig,name){
- const next=rig.actions[name];if(!next||rig.active===next)return;
- if(rig.active)rig.active.fadeOut(.12);
- next.reset().fadeIn(.12).play();rig.active=next;
-}
-
-function animateAvatar(avatar, dt, moving=false){
- const rig=avatar?.userData?.rig;if(!rig)return;
- if(rig.mixer){
-  const attacking=rig.actionUntil&&performance.now()<rig.actionUntil;
-  setRigAction(rig,attacking?(rig.actions.attack?'attack':'special'):(moving?(rig.actions.walk?'walk':'run'):'idle'));
-  rig.mixer.update(dt);return;
- }
- if(moving)rig.walk+=dt*10;
- const swing=moving?Math.sin(rig.walk)*.62:0;
- const attacking=performance.now()<rig.actionUntil;
- rig.legL.rotation.x=swing;rig.legR.rotation.x=-swing;
- rig.legL.userData.knee.rotation.x=Math.max(0,-swing)*.7;rig.legR.userData.knee.rotation.x=Math.max(0,swing)*.7;
- rig.armL.rotation.x=-swing*.65;rig.armR.rotation.x=swing*.65;
- if(attacking){const t=(rig.actionUntil-performance.now())/330;rig.armR.rotation.x=-1.2*Math.sin(Math.PI*Math.max(0,Math.min(1,t)));rig.torso.rotation.y=.16*Math.sin(Math.PI*Math.max(0,Math.min(1,t)));}
- else rig.torso.rotation.y=0;
-}
-
-let player,playerId=null,socket=null,chosen='sword',gender='male',name='新生玩家',level=1,xp=0,gold=0,hp=100,mp=50,camYaw=0,camDist=11,attackAt=0,skillAt=0,quest=0;
-let remote=new Map(),mobs=[],drops=[],keys={};
-function addMob(x,z){const g=new THREE.Group();let torso=new THREE.Mesh(new THREE.BoxGeometry(.9,1.2,.55),mat(0x987c58));torso.position.y=.85;g.add(torso);let head=new THREE.Mesh(new THREE.SphereGeometry(.32,10,8),mat(0xc8a27a));head.position.y=1.65;g.add(head);g.position.set(x,0,z);g.userData={hp:50,max:50,dead:false,hit:0};scene.add(g);mobs.push(g);return g}
-for(let i=0;i<9;i++)addMob(-12+(i%3)*12,4+Math.floor(i/3)*8);
-function log(s){let el=$('log');el.innerHTML+=`<div>› ${s}</div>`;el.scrollTop=el.scrollHeight}
-function updateUI(){let c=classData[chosen],maxxp=level*100;hp=Math.max(0,Math.min(hp,c.hp+(level-1)*8));$('who').textContent=name;$('className').textContent=c.label;$('level').textContent='Lv.'+level;$('hpText').textContent=`${Math.round(hp)} / ${c.hp+(level-1)*8}`;$('mpText').textContent=`${Math.round(mp)} / ${c.mp+(level-1)*5}`;$('xpText').textContent=`${xp} / ${maxxp}`;$('hp').style.width=(hp/(c.hp+(level-1)*8)*100)+'%';$('mp').style.width=(mp/(c.mp+(level-1)*5)*100)+'%';$('xp').style.width=(xp/maxxp*100)+'%';$('goldText').textContent='金幣：'+gold;$('quest').textContent=`進度 ${quest} / 3`}
-function gainXP(n){xp+=n;while(xp>=level*100){xp-=level*100;level++;hp+=20;mp+=15;log(`升級！目前等級 Lv.${level}`)}updateUI()}
-function attack(skill=0){if(!player)return;let now=performance.now();if(now-attackAt<420)return;attackAt=now;if(player?.userData?.rig)player.userData.rig.actionUntil=now+650;let c=classData[chosen];if(skill){if(now-skillAt<2200||mp<18){log('技能冷卻中或 MP 不足');return}skillAt=now;mp-=18}
- let range=skill?c.range*1.35:c.range+1,damage=c.power*(skill?2.1:1);let target=null,best=range;
- for(let m of mobs){if(m.userData.dead)continue;let d=player.position.distanceTo(m.position);if(d<best){best=d;target=m}}
- if(target){target.userData.hp-=damage;target.userData.hit=performance.now();let flash=new THREE.PointLight(0xffc56b,2,4);flash.position.copy(target.position).add(new THREE.Vector3(0,1,0));scene.add(flash);setTimeout(()=>scene.remove(flash),100);
- if(target.userData.hp<=0){target.userData.dead=true;target.visible=false;gainXP(35);gold+=8;quest=Math.min(3,quest+1);drops.push({x:target.position.x,z:target.position.z,kind:'coin'});log(`擊倒訓練假人！獲得 35 EXP、8 金幣`);updateUI()}else log(`${skill?c.skill:'普通攻擊'}命中！造成 ${Math.round(damage)} 傷害`)}
- else log('附近沒有可攻擊的訓練假人');updateUI();
- if(socket?.connected)socket.emit('combat',{type:skill?'skill':'attack',x:player.position.x,z:player.position.z});
-}
-function pickup(){if(!player)return;let idx=drops.findIndex(d=>Math.hypot(d.x-player.position.x,d.z-player.position.z)<2.5);if(idx>=0){drops.splice(idx,1);gold+=5;log('拾取地上的補給品：+5 金幣');updateUI()}else log('附近沒有可拾取物品')}
-function makeDrop(d){let m=new THREE.Mesh(new THREE.TorusGeometry(.35,.1,6,12),mat(0xffd45c));m.rotation.x=Math.PI/2;m.position.set(d.x,.35,d.z);scene.add(m);return m}
-let dropMeshes=[];
+function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({level:save.level,xp:save.xp,gold:save.gold,quest:quest}))}catch(e){}}
+function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
- name=$('name').value.trim()||'新生玩家';chosen=$('class').value;gender=$('gender').value;let c=classData[chosen];hp=c.hp;mp=c.mp;
- player=makeAvatar(chosen,c.color,gender);const localFallback=player;player.position.set(0,0,12);scene.add(player);$('assetStatus').textContent='角色模型：正在下載並載入骨骼 3D 校服模型…';makeRiggedSchoolAvatar(chosen,gender).then(model=>{if(player!==localFallback)return;model.position.copy(localFallback.position);model.rotation.copy(localFallback.rotation);scene.add(model);scene.remove(localFallback);player=model;$('assetStatus').textContent='角色模型：已載入真正 3D 骨骼模型';log('已載入校服 3D 骨骼人物與內建動作。');}).catch(err=>{$('assetStatus').textContent='角色模型：外部模型載入失敗，暫用本機備援人物';log('外部 3D 模型暫時無法載入，已使用備援人物。');console.warn(err)});$('login').style.display='none';updateUI();log(`歡迎 ${name} 加入${c.label}！`);log('任務開始：擊倒 3 隻訓練假人。');
- socket=io({transports:['websocket','polling'],timeout:2500});
- socket.on('connect',()=>{playerId=socket.id;$('net').textContent='連線狀態：已連線';log('已連上學園伺服器，可以遇見其他玩家。');socket.emit('join',{name,job:c.label,jobKey:chosen,genderKey:gender,color:c.color,x:player.position.x,z:player.position.z})});
- socket.on('connect_error',()=>{$('net').textContent='連線狀態：離線單人模式';});
- socket.on('disconnect',()=>{$('net').textContent='連線狀態：已中斷'});
- socket.on('players',list=>{let alive=new Set(list.map(p=>p.id));for(let [id,obj] of remote){if(!alive.has(id)){scene.remove(obj.mesh);remote.delete(id)}}for(let p of list){if(p.id===playerId)continue;let o=remote.get(p.id);if(!o){let mesh=makeAvatar(p.jobKey||'sword',p.color||0xdddddd,p.genderKey||'male');scene.add(mesh);o={mesh,label:p.name};remote.set(p.id,o);const fallback=mesh;makeRiggedSchoolAvatar(p.jobKey||'sword',p.genderKey||'male').then(rigged=>{if(remote.get(p.id)!==o||o.mesh!==fallback)return;rigged.position.copy(fallback.position);rigged.rotation.copy(fallback.rotation);scene.add(rigged);scene.remove(fallback);o.mesh=rigged;}).catch(err=>console.warn('Remote avatar model load failed',err))}o.mesh.position.set(p.x||0,0,p.z||0);o.mesh.rotation.y=p.rot||0;o.label=p.name} $('players').innerHTML=[...remote.values()].map(o=>'• '+o.label).join('<br>')||'目前沒有其他玩家'});
+ loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
+ player={id:'local',name,job,gender,x:MW*T/2,y:29*T,dir:'down',frame:0,walk:0,flash:0};
+ save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
+ $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
+ try{
+  if(typeof io==='function'){socket=io({transports:['websocket','polling'],timeout:2500});
+   socket.on('connect',()=>{playerId=socket.id;$('net').textContent='多人連線中';socket.emit('join',{name:player.name,job:jobs[player.job].name,jobKey:player.job,genderKey:player.gender,color:0x4d8fc7,x:player.x/T,z:player.y/T});say('已連上學園伺服器。')});
+   socket.on('connect_error',()=>{$('net').textContent='離線單人模式'});
+   socket.on('disconnect',()=>{$('net').textContent='連線中斷'});
+   socket.on('players',syncPlayers);
+   socket.on('combat-event',e=>say((e.player||'玩家')+' 發動了攻擊！'));
+  }
+ }catch(e){$('net').textContent='離線單人模式'}
 }
-$('start').onclick=start;
-$('attack').onclick=()=>attack(0);$('skill1').onclick=()=>attack(1);$('skill2').onclick=()=>{if(chosen==='psy'&&mp<10){log('MP 不足');return}mp=Math.min(classData[chosen].mp+(level-1)*5,mp+12);hp=Math.min(classData[chosen].hp+(level-1)*8,hp+8);log('凝神調息：恢復生命與法力');updateUI()};$('pickup').onclick=pickup;
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();attack(0)}if(e.key==='1')attack(1);if(e.key==='2'){$('skill2').click()}if(e.key.toLowerCase()==='e')pickup()});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-document.querySelectorAll('#mobile button').forEach(b=>{let k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});
-let dragging=false,lastX=0;renderer.domElement.addEventListener('pointerdown',e=>{if(e.button===2){dragging=true;lastX=e.clientX}else if(e.button===0&&player)attack(0)});
-addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging){camYaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});
-renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());renderer.domElement.addEventListener('wheel',e=>{camDist=Math.max(6,Math.min(20,camDist+e.deltaY*.01))},{passive:true});
-const clock=new THREE.Clock();let sendTimer=0;
-function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.05);
- if(player){let f=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),s=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);let v=new THREE.Vector3(s,0,-f);if(v.lengthSq()){v.normalize().applyAxisAngle(new THREE.Vector3(0,1,0),camYaw);player.position.addScaledVector(v,7*dt);player.position.x=Math.max(-48,Math.min(48,player.position.x));player.position.z=Math.max(-45,Math.min(48,player.position.z));player.rotation.y=Math.atan2(v.x,v.z)}
- animateAvatar(player,dt,!!(f||s));
- let desired=new THREE.Vector3(player.position.x+Math.sin(camYaw)*camDist,camDist*.85,player.position.z+Math.cos(camYaw)*camDist);camera.position.lerp(desired,.12);camera.lookAt(player.position.x,1,player.position.z);
- sendTimer+=dt;if(sendTimer>.08){sendTimer=0;if(socket?.connected)socket.emit('move',{x:player.position.x,z:player.position.z,rot:player.rotation.y})}
+function initMobs(){
+ mobs=[];const pts=[[25,20],[28,30],[44,20],[46,31],[19,37],[55,37],[37,17]];
+ pts.forEach((p,i)=>mobs.push({x:p[0]*T+8,y:p[1]*T+8,hp:55,max:55,alive:true,dir:'down',hit:0,phase:i*.7}));
+}
+function syncPlayers(list){
+ const seen=new Set();
+ list.forEach(p=>{if(p.id===playerId)return;seen.add(p.id);let r=remotes.get(p.id);if(!r){r={x:(p.x||0)*T,y:(p.z||0)*T,name:p.name||'玩家',job:p.jobKey||'sword',gender:p.genderKey||'male',dir:'down',frame:0};remotes.set(p.id,r)}
+ r.tx=(p.x||0)*T;r.ty=(p.z||0)*T;r.name=p.name||'玩家';r.job=p.jobKey||'sword';r.gender=p.genderKey||'male';});
+ for(const id of remotes.keys())if(!seen.has(id))remotes.delete(id);
+ $('players').textContent=Array.from(remotes.values()).map(r=>'• '+r.name).join('、')||'目前沒有其他玩家';
+}
+function collides(x,y){
+ const r={x:x-5,y:y-5,w:10,h:10};
+ for(const b of obstacles)if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)return true;
+ for(let yy=Math.floor((y-5)/T);yy<=Math.floor((y+5)/T);yy++)for(let xx=Math.floor((x-5)/T);xx<=Math.floor((x+5)/T);xx++){
+  const v=(map[yy]||[])[xx];if(v===3||v===4||v===5)return true;
  }
- for(let m of mobs){if(m.userData.dead)continue;if(performance.now()-m.userData.hit<150){m.scale.setScalar(1.06)}else m.scale.setScalar(1);if(player){let d=m.position.distanceTo(player.position);if(d<2.3&&Math.random()<.003){hp=Math.max(0,hp-3);updateUI();if(hp<=0){player.position.set(0,0,12);hp=classData[chosen].hp;log('你暫時失去戰鬥能力，已返回廣場。');updateUI()}}}}
- for(const o of remote.values())animateAvatar(o.mesh,dt,false);
- for(let d of drops){if(!d.mesh){d.mesh=makeDrop(d)}d.mesh.rotation.z+=dt*1.5}
- renderer.render(scene,camera)
-}animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+ return false;
+}
+function move(dx,dy){
+ if(!player)return;let nx=player.x+dx,ny=player.y+dy;
+ if(!collides(nx,player.y))player.x=nx;if(!collides(player.x,ny))player.y=ny;
+ if(Math.abs(dx)+Math.abs(dy)>0){player.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');player.walk+=.18}
+}
+function drawTile(v,x,y,tx,ty){
+ if(v===0){ctx.fillStyle=(tx+ty)%2?'#78aa63':'#74a45e';ctx.fillRect(x,y,T,T);if(rand(tx,ty)>.72){ctx.fillStyle='#8cba70';ctx.fillRect(x+3,y+5,2,2);ctx.fillRect(x+11,y+12,2,2)}}
+ else if(v===1){ctx.fillStyle='#c9b88a';ctx.fillRect(x,y,T,T);ctx.fillStyle='#d9c99c';ctx.fillRect(x+1,y+1,14,2);ctx.fillStyle='#b8a578';ctx.fillRect(x+3,y+11,3,1)}
+ else if(v===2){ctx.fillStyle='#8d6045';ctx.fillRect(x,y,T,T);ctx.fillStyle='#bd9367';ctx.fillRect(x,y,16,4);ctx.fillStyle='#674937';ctx.fillRect(x+1,y+5,14,10);ctx.fillStyle='#d7bd8b';ctx.fillRect(x+3,y+7,10,6)}
+ else if(v===3){ctx.fillStyle='#477c4e';ctx.fillRect(x,y,T,T);ctx.fillStyle='#2d603f';ctx.fillRect(x+2,y+5,12,8);ctx.fillStyle='#5e9b5c';ctx.fillRect(x+4,y+2,8,9)}
+ else if(v===4){ctx.fillStyle='#438fa0';ctx.fillRect(x,y,T,T);ctx.fillStyle='#8bc6bd';ctx.fillRect(x+2,y+4,6,1);ctx.fillRect(x+9,y+11,5,1)}
+ else if(v===5){ctx.fillStyle='#6b9e59';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e0c57f';ctx.fillRect(x+3,y+3,10,10);ctx.fillStyle='#477b4a';ctx.fillRect(x+5,y+2,7,8)}
+}
+function drawBuildingSign(d,sx,sy){
+ ctx.fillStyle='#63452f';ctx.fillRect(sx-18,sy-7,36,12);ctx.fillStyle='#f4df9c';ctx.fillRect(sx-17,sy-6,34,9);ctx.fillStyle='#57422f';ctx.font='6px monospace';ctx.textAlign='center';ctx.fillText(d.text,sx,sy+1)
+}
+function drawTree(sx,sy){
+ ctx.fillStyle='#6c4b35';ctx.fillRect(sx-2,sy-2,5,11);
+ ctx.fillStyle='#2c6845';ctx.fillRect(sx-8,sy-12,16,12);ctx.fillStyle='#438452';ctx.fillRect(sx-6,sy-15,12,9);
+ ctx.fillStyle='#75a65d';ctx.fillRect(sx-3,sy-13,4,3);
+}
+function drawAvatar(a,sx,sy,local){
+ const c=jobs[a.job]||jobs.sword,step=Math.floor((a.walk||a.frame||0))%2,dir=a.dir||'down';
+ const skin='#e7b88f',hair=a.gender==='female'?'#3d2925':'#30221e',shirt='#e6e3d2',pants='#273b59';
+ // shadow
+ ctx.fillStyle='#3c6346';ctx.fillRect(sx-6,sy+5,12,3);
+ // weapon behind the body
+ if(a.job==='sword'){ctx.fillStyle='#d9dce0';if(dir==='left'||dir==='right')ctx.fillRect(sx+(dir==='right'?7:-9),sy-5,2,13);else ctx.fillRect(sx+7,sy-8,2,13)}
+ else if(a.job==='archer'){ctx.strokeStyle='#795332';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx+(dir==='left'?-8:8),sy-1,6,-1.2,1.2);ctx.stroke()}
+ // legs
+ ctx.fillStyle=pants;ctx.fillRect(sx-4,sy+1,3,6+(step?1:0));ctx.fillRect(sx+1,sy+1,3,6+(step?0:1));
+ ctx.fillStyle='#25232b';ctx.fillRect(sx-5,sy+6,4,2);ctx.fillRect(sx+1,sy+6,4,2);
+ // torso and sleeves
+ ctx.fillStyle=shirt;ctx.fillRect(sx-5,sy-8,10,10);ctx.fillStyle='#c4c8bd';ctx.fillRect(sx-5,sy-1,10,2);
+ ctx.fillStyle=c.color;ctx.fillRect(sx-1,sy-6,2,5);
+ ctx.fillStyle=skin;ctx.fillRect(sx-7,sy-6,2,6);ctx.fillRect(sx+5,sy-6,2,6);
+ // female skirt and hair
+ if(a.gender==='female'){ctx.fillStyle='#293c5b';ctx.fillRect(sx-6,sy,12,3);ctx.fillStyle=hair;ctx.fillRect(sx-6,sy-14,3,10);ctx.fillRect(sx+3,sy-14,3,10)}
+ // face/head, hair cap
+ ctx.fillStyle=skin;ctx.fillRect(sx-4,sy-16,8,8);
+ ctx.fillStyle=hair;ctx.fillRect(sx-5,sy-18,10,4);ctx.fillRect(sx-5,sy-15,2,4);ctx.fillRect(sx+3,sy-15,2,4);
+ if(dir==='down'){ctx.fillStyle='#382d2a';ctx.fillRect(sx-2,sy-12,1,1);ctx.fillRect(sx+2,sy-12,1,1)}
+ else if(dir==='left'||dir==='right'){ctx.fillStyle='#382d2a';ctx.fillRect(sx+(dir==='left'?-3:2),sy-12,1,1)}
+ else{ctx.fillStyle=hair;ctx.fillRect(sx-4,sy-15,8,3)}
+ if(a.job==='fighter'){ctx.fillStyle='#c9a46b';ctx.fillRect(sx-7,sy-5,3,3);ctx.fillRect(sx+4,sy-5,3,3)}
+ if(a.job==='psy'){ctx.fillStyle='#8ad5e7';ctx.fillRect(sx+5,sy-10,2,2)}
+ if(local){ctx.fillStyle='#fff1a8';ctx.fillRect(sx-1,sy-23,2,2)}
+}
+function drawMob(m,sx,sy){
+ ctx.fillStyle='#3e6745';ctx.fillRect(sx-7,sy+6,14,3);
+ ctx.fillStyle='#8c7556';ctx.fillRect(sx-6,sy-9,12,14);ctx.fillStyle='#b69a6e';ctx.fillRect(sx-5,sy-13,10,7);
+ ctx.fillStyle='#5c4937';ctx.fillRect(sx-3,sy-10,2,2);ctx.fillRect(sx+2,sy-10,2,2);
+ ctx.fillStyle='#e5d3a3';ctx.fillRect(sx-7,sy-15,14,2);
+ ctx.fillStyle='#172d35';ctx.fillRect(sx-7,sy-19,14,3);ctx.fillStyle='#d95e55';ctx.fillRect(sx-6,sy-18,12*Math.max(0,m.hp/m.max),1);
+}
+function drawWorld(){
+ const camX=Math.max(0,Math.min(MW*T-W,camera.x-W/2)),camY=Math.max(0,Math.min(MH*T-H,camera.y-H/2));camera.sx=camX;camera.sy=camY;
+ const sx0=Math.floor(camX/T),sy0=Math.floor(camY/T),sx1=sx0+Math.ceil(W/T)+1,sy1=sy0+Math.ceil(H/T)+1;
+ for(let y=sy0;y<sy1;y++)for(let x=sx0;x<sx1;x++)drawTile((map[y]||[])[x]||0,x*T-camX,y*T-camY,x,y);
+ // Building signs and campus furniture
+ decor.forEach(d=>{let x=d.x-camX,y=d.y-camY;if(x<-20||x>W+20||y<-20||y>H+20)return;if(d.type==='flower'){ctx.fillStyle=d.c;ctx.fillRect(x,y,3,3)}else if(d.type==='sign')drawBuildingSign(d,x,y)});
+ // Training posts, benches and lamp posts
+ for(let i=0;i<5;i++){let x=(22+i*7)*T-camX,y=27*T-camY;ctx.fillStyle='#66452e';ctx.fillRect(x-2,y-9,4,17);ctx.fillStyle='#b38b55';ctx.fillRect(x-6,y-10,12,4);ctx.fillStyle='#e1d0a2';ctx.fillRect(x-1,y-8,2,3)}
+ // Trees and garden borders
+ for(let y=4;y<52;y++)for(let x=4;x<68;x++)if(map[y][x]===3)drawTree(x*T+8-camX,y*T+8-camY);
+ // Mobs, drops, players sorted by y
+ const actors=[];
+ mobs.forEach(m=>{if(m.alive)actors.push({y:m.y,draw:()=>drawMob(m,m.x-camX,m.y-camY)})});
+ drops.forEach(d=>actors.push({y:d.y,draw:()=>{ctx.fillStyle='#f4d45e';ctx.fillRect(d.x-camX-3,d.y-camY-3,7,7);ctx.fillStyle='#fff1a8';ctx.fillRect(d.x-camX-1,d.y-camY-2,2,2)}}));
+ remotes.forEach(r=>actors.push({y:r.y,draw:()=>drawAvatar(r,r.x-camX,r.y-camY,false)}));
+ if(player)actors.push({y:player.y,draw:()=>drawAvatar(player,player.x-camX,player.y-camY,true)});
+ actors.sort((a,b)=>a.y-b.y).forEach(a=>a.draw());
+ // floating combat numbers
+ particles.forEach(p=>{ctx.fillStyle=p.color;ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(p.text,p.x-camX,p.y-camY-p.life*12)});
+}
+function attack(skill){
+ if(!player)return;let now=performance.now();if(skill?skillCooldown>0:attackCooldown>0)return;
+ const c=jobs[player.job],range=skill?c.range*1.4:c.range+15,damage=c.power*(skill?2.1:1);
+ if(skill){if(save.mp<18){toast('MP 不足');return}save.mp-=18;skillCooldown=1.5}else attackCooldown=.42;
+ let target=null,best=range;
+ mobs.forEach(m=>{if(!m.alive)return;let d=Math.hypot(m.x-player.x,m.y-player.y);if(d<best){best=d;target=m}});
+ if(target){target.hp-=damage;target.hit=.18;particles.push({x:target.x,y:target.y-18,text:'-'+Math.round(damage),color:'#fff19a',life:1});
+  if(target.hp<=0){target.alive=false;save.xp+=35;save.gold+=8;quest=Math.min(3,quest+1);drops.push({x:target.x,y:target.y,life:20});say('擊倒訓練假人！獲得 35 EXP、8 金幣');if(quest===3){say('任務完成！校園新生訓練結業。');toast('任務完成！')};levelCheck();persist()}
+  else say((skill?c.skill:'普通攻擊')+'命中！');
+ }else say('附近沒有可攻擊的訓練假人');
+ if(socket&&socket.connected)socket.emit('combat',{type:skill?'skill':'attack'});
+ updateUI();
+}
+function levelCheck(){while(save.xp>=save.level*100){save.xp-=save.level*100;save.level++;let m=statMax();save.hp=m.hp;save.mp=m.mp;say('升級！目前 Lv.'+save.level);toast('LEVEL UP! Lv.'+save.level)}}
+function pickup(){if(!player)return;let i=drops.findIndex(d=>Math.hypot(d.x-player.x,d.y-player.y)<26);if(i<0){say('附近沒有可拾取物品');return}drops.splice(i,1);save.gold+=5;say('拾取補給品：+5 金幣');updateUI();persist()}
+function rest(){if(!player)return;let m=statMax();save.hp=Math.min(m.hp,save.hp+25);save.mp=Math.min(m.mp,save.mp+20);say('原地調息，恢復生命與法力。');updateUI()}
+function update(dt){
+ if(!player)return;
+ let dx=0,dy=0;if(keys.ArrowUp||keys.w||touch.up)dy--;if(keys.ArrowDown||keys.s||touch.down)dy++;if(keys.ArrowLeft||keys.a||touch.left)dx--;if(keys.ArrowRight||keys.d||touch.right)dx++;
+ if(dx||dy){let l=Math.hypot(dx,dy);move(dx/l*48*dt,dy/l*48*dt)}
+ if(attackCooldown>0)attackCooldown-=dt;if(skillCooldown>0)skillCooldown-=dt;
+ mobs.forEach(m=>{if(!m.alive)return;m.phase+=dt;if(Math.hypot(m.x-player.x,m.y-player.y)<21&&Math.random()<dt*.35){save.hp=Math.max(0,save.hp-3);if(save.hp===0){let c=jobs[player.job];save.hp=c.hp;player.x=MW*T/2;player.y=29*T;say('體力耗盡，已返回學園廣場。');toast('返回廣場')}updateUI()}});
+ drops.forEach(d=>d.life-=dt);drops=drops.filter(d=>d.life>0);
+ remotes.forEach(r=>{if(r.tx!==undefined){r.x+=(r.tx-r.x)*Math.min(1,dt*12);r.y+=(r.ty-r.y)*Math.min(1,dt*12)}r.frame+=dt*7});
+ particles.forEach(p=>p.life-=dt);particles=particles.filter(p=>p.life>0);
+ if(socket&&socket.connected){player.send=(player.send||0)+dt;if(player.send>.1){player.send=0;socket.emit('move',{x:player.x/T,z:player.y/T,rot:0})}}
+ camera.x+=(player.x-camera.x)*Math.min(1,dt*8);camera.y+=(player.y-camera.y)*Math.min(1,dt*8);
+ if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$('toast').style.opacity=0}
+}
+function render(){
+ ctx.clearRect(0,0,W,H);drawWorld();
+ // GBC-style bottom location plaque
+ ctx.fillStyle='#18333cdd';ctx.fillRect(112,220,96,14);ctx.strokeStyle='#d5c18a';ctx.strokeRect(112.5,220.5,95,13);
+ ctx.fillStyle='#f6e7b7';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText('學園中央廣場',160,230);
+}
+function loop(t){let dt=Math.min(.05,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
+function bindHold(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();fn(false)}))}
+document.querySelectorAll('[data-dir]').forEach(b=>{const d=b.dataset.dir==='down2'?'down':b.dataset.dir;bindHold(b,v=>touch[d]=v)});
+$('attack').addEventListener('pointerdown',e=>{e.preventDefault();attack(false)});
+$('skill').addEventListener('pointerdown',e=>{e.preventDefault();attack(true)});
+$('rest').addEventListener('pointerdown',e=>{e.preventDefault();rest()});
+$('pickup').addEventListener('pointerdown',e=>{e.preventDefault();pickup()});
+$('start').onclick=start;
+addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true;if(e.key==='j'||e.key===' '){e.preventDefault();attack(false)}if(e.key==='k')attack(true);if(e.key==='e')pickup()});
+addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+initMap();requestAnimationFrame(loop);
+})();
 </script>
-</body></html>
+</body>
+</html>
