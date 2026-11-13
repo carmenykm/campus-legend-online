@@ -1,8 +1,8 @@
 {
   "name": "campus-legend-online-prototype",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
-  "description": "3D campus MMORPG prototype with CC0 rigged school character avatars",
+  "description": "2D GBC-style top-down pixel campus RPG prototype",
   "scripts": {
     "start": "node server.js"
   },
