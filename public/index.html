@@ -122,23 +122,64 @@ const jobs={
 const trainerStyles={m1:{"key":"m1","gender":"male","name":"赤焰","mood":"自信","hair":"#30241f","shirt":"#d94d45","pants":"#31527a","accent":"#f2cf78","hairType":0,"expression":0},m2:{"key":"m2","gender":"male","name":"陽光","mood":"開朗","hair":"#76502f","shirt":"#e9c66c","pants":"#527d4b","accent":"#fff0b0","hairType":1,"expression":1},m3:{"key":"m3","gender":"male","name":"冷峻","mood":"嚴肅","hair":"#263b55","shirt":"#526d91","pants":"#293d58","accent":"#d7a64c","hairType":2,"expression":2},m4:{"key":"m4","gender":"male","name":"頑皮","mood":"調皮","hair":"#4b3527","shirt":"#67a6a0","pants":"#475a72","accent":"#f2d47b","hairType":3,"expression":3},m5:{"key":"m5","gender":"male","name":"害羞","mood":"害羞","hair":"#684a43","shirt":"#d9b4a0","pants":"#61516f","accent":"#e98f91","hairType":4,"expression":4},m6:{"key":"m6","gender":"male","name":"疑惑","mood":"困惑","hair":"#353b43","shirt":"#8c9aab","pants":"#3f5260","accent":"#d7e0dc","hairType":5,"expression":5},m7:{"key":"m7","gender":"male","name":"熱血","mood":"憤怒","hair":"#3d2924","shirt":"#c65b35","pants":"#4c3b3b","accent":"#f0b44f","hairType":6,"expression":6},m8:{"key":"m8","gender":"male","name":"沉穩","mood":"冷靜","hair":"#51443b","shirt":"#718b65","pants":"#394f43","accent":"#d8c995","hairType":7,"expression":7},f1:{"key":"f1","gender":"female","name":"星晴","mood":"自信","hair":"#382a35","shirt":"#d95b78","pants":"#51446e","accent":"#f4d18a","hairType":0,"expression":0},f2:{"key":"f2","gender":"female","name":"甜心","mood":"開朗","hair":"#8a593c","shirt":"#e9bd65","pants":"#6c7650","accent":"#fff0b0","hairType":1,"expression":1},f3:{"key":"f3","gender":"female","name":"冰羽","mood":"嚴肅","hair":"#293d5c","shirt":"#6688b5","pants":"#34475f","accent":"#d5e6ed","hairType":2,"expression":2},f4:{"key":"f4","gender":"female","name":"莓果","mood":"調皮","hair":"#63384b","shirt":"#b86e91","pants":"#594866","accent":"#f2c2d2","hairType":3,"expression":3},f5:{"key":"f5","gender":"female","name":"櫻雪","mood":"害羞","hair":"#754b54","shirt":"#e5b4b9","pants":"#78627c","accent":"#fff0df","hairType":4,"expression":4},f6:{"key":"f6","gender":"female","name":"知性","mood":"困惑","hair":"#34394a","shirt":"#8296a8","pants":"#455a70","accent":"#dce5ec","hairType":5,"expression":5},f7:{"key":"f7","gender":"female","name":"烈陽","mood":"憤怒","hair":"#4a3028","shirt":"#d66b4e","pants":"#57414b","accent":"#f5c56d","hairType":6,"expression":6},f8:{"key":"f8","gender":"female","name":"月影","mood":"冷靜","hair":"#50415d","shirt":"#8878a7","pants":"#49435d","accent":"#e5d8f1","hairType":7,"expression":7}};
 let selectedStyle='m1';
 function drawTrainerMini(g,p,x,y,z){
- const r=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(x+a*z,y+b*z,w*z,h*z)};
- r(3,1,10,9,p.hair);r(2,3,12,7,p.hair);r(4,4,8,6,'#efbd98');
- const ht=p.hairType;
- if(ht===0){r(2,1,12,3,p.hair);r(1,3,3,2,p.hair)}
- if(ht===1){r(2,1,12,2,p.hair);r(11,3,4,6,p.hair)}
- if(ht===2){r(3,0,10,3,p.hair);r(2,3,2,5,p.hair)}
- if(ht===3){r(2,1,12,2,p.hair);r(1,3,3,7,p.hair);r(12,4,3,6,p.hair)}
- if(ht===4){r(2,1,12,2,p.hair);r(1,4,3,7,p.hair);r(12,4,3,7,p.hair);r(5,0,6,2,p.accent)}
- if(ht===5){r(3,0,10,3,p.hair);r(2,3,2,3,p.hair);r(12,3,2,3,p.hair)}
- if(ht===6){r(2,2,12,2,p.hair);r(3,0,3,3,p.hair);r(7,0,3,3,p.hair);r(11,1,3,3,p.hair)}
- if(ht===7){r(3,1,10,2,p.hair);r(1,4,3,7,p.hair);r(12,4,3,7,p.hair);r(5,0,6,2,p.hair)}
- r(5,5,2,2,'#fff7e7');r(9,5,2,2,'#fff7e7');r(6,5,1,2,'#282c37');r(10,5,1,2,'#282c37');
- if(p.expression===2||p.expression===6){r(5,4,2,1,'#282c37');r(9,4,2,1,'#282c37')}
- if(p.expression===1)r(6,7,5,1,'#a64c50');else if(p.expression===3)r(7,7,2,2,'#713c43');else if(p.expression===4){r(7,7,2,1,'#a64c50');r(4,7,2,1,'#df8b83');r(10,7,2,1,'#df8b83')}else if(p.expression===5)r(7,7,2,1,'#713c43');else if(p.expression===6)r(7,7,3,1,'#713c43');else r(7,7,2,1,'#a64c50');
- r(5,11,6,5,p.shirt);r(4,12,8,2,p.accent);r(6,16,2,4,p.pants);r(9,16,2,4,p.pants);r(5,19,3,1,'#292b35');r(9,19,3,1,'#292b35');
+ drawPixelTrainer(g,p,x,y,z,'down',0,'sword');
 }
-function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,7,8,2)}
+function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
+ const r=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(x+a*z,y+b*z,w*z,h*z)};
+ const dark='#292b35',skin='#efbd98',hair=p.hair||'#49372e',side=dir==='left'||dir==='right',back=dir==='up',flip=dir==='right';
+ const shirt=p.shirt||'#6688a0',pants=p.pants||'#40536b',accent=p.accent||'#e9ca7a';
+ // compact 16x24 GBA-style trainer silhouette and ground shadow
+ r(2,22,12,1,'#315b43');r(4,23,8,1,'#294a38');
+ // legs and shoes
+ const step=frame%2?1:0;
+ r(5,18,3,4,pants);r(9,18,3,4,pants);
+ if(frame%4===1){r(5,20,3,2,pants);r(9,18,3,2,pants)}
+ r(4,22,4,2,dark);r(9,22,4,2,dark);
+ // body / outfit
+ r(3,12,10,7,dark);r(4,12,8,7,shirt);r(3,14,2,4,shirt);r(11,14,2,4,shirt);
+ r(5,12,6,2,accent);r(7,14,2,3,'#f0d6a0');
+ if(p.gender==='female'){r(3,17,10,2,accent);r(4,18,8,1,shirt)}
+ else{r(5,18,6,1,pants)}
+ // neck and head base
+ r(6,10,4,3,skin);
+ r(3,2,10,10,dark);r(4,2,8,10,skin);r(2,4,2,6,skin);r(12,4,2,6,skin);
+ // hair silhouette variations
+ if(p.hairType===0){r(2,1,12,4,hair);r(3,3,10,2,hair);r(2,5,2,3,hair)}
+ if(p.hairType===1){r(2,1,12,4,hair);r(3,2,10,2,hair);r(11,5,3,7,hair)}
+ if(p.hairType===2){r(3,0,10,4,hair);r(2,3,3,5,hair);r(7,0,3,2,accent)}
+ if(p.hairType===3){r(2,1,12,4,hair);r(2,5,3,7,hair);r(11,5,3,7,hair);r(8,0,4,2,hair)}
+ if(p.hairType===4){r(2,1,12,4,hair);r(2,5,3,8,hair);r(11,5,3,8,hair);r(6,0,4,2,accent)}
+ if(p.hairType===5){r(3,0,10,4,hair);r(2,4,3,4,hair);r(11,4,3,4,hair)}
+ if(p.hairType===6){r(2,2,12,3,hair);r(3,0,3,4,hair);r(7,0,3,4,hair);r(11,1,3,4,hair)}
+ if(p.hairType===7){r(2,1,12,4,hair);r(2,5,3,8,hair);r(11,5,3,8,hair);r(5,0,6,2,hair)}
+ if(back){
+  r(2,3,12,9,hair);r(3,6,10,6,hair);r(4,12,8,7,shirt);r(6,13,4,2,accent);
+ }else if(side){
+  const faceX=flip?8:3,farX=flip?3:10;
+  r(faceX,4,4,7,skin);r(farX,5,2,3,dark);r(flip?11:2,4,3,7,hair);
+  r(flip?9:5,7,1,2,dark);
+  r(flip?9:5,10,2,1,'#a95e58');
+ }else{
+  r(3,4,10,7,skin);
+  // two clearly separated eyes, matching the source sheet's tiny GBA face scale
+  r(4,7,2,2,'#fff8e9');r(10,7,2,2,'#fff8e9');r(5,7,1,2,dark);r(10,7,1,2,dark);
+  if(p.expression===2||p.expression===6){r(4,6,3,1,dark);r(9,6,3,1,dark)}
+  else{r(4,6,3,1,hair);r(9,6,3,1,hair)}
+  if(p.expression===1){r(7,10,3,1,'#a94e57')}
+  else if(p.expression===3){r(7,9,2,2,'#783d45')}
+  else if(p.expression===4){r(7,10,2,1,'#a94e57');r(3,10,2,1,'#df8b83');r(11,10,2,1,'#df8b83')}
+  else if(p.expression===5){r(7,10,2,1,'#783d45');r(11,5,1,1,'#fff0a0')}
+  else if(p.expression===6){r(7,9,3,1,'#783d45')}
+  else{r(7,10,2,1,'#a94e57')}
+ }
+ // class accessory retained as a small readable pixel accent
+ if(job==='sword'){r(flip?14:1,12,1,8,'#dce5e7');r(flip?13:2,14,2,1,'#9b7545')}
+ if(job==='archer'){r(flip?14:1,12,1,8,'#9d7545');r(flip?13:2,12,1,1,'#ead8a4')}
+ if(job==='fighter'){r(2,14,2,2,'#f0d18a');r(12,14,2,2,'#f0d18a')}
+ if(job==='psy'){r(13,3,1,1,'#9ce7f1');r(14,2,1,1,'#e7f8ff')}
+ // movement alternates feet without blurring the 1-pixel outline
+ if(frame%4===1){r(4,22,4,1,dark);r(9,21,4,1,dark)}
+}function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,7,8,2)}
 function refreshStyleChoices(){
  const gender=$('gender').value,root=$('styleChoices');root.innerHTML='';
  const choices=Object.values(trainerStyles).filter(p=>p.gender===gender);
@@ -367,54 +408,11 @@ function drawTree(sx,sy){
  ctx.fillStyle='#75a65d';ctx.fillRect(sx-3,sy-13,4,3);
 }
 function drawAvatar(a,sx,sy,local){
- const c=jobs[a.job]||jobs.sword,dir=a.dir||'down',moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
- const side=dir==='left'||dir==='right',flip=dir==='right',look=trainerStyles[a.styleKey]||trainerStyles.m1;
- const skin='#efbd98',outline='#292c37',hair=look.hair;
- const rect=(x,y,w,h,col)=>{ctx.fillStyle=col;ctx.fillRect(x,y,w,h)};
- rect(sx-10,sy+9,20,3,'#365f42');rect(sx-6,sy+11,12,1,'#294d38');
- const weaponSide=side?(flip?-1:1):1;
- if(a.job==='sword'){rect(sx+weaponSide*13-1,sy-8,3,22,'#38414a');rect(sx+weaponSide*13,sy-13,2,18,'#dce8e8');rect(sx+weaponSide*10,sy+3,6,2,'#9b7545')}
- if(a.job==='archer'){rect(sx+weaponSide*13-1,sy-8,2,20,'#68462f');rect(sx+weaponSide*14,sy-7,1,15,'#d9c18b')}
- const ht=look.hairType;
- if(ht===0){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-12,sy-30,24,4,hair);rect(sx-13,sy-22,4,8,hair)}
- if(ht===1){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-13,sy-30,26,5,hair);rect(sx+9,sy-20,6,13,hair)}
- if(ht===2){rect(sx-12,sy-29,24,7,hair);rect(sx-14,sy-23,5,8,hair);rect(sx-8,sy-32,7,5,hair)}
- if(ht===3){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,13,hair);rect(sx+9,sy-19,6,13,hair);rect(sx+2,sy-31,9,4,hair)}
- if(ht===4){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,15,hair);rect(sx+9,sy-20,5,15,hair);rect(sx-3,sy-32,8,5,look.accent)}
- if(ht===5){rect(sx-12,sy-30,24,8,hair);rect(sx-14,sy-24,4,7,hair);rect(sx+10,sy-24,4,7,hair)}
- if(ht===6){rect(sx-13,sy-25,26,7,hair);rect(sx-10,sy-32,7,8,hair);rect(sx-2,sy-34,7,10,hair);rect(sx+6,sy-30,8,7,hair)}
- if(ht===7){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,14,hair);rect(sx+9,sy-20,5,14,hair);rect(sx-4,sy-33,9,5,hair)}
- rect(sx-11,sy-23,22,19,skin);rect(sx-14,sy-17,3,7,skin);rect(sx+11,sy-17,3,7,skin);rect(sx-12,sy-25,24,4,hair);
- if(a.gender==='female'){rect(sx-14,sy-17,4,13,hair);rect(sx+10,sy-17,4,13,hair)}
- if(dir==='up'){rect(sx-12,sy-24,24,20,hair);rect(sx-14,sy-18,4,10,hair);rect(sx+10,sy-18,4,10,hair)}
- else if(side){
-  const sign=flip?1:-1;rect(sx+sign*8,sy-16,4,5,skin);rect(sx+sign*2,sy-16,3,3,'#fff7e7');rect(sx+sign*3,sy-15,2,2,outline);rect(sx+sign*8,sy-11,3,2,'#b86c65');rect(sx-sign*11,sy-23,5,12,hair);
- }else{
-  const e=look.expression;
-  // Eyes are two separate clusters with a wide strip of skin between them.
-  rect(sx-7,sy-17,4,4,'#fff8e9');rect(sx+3,sy-17,4,4,'#fff8e9');rect(sx-5,sy-16,2,3,outline);rect(sx+4,sy-16,2,3,outline);
-  if(e===2||e===6){rect(sx-8,sy-19,5,2,outline);rect(sx+3,sy-19,5,2,outline)}else{rect(sx-8,sy-19,5,1,outline);rect(sx+3,sy-19,5,1,outline)}
-  if(e===1){rect(sx-2,sy-8,5,2,'#a64c50');rect(sx-1,sy-7,3,1,'#fff0df')}
-  else if(e===3){rect(sx-1,sy-9,3,3,'#713c43')}
-  else if(e===4){rect(sx-2,sy-9,4,2,'#a64c50');rect(sx-10,sy-10,3,2,'#df8b83');rect(sx+7,sy-10,3,2,'#df8b83')}
-  else if(e===5){rect(sx-1,sy-9,3,1,'#713c43');rect(sx+8,sy-20,2,2,'#fff0a0')}
-  else if(e===6){rect(sx-2,sy-9,5,2,'#713c43')}
-  else if(e===7){rect(sx-1,sy-8,3,1,'#a64c50')}
-  else{rect(sx-1,sy-9,3,1,'#a64c50')}
- }
- rect(sx-4,sy-4,8,5,skin);rect(sx-9,sy,18,12,look.shirt);rect(sx-11,sy+2,4,7,look.shirt);rect(sx+7,sy+2,4,7,look.shirt);
- rect(sx-5,sy,10,3,look.accent);rect(sx-2,sy+3,4,5,c.color);
- if(look.gender==='female'){rect(sx-9,sy+8,18,3,look.accent);rect(sx-3,sy+1,6,2,'#fff0df')}else{rect(sx-7,sy+9,14,2,look.pants)}
- rect(sx-7,sy+12,5,5,look.pants);rect(sx+2,sy+12,5,5,look.pants);rect(sx-8,sy+16,7,2,outline);rect(sx+1,sy+16,7,2,outline);
- if(ht===0)rect(sx+7,sy-27,5,3,look.accent);if(ht===1)rect(sx-13,sy-27,5,3,look.accent);
- if(ht===3||ht===4)rect(sx-2,sy-29,5,3,look.accent);if(ht===5)rect(sx+9,sy+2,3,3,look.accent);if(ht===7)rect(sx-2,sy-31,5,3,look.accent);
- if(moving){const swing=frame===1?2:(frame===3?-2:0);rect(sx-7,sy+12+swing,5,4,look.pants);rect(sx+2,sy+12-swing,5,4,look.pants)}
- if(a.job==='fighter'){rect(sx-12,sy+2,4,4,'#f0d18a');rect(sx+8,sy+2,4,4,'#f0d18a')}
- if(a.job==='psy'){rect(sx+10,sy-22,2,2,'#9ce7f1');rect(sx+11,sy-24,1,1,'#e7f8ff')}
- if(a.job==='archer')rect(sx-14,sy-5,2,13,'#9d7545');
- if(local){rect(sx-1,sy-37,2,2,'#fff0a2');rect(sx-4,sy-35,8,1,'#e9c75f')}
-}
-function drawMob(m,sx,sy){
+ const dir=a.dir||'down',moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
+ const look=trainerStyles[a.styleKey]||trainerStyles.m1;
+ drawPixelTrainer(ctx,look,sx-8,sy-24,1,dir,frame,a.job||'sword');
+ if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-28,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-26,8,1)}
+}function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
  ctx.fillStyle='#315a3d';ctx.fillRect(sx-9,sy+7,18,3);ctx.fillStyle='#254a35';ctx.fillRect(sx-5,sy+9,10,1);
  ctx.fillStyle='#5b3b29';ctx.fillRect(sx-2,sy-13,4,23);ctx.fillRect(sx-11,sy-8,22,3);
