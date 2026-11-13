@@ -46,7 +46,7 @@ button:active{transform:translateY(2px);box-shadow:0 1px 0 #102630;background:#5
 #stick{position:absolute;left:50%;top:50%;width:54px;height:54px;border:3px solid #f3dda0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f1d58b,#986b43 72%,#593f32);box-shadow:0 3px 0 #142630,inset 0 0 0 2px #d7b979;transform:translate(-50%,-50%);pointer-events:none}
 #joyHint{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font-size:9px;color:#fff0c9;white-space:nowrap;text-shadow:1px 1px #142b34;pointer-events:none}
 #login{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;background:radial-gradient(ellipse at center,#456d62dd,#10242eee)}
-#login .card{width:min(430px,100%);max-height:94vh;overflow-y:auto;padding:18px 20px}#styleChoices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}.style-choice{min-width:0;padding:7px 2px;background:#294653;border:2px solid #78918b;border-radius:4px;color:#fff0c9;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px}.style-choice.active{border-color:#ffe28b;background:#526b50;box-shadow:inset 0 0 0 1px #fff0b2}.style-choice canvas{width:38px;height:57px;image-rendering:pixelated;background:#8fb77a;border:1px solid #d7c68d}.style-choice span{white-space:nowrap}
+#login .card{width:min(430px,100%);max-height:94vh;overflow-y:auto;padding:18px 20px}#styleChoices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:7px}.style-choice{min-width:0;padding:5px 1px;background:#294653;border:2px solid #78918b;border-radius:4px;color:#fff0c9;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px}.style-choice.active{border-color:#ffe28b;background:#526b50;box-shadow:inset 0 0 0 1px #fff0b2}.style-choice canvas{width:36px;height:54px;image-rendering:pixelated;background:#8fb77a;border:1px solid #d7c68d}.style-choice span{white-space:nowrap;font-size:9px}
 h1{margin:0;color:#ffe9a7;font-size:24px;text-shadow:2px 2px #142b34}
 p{font-size:12px;line-height:1.55;color:#e2e4cc}
 label{display:block;font-size:12px;margin:10px 0 4px;color:#ffe9a7}
@@ -99,7 +99,7 @@ input,select{width:100%;padding:9px}
   <p>踏入熟悉的校園，選擇你的社團職業，探索廣場、挑戰訓練假人並提升等級。</p>
   <label>角色名稱</label><input id="name" maxlength="12" value="新生玩家">
   <label>性別</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
-  <label>選擇訓練家造型</label><div id="styleChoices" aria-label="人物造型選擇"><button type="button" class="style-choice active" data-style="red"><canvas width="48" height="72"></canvas><span>紅帽少年</span></button><button type="button" class="style-choice" data-style="green"><canvas width="48" height="72"></canvas><span>森林旅人</span></button><button type="button" class="style-choice" data-style="blue"><canvas width="48" height="72"></canvas><span>金版冒險家</span></button><button type="button" class="style-choice" data-style="violet"><canvas width="48" height="72"></canvas><span>水晶旅者</span></button></div>
+  <label>選擇角色造型（男女各 8 款）</label><div id="styleChoices" aria-label="人物造型選擇"></div>
   <label>選擇職業</label><select id="class"><option value="sword">劍道部｜均衡近戰</option><option value="fighter">格鬥部｜近身爆發</option><option value="archer">弓箭部｜遠程攻擊</option><option value="psy">氣功部｜氣功術法</option></select>
   <button id="start">進入學園</button>
   <p class="small">支援 Android 手機觸控。可離線單人遊玩；啟動伺服器後可同步其他在線玩家。</p>
@@ -119,11 +119,34 @@ const jobs={
  archer:{name:'弓箭部',hp:98,mp:65,power:17,range:100,color:'#4c9c62',skill:'穿透箭'},
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
-const trainerStyles={red:{hair:'#30241f',shirt:'#f0e4c0',pants:'#31527a',accent:'#bd4540',hat:'#bd4540',name:'紅帽少年'},green:{hair:'#4b3527',shirt:'#e8d9a7',pants:'#456b43',accent:'#6e9b58',hat:'#527d4b',name:'森林旅人'},blue:{hair:'#263b55',shirt:'#e5e8df',pants:'#344e72',accent:'#d7a64c',hat:'#344e72',name:'金版冒險家'},violet:{hair:'#573c66',shirt:'#e7d9e9',pants:'#56446d',accent:'#d6a6cf',hat:'#76517f',name:'水晶旅者'}};
-let selectedStyle='red';
-function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const rows=['...KKKKKK...','..KHHHHHHK..','.KHHHHHHHHK.','.HHHHHHHHHH.','.HHSSSSSSHH.','.HSWIIWSSSH.','.HSSSSSSSSH.','..HHSSSSHH..','...TTTTTT...','..TTCTCTTT..','..TTTTTTTT..','...PP..PP...','...PP..PP...','...BB..BB...'];const colors={K:'#26333b',H:p.hair,S:'#e9b98d',W:'#fff1d9',I:'#28303a',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch]){g.fillStyle=colors[ch];g.fillRect(6+x*3,6+y*4,3,4)}}));g.fillStyle='#3a2927';g.fillRect(15,25,6,2);g.fillRect(24,25,6,2);g.fillStyle='#fff8df';g.fillRect(15,27,3,3);g.fillRect(24,27,3,3);g.fillStyle='#26303a';g.fillRect(18,27,2,3);g.fillRect(27,27,2,3);g.fillStyle='#d88e7c';g.fillRect(12,32,3,2);g.fillRect(30,32,3,2);g.fillStyle='#75433d';g.fillRect(21,35,3,2);if(styleKey==='red'||styleKey==='green'||styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(12,4,24,6);g.fillRect(6,10,36,4);g.fillStyle=p.accent;g.fillRect(21,6,6,3);}else{g.fillStyle=p.hair;g.fillRect(6,19,5,19);g.fillRect(37,19,5,19);g.fillStyle=p.accent;g.fillRect(33,10,9,5);}}
-function refreshStyleChoices(){document.querySelectorAll('.style-choice').forEach(b=>{b.classList.toggle('active',b.dataset.style===selectedStyle);paintStylePreview(b.querySelector('canvas'),b.dataset.style)})}
-const skillArt={
+const trainerStyles={m1:{"key":"m1","gender":"male","name":"赤焰","mood":"自信","hair":"#30241f","shirt":"#d94d45","pants":"#31527a","accent":"#f2cf78","hairType":0,"expression":0},m2:{"key":"m2","gender":"male","name":"陽光","mood":"開朗","hair":"#76502f","shirt":"#e9c66c","pants":"#527d4b","accent":"#fff0b0","hairType":1,"expression":1},m3:{"key":"m3","gender":"male","name":"冷峻","mood":"嚴肅","hair":"#263b55","shirt":"#526d91","pants":"#293d58","accent":"#d7a64c","hairType":2,"expression":2},m4:{"key":"m4","gender":"male","name":"頑皮","mood":"調皮","hair":"#4b3527","shirt":"#67a6a0","pants":"#475a72","accent":"#f2d47b","hairType":3,"expression":3},m5:{"key":"m5","gender":"male","name":"害羞","mood":"害羞","hair":"#684a43","shirt":"#d9b4a0","pants":"#61516f","accent":"#e98f91","hairType":4,"expression":4},m6:{"key":"m6","gender":"male","name":"疑惑","mood":"困惑","hair":"#353b43","shirt":"#8c9aab","pants":"#3f5260","accent":"#d7e0dc","hairType":5,"expression":5},m7:{"key":"m7","gender":"male","name":"熱血","mood":"憤怒","hair":"#3d2924","shirt":"#c65b35","pants":"#4c3b3b","accent":"#f0b44f","hairType":6,"expression":6},m8:{"key":"m8","gender":"male","name":"沉穩","mood":"冷靜","hair":"#51443b","shirt":"#718b65","pants":"#394f43","accent":"#d8c995","hairType":7,"expression":7},f1:{"key":"f1","gender":"female","name":"星晴","mood":"自信","hair":"#382a35","shirt":"#d95b78","pants":"#51446e","accent":"#f4d18a","hairType":0,"expression":0},f2:{"key":"f2","gender":"female","name":"甜心","mood":"開朗","hair":"#8a593c","shirt":"#e9bd65","pants":"#6c7650","accent":"#fff0b0","hairType":1,"expression":1},f3:{"key":"f3","gender":"female","name":"冰羽","mood":"嚴肅","hair":"#293d5c","shirt":"#6688b5","pants":"#34475f","accent":"#d5e6ed","hairType":2,"expression":2},f4:{"key":"f4","gender":"female","name":"莓果","mood":"調皮","hair":"#63384b","shirt":"#b86e91","pants":"#594866","accent":"#f2c2d2","hairType":3,"expression":3},f5:{"key":"f5","gender":"female","name":"櫻雪","mood":"害羞","hair":"#754b54","shirt":"#e5b4b9","pants":"#78627c","accent":"#fff0df","hairType":4,"expression":4},f6:{"key":"f6","gender":"female","name":"知性","mood":"困惑","hair":"#34394a","shirt":"#8296a8","pants":"#455a70","accent":"#dce5ec","hairType":5,"expression":5},f7:{"key":"f7","gender":"female","name":"烈陽","mood":"憤怒","hair":"#4a3028","shirt":"#d66b4e","pants":"#57414b","accent":"#f5c56d","hairType":6,"expression":6},f8:{"key":"f8","gender":"female","name":"月影","mood":"冷靜","hair":"#50415d","shirt":"#8878a7","pants":"#49435d","accent":"#e5d8f1","hairType":7,"expression":7}};
+let selectedStyle='m1';
+function drawTrainerMini(g,p,x,y,z){
+ const r=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(x+a*z,y+b*z,w*z,h*z)};
+ r(3,1,10,9,p.hair);r(2,3,12,7,p.hair);r(4,4,8,6,'#efbd98');
+ const ht=p.hairType;
+ if(ht===0){r(2,1,12,3,p.hair);r(1,3,3,2,p.hair)}
+ if(ht===1){r(2,1,12,2,p.hair);r(11,3,4,6,p.hair)}
+ if(ht===2){r(3,0,10,3,p.hair);r(2,3,2,5,p.hair)}
+ if(ht===3){r(2,1,12,2,p.hair);r(1,3,3,7,p.hair);r(12,4,3,6,p.hair)}
+ if(ht===4){r(2,1,12,2,p.hair);r(1,4,3,7,p.hair);r(12,4,3,7,p.hair);r(5,0,6,2,p.accent)}
+ if(ht===5){r(3,0,10,3,p.hair);r(2,3,2,3,p.hair);r(12,3,2,3,p.hair)}
+ if(ht===6){r(2,2,12,2,p.hair);r(3,0,3,3,p.hair);r(7,0,3,3,p.hair);r(11,1,3,3,p.hair)}
+ if(ht===7){r(3,1,10,2,p.hair);r(1,4,3,7,p.hair);r(12,4,3,7,p.hair);r(5,0,6,2,p.hair)}
+ r(5,5,2,2,'#fff7e7');r(9,5,2,2,'#fff7e7');r(6,5,1,2,'#282c37');r(10,5,1,2,'#282c37');
+ if(p.expression===2||p.expression===6){r(5,4,2,1,'#282c37');r(9,4,2,1,'#282c37')}
+ if(p.expression===1)r(6,7,5,1,'#a64c50');else if(p.expression===3)r(7,7,2,2,'#713c43');else if(p.expression===4){r(7,7,2,1,'#a64c50');r(4,7,2,1,'#df8b83');r(10,7,2,1,'#df8b83')}else if(p.expression===5)r(7,7,2,1,'#713c43');else if(p.expression===6)r(7,7,3,1,'#713c43');else r(7,7,2,1,'#a64c50');
+ r(5,11,6,5,p.shirt);r(4,12,8,2,p.accent);r(6,16,2,4,p.pants);r(9,16,2,4,p.pants);r(5,19,3,1,'#292b35');r(9,19,3,1,'#292b35');
+}
+function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,7,8,2)}
+function refreshStyleChoices(){
+ const gender=$('gender').value,root=$('styleChoices');root.innerHTML='';
+ const choices=Object.values(trainerStyles).filter(p=>p.gender===gender);
+ if(!choices.some(p=>p.key===selectedStyle))selectedStyle=gender==='female'?'f1':'m1';
+ choices.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.className='style-choice'+(p.key===selectedStyle?' active':'');b.dataset.style=p.key;
+ const cv=document.createElement('canvas');cv.width=48;cv.height=72;const name=document.createElement('span');name.textContent=(i+1)+'. '+p.name;const mood=document.createElement('small');mood.textContent=p.mood;mood.style.cssText='font-size:9px;color:#d9d9c4';
+ b.append(cv,name,mood);b.addEventListener('click',()=>{selectedStyle=p.key;refreshStyleChoices()});root.appendChild(b);paintStylePreview(cv,p.key)});
+}const skillArt={
  sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','破空斬'],['▣','格擋'],['➶','突進斬'],['✧','劍影'],['☄','劍舞']],
  fighter:[['✊','重拳'],['✦','連打'],['✹','旋風拳'],['☄','爆裂擊'],['▣','鐵布衫'],['➤','衝拳'],['◉','震地'],['✧','狂怒']],
  archer:[['➶','速射'],['➤','穿透箭'],['✧','箭雨'],['◎','狙擊'],['▣','翻滾'],['➹','連珠箭'],['✦','束縛箭'],['☄','風暴箭']],
@@ -344,110 +367,52 @@ function drawTree(sx,sy){
  ctx.fillStyle='#75a65d';ctx.fillRect(sx-3,sy-13,4,3);
 }
 function drawAvatar(a,sx,sy,local){
- const c=jobs[a.job]||jobs.sword,dir=a.dir||'down';
- const moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
- const side=dir==='left'||dir==='right',flip=dir==='right';
- const look=trainerStyles[a.styleKey]||trainerStyles.red;
- const colors={K:'#26333b',H:look.hair,S:'#f0bd91',E:'#302a2b',W:'#fff1d9',I:'#28303a',T:look.shirt,C:c.color,P:look.pants,B:'#292b35',A:look.accent};
- // 12x14 GBC-style chibi: oversized expressive head, compact torso and short legs.
- const front=[
-  '...KKKKKK...',
-  '..KHHHHHHK..',
-  '.KHHHHHHHHK.',
-  '.HHHHHHHHHH.',
-  '.HHSSSSSSHH.',
-  '.HSWIIWSSSH.',
-  '.HSSSSSSSSH.',
-  '..HHSSSSHH..',
-  '...TTTTTT...',
-  '..TTCTCTTT..',
-  '..TTTTTTTT..',
-  '...PP..PP...',
-  '...PP..PP...',
-  '...BB..BB...'
- ];
- const back=[
-  '...KKKKKK...',
-  '..KHHHHHHK..',
-  '.KHHHHHHHHK.',
-  '.HHHHHHHHHH.',
-  '.HHHHHHHHHH.',
-  '.HHHHHHHHHH.',
-  '..HHHHHHHH..',
-  '...HHHHHH...',
-  '...TTTTTT...',
-  '..TTCTCTTT..',
-  '..TTTTTTTT..',
-  '...PP..PP...',
-  '...PP..PP...',
-  '...BB..BB...'
- ];
- const profile=[
-  '...KKKKKK...',
-  '..KHHHHHHK..',
-  '.KHHHHHHHHK.',
-  '.HHHHHHHHHH.',
-  '.HHSSSSSSHH.',
-  '.HHSWIIISSH.',
-  '.HHSSSSSSSH.',
-  '..HHHSSSSHH..',
-  '...TTTTTT...',
-  '..TTCTCTTT..',
-  '..TTTTTTTT..',
-  '...PP..PP...',
-  '...PP..PP...',
-  '...BB..BB...'
- ];
- let rows=(dir==='up'?back:(side?profile:front)).slice();
- if(a.gender==='female'&&dir!=='up'){rows[2]='.HHHHHHHHHH.';rows[3]='HHHHHHHHHHHH';rows[4]='HHHSSSSSSHHH';}
- if(a.styleKey==='green'){rows[0]='..KKKKKKKK..';rows[1]='.KHHHHHHHHK.';}
- if(a.styleKey==='blue'){rows[0]='...KKKKKK...';rows[1]='..KHHHHHHK..';}
- if(a.styleKey==='violet'){rows[1]='.KHHHHHHHHK.';rows[2]='KHHHHHHHHHHK';}
- const mirror=side&&flip;
- const px=(rx)=>mirror?11-rx:rx;
- const pixel=(rx,ry,color)=>{if(ry<0||ry>=14)return;ctx.fillStyle=color;ctx.fillRect(sx-12+px(rx)*2,sy-24+ry*2,2,2)};
- ctx.fillStyle='#365f42';ctx.fillRect(sx-10,sy+5,20,3);ctx.fillStyle='#294d38';ctx.fillRect(sx-6,sy+7,12,1);
+ const c=jobs[a.job]||jobs.sword,dir=a.dir||'down',moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
+ const side=dir==='left'||dir==='right',flip=dir==='right',look=trainerStyles[a.styleKey]||trainerStyles.m1;
+ const skin='#efbd98',outline='#292c37',hair=look.hair;
+ const rect=(x,y,w,h,col)=>{ctx.fillStyle=col;ctx.fillRect(x,y,w,h)};
+ rect(sx-10,sy+9,20,3,'#365f42');rect(sx-6,sy+11,12,1,'#294d38');
  const weaponSide=side?(flip?-1:1):1;
- if(a.job==='sword'){
-  ctx.fillStyle='#38414a';ctx.fillRect(sx+weaponSide*10-1,sy-9,3,20);
-  ctx.fillStyle='#dce8e8';ctx.fillRect(sx+weaponSide*10,sy-12,2,17);
-  ctx.fillStyle='#9b7545';ctx.fillRect(sx+weaponSide*8,sy+2,6,2);
- }else if(a.job==='archer'){
-  ctx.fillStyle='#68462f';ctx.fillRect(sx+weaponSide*10-1,sy-9,2,19);
-  ctx.fillStyle='#d9c18b';ctx.fillRect(sx+weaponSide*11,sy-8,1,15);
-  ctx.fillStyle='#8b603b';ctx.fillRect(sx+weaponSide*8,sy-1,4,2);
+ if(a.job==='sword'){rect(sx+weaponSide*13-1,sy-8,3,22,'#38414a');rect(sx+weaponSide*13,sy-13,2,18,'#dce8e8');rect(sx+weaponSide*10,sy+3,6,2,'#9b7545')}
+ if(a.job==='archer'){rect(sx+weaponSide*13-1,sy-8,2,20,'#68462f');rect(sx+weaponSide*14,sy-7,1,15,'#d9c18b')}
+ const ht=look.hairType;
+ if(ht===0){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-12,sy-30,24,4,hair);rect(sx-13,sy-22,4,8,hair)}
+ if(ht===1){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-13,sy-30,26,5,hair);rect(sx+9,sy-20,6,13,hair)}
+ if(ht===2){rect(sx-12,sy-29,24,7,hair);rect(sx-14,sy-23,5,8,hair);rect(sx-8,sy-32,7,5,hair)}
+ if(ht===3){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,13,hair);rect(sx+9,sy-19,6,13,hair);rect(sx+2,sy-31,9,4,hair)}
+ if(ht===4){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,15,hair);rect(sx+9,sy-20,5,15,hair);rect(sx-3,sy-32,8,5,look.accent)}
+ if(ht===5){rect(sx-12,sy-30,24,8,hair);rect(sx-14,sy-24,4,7,hair);rect(sx+10,sy-24,4,7,hair)}
+ if(ht===6){rect(sx-13,sy-25,26,7,hair);rect(sx-10,sy-32,7,8,hair);rect(sx-2,sy-34,7,10,hair);rect(sx+6,sy-30,8,7,hair)}
+ if(ht===7){rect(sx-12,sy-29,24,8,hair);rect(sx-14,sy-24,28,7,hair);rect(sx-14,sy-20,5,14,hair);rect(sx+9,sy-20,5,14,hair);rect(sx-4,sy-33,9,5,hair)}
+ rect(sx-11,sy-23,22,19,skin);rect(sx-14,sy-17,3,7,skin);rect(sx+11,sy-17,3,7,skin);rect(sx-12,sy-25,24,4,hair);
+ if(a.gender==='female'){rect(sx-14,sy-17,4,13,hair);rect(sx+10,sy-17,4,13,hair)}
+ if(dir==='up'){rect(sx-12,sy-24,24,20,hair);rect(sx-14,sy-18,4,10,hair);rect(sx+10,sy-18,4,10,hair)}
+ else if(side){
+  const sign=flip?1:-1;rect(sx+sign*8,sy-16,4,5,skin);rect(sx+sign*2,sy-16,3,3,'#fff7e7');rect(sx+sign*3,sy-15,2,2,outline);rect(sx+sign*8,sy-11,3,2,'#b86c65');rect(sx-sign*11,sy-23,5,12,hair);
+ }else{
+  const e=look.expression;
+  // Eyes are two separate clusters with a wide strip of skin between them.
+  rect(sx-7,sy-17,4,4,'#fff8e9');rect(sx+3,sy-17,4,4,'#fff8e9');rect(sx-5,sy-16,2,3,outline);rect(sx+4,sy-16,2,3,outline);
+  if(e===2||e===6){rect(sx-8,sy-19,5,2,outline);rect(sx+3,sy-19,5,2,outline)}else{rect(sx-8,sy-19,5,1,outline);rect(sx+3,sy-19,5,1,outline)}
+  if(e===1){rect(sx-2,sy-8,5,2,'#a64c50');rect(sx-1,sy-7,3,1,'#fff0df')}
+  else if(e===3){rect(sx-1,sy-9,3,3,'#713c43')}
+  else if(e===4){rect(sx-2,sy-9,4,2,'#a64c50');rect(sx-10,sy-10,3,2,'#df8b83');rect(sx+7,sy-10,3,2,'#df8b83')}
+  else if(e===5){rect(sx-1,sy-9,3,1,'#713c43');rect(sx+8,sy-20,2,2,'#fff0a0')}
+  else if(e===6){rect(sx-2,sy-9,5,2,'#713c43')}
+  else if(e===7){rect(sx-1,sy-8,3,1,'#a64c50')}
+  else{rect(sx-1,sy-9,3,1,'#a64c50')}
  }
- rows.forEach((row,ry)=>{for(let rx=0;rx<row.length;rx++){const ch=row[rx];if(ch==='.')continue;let color=colors[ch]||'#26333b';
-  if(ch==='C'&&a.job==='psy')color='#8b78d1';
-  if(ch==='C'&&a.job==='archer')color='#5c9857';
-  if(ch==='C'&&a.job==='fighter')color='#cf8745';
-  pixel(rx,ry,color);
- }});
- // Facial features: defined brows, bright pupils, a tiny mouth and warm cheek pixels.
- if(dir==='down'){
-  pixel(3,4,'#47302b');pixel(6,4,'#47302b');
-  pixel(3,5,'#fff8e6');pixel(6,5,'#fff8e6');
-  pixel(4,5,'#252b32');pixel(7,5,'#252b32');
-  pixel(2,6,'#df927f');pixel(9,6,'#df927f');
-  pixel(5,7,'#75433d');pixel(6,7,'#75433d');
- }
- // Distinct GBC trainer caps and hair details, kept crisp on the pixel grid.
- if(a.styleKey==='red'||a.styleKey==='green'||a.styleKey==='blue'){
-  ctx.fillStyle=look.hat;ctx.fillRect(sx-8,sy-25,16,4);ctx.fillRect(sx-12,sy-21,24,3);
-  ctx.fillStyle=look.accent;ctx.fillRect(sx-2,sy-24,4,2);
-  if(a.styleKey==='green'){ctx.fillStyle='#d4d18b';ctx.fillRect(sx-2,sy-26,4,2)}
-  if(a.styleKey==='blue'){ctx.fillStyle='#e4bd66';ctx.fillRect(sx-2,sy-25,4,2)}
- }else{ctx.fillStyle=look.hair;ctx.fillRect(sx-12,sy-15,3,10);ctx.fillRect(sx+9,sy-15,3,10);ctx.fillStyle=look.accent;ctx.fillRect(sx+6,sy-23,6,3)}
- // Walking animation: alternating short legs and sleeve movement.
- if(moving){const swing=frame===1?1:(frame===3?-1:0);ctx.fillStyle=look.pants;
-  if(swing>0){ctx.fillRect(sx-7,sy+1,5,4);ctx.fillRect(sx+2,sy+3,5,3)}
-  else if(swing<0){ctx.fillRect(sx-7,sy+3,5,3);ctx.fillRect(sx+2,sy+1,5,4)}
-  ctx.fillStyle=look.shirt;ctx.fillRect(sx-10,sy-6+(swing>0?2:0),3,5);ctx.fillRect(sx+7,sy-6+(swing<0?2:0),3,5);
- }
- if(a.job==='fighter'){ctx.fillStyle='#f0d18a';ctx.fillRect(sx-11,sy-7,3,4);ctx.fillRect(sx+8,sy-7,3,4)}
- if(a.job==='psy'){ctx.fillStyle='#9ce7f1';ctx.fillRect(sx+9,sy-18,2,2);ctx.fillStyle='#e7f8ff';ctx.fillRect(sx+10,sy-20,1,1)}
- if(a.job==='archer'){ctx.fillStyle='#9d7545';ctx.fillRect(sx-13,sy-7,2,13)}
- if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-31,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-29,8,1)}
+ rect(sx-4,sy-4,8,5,skin);rect(sx-9,sy,18,12,look.shirt);rect(sx-11,sy+2,4,7,look.shirt);rect(sx+7,sy+2,4,7,look.shirt);
+ rect(sx-5,sy,10,3,look.accent);rect(sx-2,sy+3,4,5,c.color);
+ if(look.gender==='female'){rect(sx-9,sy+8,18,3,look.accent);rect(sx-3,sy+1,6,2,'#fff0df')}else{rect(sx-7,sy+9,14,2,look.pants)}
+ rect(sx-7,sy+12,5,5,look.pants);rect(sx+2,sy+12,5,5,look.pants);rect(sx-8,sy+16,7,2,outline);rect(sx+1,sy+16,7,2,outline);
+ if(ht===0)rect(sx+7,sy-27,5,3,look.accent);if(ht===1)rect(sx-13,sy-27,5,3,look.accent);
+ if(ht===3||ht===4)rect(sx-2,sy-29,5,3,look.accent);if(ht===5)rect(sx+9,sy+2,3,3,look.accent);if(ht===7)rect(sx-2,sy-31,5,3,look.accent);
+ if(moving){const swing=frame===1?2:(frame===3?-2:0);rect(sx-7,sy+12+swing,5,4,look.pants);rect(sx+2,sy+12-swing,5,4,look.pants)}
+ if(a.job==='fighter'){rect(sx-12,sy+2,4,4,'#f0d18a');rect(sx+8,sy+2,4,4,'#f0d18a')}
+ if(a.job==='psy'){rect(sx+10,sy-22,2,2,'#9ce7f1');rect(sx+11,sy-24,1,1,'#e7f8ff')}
+ if(a.job==='archer')rect(sx-14,sy-5,2,13,'#9d7545');
+ if(local){rect(sx-1,sy-37,2,2,'#fff0a2');rect(sx-4,sy-35,8,1,'#e9c75f')}
 }
 function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
@@ -609,8 +574,7 @@ swipeArea.addEventListener('pointerup',e=>{if(!swipeStart||e.pointerId!==swipeSt
 swipeArea.addEventListener('pointercancel',()=>{swipeStart=null});
 $('rest').addEventListener('pointerdown',e=>{e.preventDefault();rest()});
 $('pickup').addEventListener('pointerdown',e=>{e.preventDefault();pickup()});
-document.querySelectorAll('.style-choice').forEach(b=>b.addEventListener('click',()=>{selectedStyle=b.dataset.style;refreshStyleChoices()}));
- $('gender').addEventListener('change',refreshStyleChoices);refreshStyleChoices();
+$('gender').addEventListener('change',refreshStyleChoices);refreshStyleChoices();
  $('start').onclick=start;
 addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true;if(e.key==='j'||e.key===' '){e.preventDefault();attack(false)}if(e.key==='k')attack(true,skillPage*4);if(e.key==='e')pickup()});
 addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
