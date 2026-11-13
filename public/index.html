@@ -20,12 +20,19 @@ canvas{display:block;width:100vw;height:100vh;object-fit:contain;image-rendering
 #right strong{color:#ffe9a7}
 #quest{margin-top:6px;color:#dce8ba}
 #log{position:fixed;left:8px;bottom:8px;width:min(310px,66vw);height:75px;padding:6px 8px;font-size:10px;line-height:1.45;overflow:hidden;z-index:2;pointer-events:none;background:#183541eF}
-#actions{position:fixed;right:10px;bottom:12px;display:flex;gap:6px;z-index:4;align-items:end}
+#combatCluster{position:fixed;right:12px;bottom:12px;width:205px;height:190px;z-index:4;pointer-events:none;user-select:none}
+#combatCluster button{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;border-radius:50%;font-weight:900;line-height:1.05;touch-action:none;pointer-events:auto;text-shadow:1px 1px #172b38}
+#combatCluster button b{font-size:17px;color:#fff0b4}
+#combatCluster button span{font-size:9px}
+#attack{right:0;bottom:0;width:72px;height:72px;border:3px solid #f3d58c;background:radial-gradient(circle at 35% 28%,#e9a85d,#a64d36 72%,#6a302b);box-shadow:0 4px 0 #3a2020,inset 0 0 0 3px #713d32}
+#attack b{font-size:27px!important}
+.skill{width:54px;height:54px;border:2px solid #e5d19a;background:radial-gradient(circle at 35% 28%,#7196bd,#34516f 72%,#1c344b);box-shadow:0 3px 0 #10232b,inset 0 0 0 2px #253f54}
+#skill1{left:52px;bottom:18px}#skill2{left:63px;bottom:61px}#skill3{left:94px;bottom:93px}#skill4{left:137px;bottom:104px}
+.utility{width:44px;height:44px;border:2px solid #d8c58e;background:radial-gradient(circle at 35% 28%,#8ba68a,#3d655c 75%,#25433e);box-shadow:0 3px 0 #10232b}
+#rest{left:0;bottom:0}#pickup{left:50px;bottom:0}
 button,select,input{font:inherit;color:#fff4d0;background:#315565;border:2px solid #d9c68b;border-radius:4px;padding:8px 10px}
 button{font-weight:800;box-shadow:0 3px 0 #102630;touch-action:none}
 button:active{transform:translateY(2px);box-shadow:0 1px 0 #102630;background:#557b75}
-.action{width:58px;height:54px;padding:3px;font-size:10px}
-.action b{display:block;font-size:17px;color:#ffe9a7}
 #joystick{position:fixed;left:16px;bottom:16px;width:132px;height:132px;border:3px solid #d9c68b;border-radius:50%;background:radial-gradient(circle,#426b68aa 0 42%,#1a3544cc 70%);box-shadow:inset 0 0 0 3px #142c37,0 4px 0 #10232b;z-index:4;touch-action:none;user-select:none}
 #joystick:before,#joystick:after{content:"";position:absolute;background:#d9c68b55;pointer-events:none}
 #joystick:before{left:50%;top:9px;bottom:9px;width:1px}
@@ -41,8 +48,8 @@ input,select{width:100%;padding:9px}
 #start{width:100%;margin-top:14px;background:#8b583e;font-size:15px}
 #toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:8px 14px;background:#142f3beF;border:2px solid #f0d68d;border-radius:4px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
 #help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
-@media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#actions{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
-@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#actions{right:7px;bottom:8px;gap:4px}.action{width:49px;height:49px;font-size:9px}#joystick{left:9px;bottom:13px;width:118px;height:118px}#stick{width:48px;height:48px}#help{display:none}}
+@media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#combatCluster{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
+@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:6px;bottom:6px;width:180px;height:174px}#combatCluster button b{font-size:14px}#combatCluster button span{font-size:8px}#attack{width:66px;height:66px}#attack b{font-size:24px!important}.skill{width:46px;height:46px}#skill1{left:45px;bottom:18px}#skill2{left:55px;bottom:53px}#skill3{left:80px;bottom:82px}#skill4{left:117px;bottom:92px}.utility{width:38px;height:38px}#pickup{left:43px;bottom:0}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
 </style>
 </head>
 <body>
@@ -67,11 +74,14 @@ input,select{width:100%;padding:9px}
 <div id="joystick" aria-label="虛擬搖桿，拖曳控制角色移動">
  <div id="stick"></div><div id="joyHint">移動搖桿</div>
 </div>
-<div id="actions">
- <button class="action" id="attack"><b>⚔</b>攻擊</button>
- <button class="action" id="skill"><b>✦</b>技能</button>
- <button class="action" id="rest"><b>✚</b>恢復</button>
- <button class="action" id="pickup"><b>＋</b>拾取</button>
+<div id="combatCluster" aria-label="戰鬥操作區">
+ <button class="skill" id="skill1" aria-label="技能一"><b>Ⅰ</b><span>技能1</span></button>
+ <button class="skill" id="skill2" aria-label="技能二"><b>Ⅱ</b><span>技能2</span></button>
+ <button class="skill" id="skill3" aria-label="技能三"><b>Ⅲ</b><span>技能3</span></button>
+ <button class="skill" id="skill4" aria-label="技能四"><b>Ⅳ</b><span>技能4</span></button>
+ <button class="utility" id="rest" aria-label="恢復"><b>✚</b><span>恢復</span></button>
+ <button class="utility" id="pickup" aria-label="拾取"><b>＋</b><span>拾取</span></button>
+ <button id="attack" aria-label="普通攻擊"><b>⚔</b><span>攻擊</span></button>
 </div>
 <div id="help">拖曳左下搖桿移動　J攻擊　K技能　E拾取</div>
 <div id="login">
@@ -101,7 +111,7 @@ const jobs={
  psy:{name:'氣功部',hp:105,mp:85,power:16,range:92,color:'#9271cb',skill:'氣功波'}
 };
 let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
-let last=0,attackCooldown=0,skillCooldown=0,toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
+let last=0,attackCooldown=0,skillCooldown=[0,0,0,0],toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
 let particles=[];
 const rand=(x,y)=>{let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n)};
@@ -266,15 +276,16 @@ function drawWorld(){
  // floating combat numbers
  particles.forEach(p=>{ctx.fillStyle=p.color;ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(p.text,p.x-camX,p.y-camY-p.life*12)});
 }
-function attack(skill){
- if(!player)return;let now=performance.now();if(skill?skillCooldown>0:attackCooldown>0)return;
- const c=jobs[player.job],range=skill?c.range*1.4:c.range+15,damage=c.power*(skill?2.1:1);
- if(skill){if(save.mp<18){toast('MP 不足');return}save.mp-=18;skillCooldown=1.5}else attackCooldown=.42;
+function attack(skill,slot=0){
+ if(!player)return;slot=Math.max(0,Math.min(3,slot|0));if(skill?skillCooldown[slot]>0:attackCooldown>0)return;
+ const c=jobs[player.job],multipliers=[1.5,1.8,2.2,2.8],costs=[10,14,18,24],cooldowns=[1.2,2.2,3.8,6.0];
+ const range=skill?c.range*(1.15+slot*.12):c.range+15,damage=c.power*(skill?multipliers[slot]:1);
+ if(skill){if(save.mp<costs[slot]){toast('MP 不足');return}save.mp-=costs[slot];skillCooldown[slot]=cooldowns[slot]}else attackCooldown=.42;
  let target=null,best=range;
  mobs.forEach(m=>{if(!m.alive)return;let d=Math.hypot(m.x-player.x,m.y-player.y);if(d<best){best=d;target=m}});
  if(target){target.hp-=damage;target.hit=.18;particles.push({x:target.x,y:target.y-18,text:'-'+Math.round(damage),color:'#fff19a',life:1});
   if(target.hp<=0){target.alive=false;save.xp+=35;save.gold+=8;quest=Math.min(3,quest+1);drops.push({x:target.x,y:target.y,life:20});say('擊倒訓練假人！獲得 35 EXP、8 金幣');if(quest===3){say('任務完成！校園新生訓練結業。');toast('任務完成！')};levelCheck();persist()}
-  else say((skill?c.skill:'普通攻擊')+'命中！');
+  else say((skill?c.skill+' '+(slot+1):'普通攻擊')+'命中！');
  }else say('附近沒有可攻擊的訓練假人');
  if(socket&&socket.connected)socket.emit('combat',{type:skill?'skill':'attack'});
  updateUI();
@@ -286,9 +297,11 @@ function update(dt){
  if(!player)return;
  let dx=touch.x,dy=touch.y;
  if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;
+ // 僅允許四方向：選擇輸入較大的軸，絕不斜向移動。
+ if(Math.abs(dx)>Math.abs(dy))dy=0;else dx=0;
  const magnitude=Math.min(1,Math.hypot(dx,dy));
  if(magnitude>.12){let l=Math.hypot(dx,dy);move(dx/l*48*magnitude*dt,dy/l*48*magnitude*dt)}
- if(attackCooldown>0)attackCooldown-=dt;if(skillCooldown>0)skillCooldown-=dt;
+ if(attackCooldown>0)attackCooldown-=dt;for(let i=0;i<4;i++)if(skillCooldown[i]>0)skillCooldown[i]-=dt;
  mobs.forEach(m=>{if(!m.alive)return;m.phase+=dt;if(Math.hypot(m.x-player.x,m.y-player.y)<21&&Math.random()<dt*.35){save.hp=Math.max(0,save.hp-3);if(save.hp===0){let c=jobs[player.job];save.hp=c.hp;player.x=MW*T/2;player.y=29*T;say('體力耗盡，已返回學園廣場。');toast('返回廣場')}updateUI()}});
  drops.forEach(d=>d.life-=dt);drops=drops.filter(d=>d.life>0);
  remotes.forEach(r=>{if(r.tx!==undefined){r.x+=(r.tx-r.x)*Math.min(1,dt*12);r.y+=(r.ty-r.y)*Math.min(1,dt*12)}r.frame+=dt*7});
@@ -310,6 +323,10 @@ function updateJoy(e){
  if(!joyRect)return;const cx=joyRect.left+joyRect.width/2,cy=joyRect.top+joyRect.height/2;
  let dx=e.clientX-cx,dy=e.clientY-cy,limit=joyRect.width*.34,len=Math.hypot(dx,dy);
  if(len>limit){dx=dx/len*limit;dy=dy/len*limit}
+ // 搖桿吸附到最近的上、下、左、右方向。
+ if(Math.max(Math.abs(dx),Math.abs(dy))<8){dx=0;dy=0}
+ else if(Math.abs(dx)>Math.abs(dy)){dx=Math.sign(dx)*Math.min(limit,Math.abs(dx));dy=0}
+ else{dy=Math.sign(dy)*Math.min(limit,Math.abs(dy));dx=0}
  touch.x=dx/limit;touch.y=dy/limit;
  stick.style.transform='translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px))';
 }
@@ -318,7 +335,7 @@ joy.addEventListener('pointerdown',e=>{e.preventDefault();joyPointer=e.pointerId
 joy.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer){e.preventDefault();updateJoy(e)}});
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>joy.addEventListener(ev,e=>{if(e.pointerId===joyPointer)resetJoy()}));
 $('attack').addEventListener('pointerdown',e=>{e.preventDefault();attack(false)});
-$('skill').addEventListener('pointerdown',e=>{e.preventDefault();attack(true)});
+[1,2,3,4].forEach((n)=>$('skill'+n).addEventListener('pointerdown',e=>{e.preventDefault();attack(true,n-1)}));
 $('rest').addEventListener('pointerdown',e=>{e.preventDefault();rest()});
 $('pickup').addEventListener('pointerdown',e=>{e.preventDefault();pickup()});
 $('start').onclick=start;
