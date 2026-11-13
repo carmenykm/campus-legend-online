@@ -121,7 +121,7 @@ const jobs={
 };
 const trainerStyles={red:{hair:'#30241f',shirt:'#f0e4c0',pants:'#31527a',accent:'#bd4540',hat:'#bd4540',name:'紅帽少年'},green:{hair:'#4b3527',shirt:'#e8d9a7',pants:'#456b43',accent:'#6e9b58',hat:'#527d4b',name:'森林旅人'},blue:{hair:'#263b55',shirt:'#e5e8df',pants:'#344e72',accent:'#d7a64c',hat:'#344e72',name:'金版冒險家'},violet:{hair:'#573c66',shirt:'#e7d9e9',pants:'#56446d',accent:'#d6a6cf',hat:'#76517f',name:'水晶旅者'}};
 let selectedStyle='red';
-function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(12+x*3,7+y*3,3,3)};const rows=['..HHHH..','..HHHH..','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','TTTTTTTT','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];const colors={H:p.hair,S:'#e9b98d',E:'#292b2b',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch])px(x,y,colors[ch])}));if(styleKey==='red'){g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(9,11,30,3);g.fillStyle='#e8d8b0';g.fillRect(21,8,6,2);}else if(styleKey==='green'){g.fillStyle=p.hat;g.fillRect(15,6,18,5);g.fillRect(12,10,24,3);g.fillStyle='#d4d18b';g.fillRect(21,6,6,3);}else if(styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(15,6,18,4);g.fillRect(12,9,24,3);g.fillStyle='#e4bd66';g.fillRect(21,7,6,2);}else{g.fillStyle=p.hair;g.fillRect(9,10,6,15);g.fillRect(33,10,6,15);g.fillStyle=p.accent;g.fillRect(27,8,9,3);}}
+function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const rows=['...KKKKKK...','..KHHHHHHK..','.KHHHHHHHHK.','.HHHHHHHHHH.','.HHSSSSSSHH.','.HSWIIWSSSH.','.HSSSSSSSSH.','..HHSSSSHH..','...TTTTTT...','..TTCTCTTT..','..TTTTTTTT..','...PP..PP...','...PP..PP...','...BB..BB...'];const colors={K:'#26333b',H:p.hair,S:'#e9b98d',W:'#fff1d9',I:'#28303a',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch]){g.fillStyle=colors[ch];g.fillRect(6+x*3,6+y*4,3,4)}}));if(styleKey==='red'||styleKey==='green'||styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(12,4,24,6);g.fillRect(6,10,36,4);g.fillStyle=p.accent;g.fillRect(21,6,6,3);}else{g.fillStyle=p.hair;g.fillRect(6,19,5,19);g.fillRect(37,19,5,19);g.fillStyle=p.accent;g.fillRect(33,10,9,5);}}
 function refreshStyleChoices(){document.querySelectorAll('.style-choice').forEach(b=>{b.classList.toggle('active',b.dataset.style===selectedStyle);paintStylePreview(b.querySelector('canvas'),b.dataset.style)})}
 const skillArt={
  sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','破空斬'],['▣','格擋'],['➶','突進斬'],['✧','劍影'],['☄','劍舞']],
@@ -345,65 +345,101 @@ function drawTree(sx,sy){
 }
 function drawAvatar(a,sx,sy,local){
  const c=jobs[a.job]||jobs.sword,dir=a.dir||'down';
- // Four-frame walk cycle. Local player advances through walk; remote players use frame time.
  const moving=!!(a.walk||a.frame),frame=moving?Math.floor((a.walk||a.frame)*2)%4:0;
- const stepA=frame===1,stepB=frame===3,side=dir==='left'||dir==='right',flip=dir==='right';
+ const side=dir==='left'||dir==='right',flip=dir==='right';
  const look=trainerStyles[a.styleKey]||trainerStyles.red;
- const palette={K:'#26333b',H:look.hair,S:'#f0bd91',E:'#302a2b',T:look.shirt,C:c.color,P:look.pants,B:'#292b35'};
- const front=['..KKKK..','.KHHHHK.','.HHHHHH.','.HSSSSH.','.HSEESH.','..SSSS..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
- const back=['..KKKK..','.KHHHHK.','.HHHHHH.','.HHHHHH.','.HHHHHH.','..HHHH..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
- const profile=['..KKKK..','.KHHHHK.','.HHHHHH.','.HSSSSH.','.HESSSH.','..SSSS..','KTTTTTTK','TTCTCTTT','.TTTTTT.','.PP..PP.','.PP..PP.','.BB..BB.'];
- let rows=dir==='up'?back:(side?profile:front);
- rows=rows.slice();
- if(a.gender==='female'){rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';rows[3]='HHSSSSHH';rows[4]='HHSEESHH';}
- if(a.styleKey==='green'){rows[0]='.HHHHHH.';rows[1]='HHHHHHHH';}
- if(a.styleKey==='blue'){rows[0]='..HHHH..';rows[1]='.HHHHHH.';}
- if(a.styleKey==='violet'){rows[0]='HH....HH';rows[1]='.HHHHHH.';rows[2]='HHHHHHHH';}
- const colors={K:palette.K,H:palette.H,S:palette.S,E:palette.E,T:palette.T,C:palette.C,P:palette.P,B:palette.B};
- // Small ground shadow, then the sprite is painted as hard-edged 2px clusters.
- ctx.fillStyle='#365f42';ctx.fillRect(sx-8,sy+6,16,3);ctx.fillStyle='#294d38';ctx.fillRect(sx-5,sy+8,10,1);
- // Side-facing sprites are mirrored rather than drawn as identical left/right profiles.
+ const colors={K:'#26333b',H:look.hair,S:'#f0bd91',E:'#302a2b',W:'#fff1d9',I:'#28303a',T:look.shirt,C:c.color,P:look.pants,B:'#292b35',A:look.accent};
+ // 12x14 GBC-style chibi: oversized expressive head, compact torso and short legs.
+ const front=[
+  '...KKKKKK...',
+  '..KHHHHHHK..',
+  '.KHHHHHHHHK.',
+  '.HHHHHHHHHH.',
+  '.HHSSSSSSHH.',
+  '.HSWIIWSSSH.',
+  '.HSSSSSSSSH.',
+  '..HHSSSSHH..',
+  '...TTTTTT...',
+  '..TTCTCTTT..',
+  '..TTTTTTTT..',
+  '...PP..PP...',
+  '...PP..PP...',
+  '...BB..BB...'
+ ];
+ const back=[
+  '...KKKKKK...',
+  '..KHHHHHHK..',
+  '.KHHHHHHHHK.',
+  '.HHHHHHHHHH.',
+  '.HHHHHHHHHH.',
+  '.HHHHHHHHHH.',
+  '..HHHHHHHH..',
+  '...HHHHHH...',
+  '...TTTTTT...',
+  '..TTCTCTTT..',
+  '..TTTTTTTT..',
+  '...PP..PP...',
+  '...PP..PP...',
+  '...BB..BB...'
+ ];
+ const profile=[
+  '...KKKKKK...',
+  '..KHHHHHHK..',
+  '.KHHHHHHHHK.',
+  '.HHHHHHHHHH.',
+  '.HHSSSSSSHH.',
+  '.HHSWIIISSH.',
+  '.HHSSSSSSSH.',
+  '..HHHSSSSHH..',
+  '...TTTTTT...',
+  '..TTCTCTTT..',
+  '..TTTTTTTT..',
+  '...PP..PP...',
+  '...PP..PP...',
+  '...BB..BB...'
+ ];
+ let rows=(dir==='up'?back:(side?profile:front)).slice();
+ if(a.gender==='female'&&dir!=='up'){rows[2]='.HHHHHHHHHH.';rows[3]='HHHHHHHHHHHH';rows[4]='HHHSSSSSSHHH';}
+ if(a.styleKey==='green'){rows[0]='..KKKKKKKK..';rows[1]='.KHHHHHHHHK.';}
+ if(a.styleKey==='blue'){rows[0]='...KKKKKK...';rows[1]='..KHHHHHHK..';}
+ if(a.styleKey==='violet'){rows[1]='.KHHHHHHHHK.';rows[2]='KHHHHHHHHHHK';}
  const mirror=side&&flip;
- const pixel=(rx,ry,color)=>{const px=mirror?7-rx:rx;ctx.fillStyle=color;ctx.fillRect(sx-8+px*2,sy-18+ry*2,2,2)};
- // Weapon behind body, with direction-aware placement.
+ const px=(rx)=>mirror?11-rx:rx;
+ const pixel=(rx,ry,color)=>{if(ry<0||ry>=14)return;ctx.fillStyle=color;ctx.fillRect(sx-12+px(rx)*2,sy-24+ry*2,2,2)};
+ ctx.fillStyle='#365f42';ctx.fillRect(sx-10,sy+5,20,3);ctx.fillStyle='#294d38';ctx.fillRect(sx-6,sy+7,12,1);
  const weaponSide=side?(flip?-1:1):1;
  if(a.job==='sword'){
-  ctx.fillStyle='#38414a';ctx.fillRect(sx+weaponSide*7-1,sy-12,3,22);
-  ctx.fillStyle='#dce8e8';ctx.fillRect(sx+weaponSide*7,sy-13,2,17);
-  ctx.fillStyle='#9b7545';ctx.fillRect(sx+weaponSide*5,sy+1,6,2);
+  ctx.fillStyle='#38414a';ctx.fillRect(sx+weaponSide*10-1,sy-9,3,20);
+  ctx.fillStyle='#dce8e8';ctx.fillRect(sx+weaponSide*10,sy-12,2,17);
+  ctx.fillStyle='#9b7545';ctx.fillRect(sx+weaponSide*8,sy+2,6,2);
  }else if(a.job==='archer'){
-  ctx.fillStyle='#68462f';ctx.fillRect(sx+weaponSide*8-1,sy-12,2,20);
-  ctx.fillStyle='#d9c18b';ctx.fillRect(sx+weaponSide*9,sy-10,1,16);
-  ctx.fillStyle='#8b603b';ctx.fillRect(sx+weaponSide*6,sy-2,4,2);
+  ctx.fillStyle='#68462f';ctx.fillRect(sx+weaponSide*10-1,sy-9,2,19);
+  ctx.fillStyle='#d9c18b';ctx.fillRect(sx+weaponSide*11,sy-8,1,15);
+  ctx.fillStyle='#8b603b';ctx.fillRect(sx+weaponSide*8,sy-1,4,2);
  }
- rows.forEach((row,ry)=>{for(let rx=0;rx<row.length;rx++){const ch=row[rx];if(ch==='.')continue;let color=colors[ch]||palette.K;
+ rows.forEach((row,ry)=>{for(let rx=0;rx<row.length;rx++){const ch=row[rx];if(ch==='.')continue;let color=colors[ch]||'#26333b';
   if(ch==='C'&&a.job==='psy')color='#8b78d1';
   if(ch==='C'&&a.job==='archer')color='#5c9857';
   if(ch==='C'&&a.job==='fighter')color='#cf8745';
   pixel(rx,ry,color);
  }});
- // Original trainer-inspired headwear and hair silhouette for the selected appearance.
+ // Distinct GBC trainer caps and hair details, kept crisp on the pixel grid.
  if(a.styleKey==='red'||a.styleKey==='green'||a.styleKey==='blue'){
-  ctx.fillStyle=look.hat;ctx.fillRect(sx-6,sy-19,12,3);ctx.fillRect(sx-8,sy-17,16,2);
-  ctx.fillStyle=look.accent;ctx.fillRect(sx-2,sy-18,4,2);
-  if(a.styleKey==='green'){ctx.fillStyle='#d4d18b';ctx.fillRect(sx-2,sy-20,4,2)}
-  if(a.styleKey==='blue'){ctx.fillStyle='#e4bd66';ctx.fillRect(sx-2,sy-19,4,2)}
- }else{ctx.fillStyle=look.hair;ctx.fillRect(sx-10,sy-14,3,8);ctx.fillRect(sx+7,sy-14,3,8);ctx.fillStyle=look.accent;ctx.fillRect(sx+5,sy-17,4,3)}
- // Animate sleeves and legs in alternating poses; feet remain aligned to the pixel grid.
- const armColor=a.job==='fighter'?'#c99b62':palette.T;
- if(moving){
-  const swing=stepA?1:(stepB?-1:0);
-  pixel(0,7,armColor);pixel(7,7,armColor);
-  pixel(0,8,armColor);pixel(7,8,armColor);
-  ctx.fillStyle=palette.P;
-  if(swing>0){ctx.fillRect(sx-6,sy+1,4,3);ctx.fillRect(sx+2,sy+3,4,3)}
-  else if(swing<0){ctx.fillRect(sx-6,sy+3,4,3);ctx.fillRect(sx+2,sy+1,4,3)}
+  ctx.fillStyle=look.hat;ctx.fillRect(sx-8,sy-25,16,4);ctx.fillRect(sx-12,sy-21,24,3);
+  ctx.fillStyle=look.accent;ctx.fillRect(sx-2,sy-24,4,2);
+  if(a.styleKey==='green'){ctx.fillStyle='#d4d18b';ctx.fillRect(sx-2,sy-26,4,2)}
+  if(a.styleKey==='blue'){ctx.fillStyle='#e4bd66';ctx.fillRect(sx-2,sy-25,4,2)}
+ }else{ctx.fillStyle=look.hair;ctx.fillRect(sx-12,sy-15,3,10);ctx.fillRect(sx+9,sy-15,3,10);ctx.fillStyle=look.accent;ctx.fillRect(sx+6,sy-23,6,3)}
+ // Walking animation: alternating short legs and sleeve movement.
+ if(moving){const swing=frame===1?1:(frame===3?-1:0);ctx.fillStyle=look.pants;
+  if(swing>0){ctx.fillRect(sx-7,sy+1,5,4);ctx.fillRect(sx+2,sy+3,5,3)}
+  else if(swing<0){ctx.fillRect(sx-7,sy+3,5,3);ctx.fillRect(sx+2,sy+1,5,4)}
+  ctx.fillStyle=look.shirt;ctx.fillRect(sx-10,sy-6+(swing>0?2:0),3,5);ctx.fillRect(sx+7,sy-6+(swing<0?2:0),3,5);
  }
- // Class-specific uniform trim and accessories.
- if(a.job==='fighter'){ctx.fillStyle='#f0d18a';ctx.fillRect(sx-10,sy-7,3,4);ctx.fillRect(sx+7,sy-7,3,4)}
- if(a.job==='psy'){ctx.fillStyle='#9ce7f1';ctx.fillRect(sx+7,sy-15,2,2);ctx.fillStyle='#e7f8ff';ctx.fillRect(sx+8,sy-16,1,1)}
- if(a.job==='archer'){ctx.fillStyle='#9d7545';ctx.fillRect(sx-11,sy-7,2,13)}
- if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-23,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-3,sy-21,6,1)}
+ if(a.job==='fighter'){ctx.fillStyle='#f0d18a';ctx.fillRect(sx-11,sy-7,3,4);ctx.fillRect(sx+8,sy-7,3,4)}
+ if(a.job==='psy'){ctx.fillStyle='#9ce7f1';ctx.fillRect(sx+9,sy-18,2,2);ctx.fillStyle='#e7f8ff';ctx.fillRect(sx+10,sy-20,1,1)}
+ if(a.job==='archer'){ctx.fillStyle='#9d7545';ctx.fillRect(sx-13,sy-7,2,13)}
+ if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-31,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-29,8,1)}
 }
 function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
