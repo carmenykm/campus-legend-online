@@ -20,14 +20,17 @@ canvas{display:block;width:100vw;height:100vh;object-fit:contain;image-rendering
 #right strong{color:#ffe9a7}
 #quest{margin-top:6px;color:#dce8ba}
 #log{position:fixed;left:8px;bottom:8px;width:min(310px,66vw);height:75px;padding:6px 8px;font-size:10px;line-height:1.45;overflow:hidden;z-index:2;pointer-events:none;background:#183541eF}
-#combatCluster{position:fixed;right:12px;bottom:12px;width:220px;height:210px;z-index:4;pointer-events:none;user-select:none}
-#combatCluster button{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;border-radius:50%;font-weight:900;line-height:1.05;touch-action:none;pointer-events:auto;text-shadow:1px 1px #172b38}
-#combatCluster button b{font-size:17px;color:#fff0b4}
-#combatCluster button span{font-size:9px}
-#attack{right:0;bottom:0;width:72px;height:72px;border:3px solid #f3d58c;background:radial-gradient(circle at 35% 28%,#e9a85d,#a64d36 72%,#6a302b);box-shadow:0 4px 0 #3a2020,inset 0 0 0 3px #713d32}
-#attack b{font-size:27px!important}
-.skill{width:54px;height:54px;border:2px solid #e5d19a;background:radial-gradient(circle at 35% 28%,#7196bd,#34516f 72%,#1c344b);box-shadow:0 3px 0 #10232b,inset 0 0 0 2px #253f54}
-#skill1{left:38px;bottom:48px}#skill2{left:3px;bottom:113px}#skill3{left:68px;bottom:163px}#skill4{left:133px;bottom:108px}
+#combatCluster{position:fixed;right:12px;bottom:12px;width:236px;height:220px;z-index:4;pointer-events:none;user-select:none}
+#combatCluster button{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;border-radius:50%;font-weight:900;line-height:1.05;touch-action:none;pointer-events:auto;text-shadow:1px 2px 2px #101c28;isolation:isolate}
+#combatCluster button b{font-size:23px;color:#fff4d4;line-height:1}
+#combatCluster button span{font-size:9px;white-space:nowrap;color:#fff5d8}
+#attack{right:0;bottom:0;width:76px;height:76px;border:3px solid #ffe29a;background:radial-gradient(circle at 34% 25%,#ffce78 0 10%,#e77b3f 42%,#a83d32 76%,#54252b);box-shadow:0 5px 0 #3a2020,inset 0 0 0 3px #7c4132,0 0 13px #f39c4b66}
+#attack b{font-size:30px!important}
+.skill{width:56px;height:56px;border:2px solid #d9e9ff;background:radial-gradient(circle at 32% 24%,#a9d9ee 0 7%,#527eaa 40%,#263f68 76%,#14263e);box-shadow:0 4px 0 #10232b,inset 0 0 0 2px #a8c7df55,0 0 0 2px #172c42;transition:filter .08s,transform .08s}
+.skill:before{content:"";position:absolute;inset:4px;border:1px solid #ffffff66;border-radius:50%;pointer-events:none}
+.skill:active{filter:brightness(1.35);transform:scale(.94)}
+#skill1{left:108px;bottom:4px}#skill2{left:42px;bottom:52px}#skill3{left:84px;bottom:116px}#skill4{left:148px;bottom:120px;width:62px;height:62px;border-color:#f7d68d;background:radial-gradient(circle at 32% 24%,#f8df9b 0 7%,#bd8b4c 40%,#6d493c 76%,#34283a);box-shadow:0 4px 0 #251d25,inset 0 0 0 2px #f8e5b477,0 0 12px #f4c66b66}
+#skill4 b{font-size:25px}
 .utility{width:44px;height:44px;border:2px solid #d8c58e;background:radial-gradient(circle at 35% 28%,#8ba68a,#3d655c 75%,#25433e);box-shadow:0 3px 0 #10232b}
 #rest{left:0;bottom:0}#pickup{left:50px;bottom:0}
 button,select,input{font:inherit;color:#fff4d0;background:#315565;border:2px solid #d9c68b;border-radius:4px;padding:8px 10px}
@@ -49,7 +52,7 @@ input,select{width:100%;padding:9px}
 #toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:8px 14px;background:#142f3beF;border:2px solid #f0d68d;border-radius:4px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
 #help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
 @media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#combatCluster{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
-@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:6px;bottom:6px;width:180px;height:190px}#combatCluster button b{font-size:14px}#combatCluster button span{font-size:8px}#attack{width:66px;height:66px}#attack b{font-size:24px!important}.skill{width:46px;height:46px}#skill1{left:35px;bottom:42px}#skill2{left:5px;bottom:105px}#skill3{left:67px;bottom:149px}#skill4{left:127px;bottom:105px}.utility{width:38px;height:38px}#pickup{left:43px;bottom:0}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
+@media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:5px;bottom:5px;width:202px;height:206px}#combatCluster button b{font-size:18px}#combatCluster button span{font-size:8px}#attack{width:66px;height:66px}#attack b{font-size:26px!important}.skill{width:48px;height:48px}#skill1{left:93px;bottom:4px}#skill2{left:38px;bottom:50px}#skill3{left:76px;bottom:108px}#skill4{left:128px;bottom:112px;width:54px;height:54px}#skill4 b{font-size:21px}.utility{width:38px;height:38px}#pickup{left:43px;bottom:0}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
 </style>
 </head>
 <body>
@@ -75,10 +78,10 @@ input,select{width:100%;padding:9px}
  <div id="stick"></div><div id="joyHint">移動搖桿</div>
 </div>
 <div id="combatCluster" aria-label="戰鬥操作區">
- <button class="skill" id="skill1" aria-label="技能一"><b>Ⅰ</b><span>技能1</span></button>
- <button class="skill" id="skill2" aria-label="技能二"><b>Ⅱ</b><span>技能2</span></button>
- <button class="skill" id="skill3" aria-label="技能三"><b>Ⅲ</b><span>技能3</span></button>
- <button class="skill" id="skill4" aria-label="技能四"><b>Ⅳ</b><span>技能4</span></button>
+ <button class="skill" id="skill1" aria-label="技能一"><b>⚔</b><span>斬擊</span></button>
+ <button class="skill" id="skill2" aria-label="技能二"><b>✦</b><span>連技</span></button>
+ <button class="skill" id="skill3" aria-label="技能三"><b>➤</b><span>範圍</span></button>
+ <button class="skill" id="skill4" aria-label="終極技能"><b>✹</b><span>奧義</span></button>
  <button class="utility" id="rest" aria-label="恢復"><b>✚</b><span>恢復</span></button>
  <button class="utility" id="pickup" aria-label="拾取"><b>＋</b><span>拾取</span></button>
  <button id="attack" aria-label="普通攻擊"><b>⚔</b><span>攻擊</span></button>
