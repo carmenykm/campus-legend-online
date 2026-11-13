@@ -149,7 +149,8 @@ function updateSkillCooldownUI(){
 }
 let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
 const mapNames=['學園廣場','劍道館','社團森林','後山修練場'];let currentMap=0,transitionLock=0;
-const skillCooldownDuration=[1.1,1.8,2.8,4.2,1.4,2.1,3.1,4.6];\nlet last=0,attackCooldown=0,skillCooldown=Array(8).fill(0),toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
+const skillCooldownDuration=[1.1,1.8,2.8,4.2,1.4,2.1,3.1,4.6];
+let last=0,attackCooldown=0,skillCooldown=Array(8).fill(0),toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
 let particles=[],pendingCombat=null,pendingPickup=null;
 const rand=(x,y)=>{let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n)};
