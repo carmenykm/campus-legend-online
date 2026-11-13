@@ -306,7 +306,7 @@ function drawWorld(){
  // Training posts, benches and lamp posts
  for(let i=0;i<5;i++){let x=(22+i*7)*T-camX,y=27*T-camY;ctx.fillStyle='#66452e';ctx.fillRect(x-2,y-9,4,17);ctx.fillStyle='#b38b55';ctx.fillRect(x-6,y-10,12,4);ctx.fillStyle='#e1d0a2';ctx.fillRect(x-1,y-8,2,3)}
  // Trees and garden borders
- for(let y=4;y<52;y++)for(let x=4;x<68;x++)if(map[y][x]===3)drawTree(x*T+8-camX,y*T+8-camY);
+ for(let y=1;y<MH-1;y++)for(let x=1;x<MW-1;x++)if(map[y]&&map[y][x]===3)drawTree(x*T+8-camX,y*T+8-camY);
  // Mobs, drops, players sorted by y
  const actors=[];
  mobs.forEach(m=>{if(m.alive)actors.push({y:m.y,draw:()=>drawMob(m,m.x-camX,m.y-camY)})});
