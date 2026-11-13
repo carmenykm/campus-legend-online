@@ -136,8 +136,17 @@ function applySkillArt(){
  });
  $('skillPageToggle').textContent=(skillPage+1)+' / 2 ↗';
  $('skillPageToggle').setAttribute('aria-label','切換至技能頁 '+(skillPage===0?'2':'1'));
+ updateSkillCooldownUI();
 }
 function toggleSkillPage(){skillPage=skillPage===0?1:0;if(player)applySkillArt();else $('skillPageToggle').textContent=(skillPage+1)+' / 2 ↗';}
+function updateSkillCooldownUI(){
+ for(let i=0;i<4;i++){
+  const button=$('skill'+(i+1)),left=skillCooldown[skillPage*4+i]||0;
+  button.classList.toggle('cooling',left>0);
+  if(left>0)button.dataset.cooldown=Math.ceil(left);
+  else delete button.dataset.cooldown;
+ }
+}
 let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
 let last=0,attackCooldown=0,skillCooldown=Array(8).fill(0),toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
@@ -329,7 +338,7 @@ function update(dt){
  if(Math.abs(dx)>Math.abs(dy))dy=0;else dx=0;
  const magnitude=Math.min(1,Math.hypot(dx,dy));
  if(magnitude>.12){let l=Math.hypot(dx,dy);move(dx/l*48*magnitude*dt,dy/l*48*magnitude*dt)}
- if(attackCooldown>0)attackCooldown-=dt;for(let i=0;i<8;i++)if(skillCooldown[i]>0)skillCooldown[i]=Math.max(0,skillCooldown[i]-dt);
+ if(attackCooldown>0)attackCooldown-=dt;for(let i=0;i<8;i++)if(skillCooldown[i]>0)skillCooldown[i]=Math.max(0,skillCooldown[i]-dt);updateSkillCooldownUI();
  mobs.forEach(m=>{if(!m.alive)return;m.phase+=dt;if(Math.hypot(m.x-player.x,m.y-player.y)<21&&Math.random()<dt*.35){save.hp=Math.max(0,save.hp-3);if(save.hp===0){let c=jobs[player.job];save.hp=c.hp;player.x=MW*T/2;player.y=29*T;say('體力耗盡，已返回學園廣場。');toast('返回廣場')}updateUI()}});
  drops.forEach(d=>d.life-=dt);drops=drops.filter(d=>d.life>0);
  remotes.forEach(r=>{if(r.tx!==undefined){r.x+=(r.tx-r.x)*Math.min(1,dt*12);r.y+=(r.ty-r.y)*Math.min(1,dt*12)}r.frame+=dt*7});
@@ -363,7 +372,19 @@ joy.addEventListener('pointerdown',e=>{e.preventDefault();joyPointer=e.pointerId
 joy.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer){e.preventDefault();updateJoy(e)}});
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>joy.addEventListener(ev,e=>{if(e.pointerId===joyPointer)resetJoy()}));
 $('attack').addEventListener('pointerdown',e=>{e.preventDefault();attack(false)});
-[1,2,3,4].forEach((n)=>$('skill'+n).addEventListener('pointerdown',e=>{e.preventDefault();attack(true,skillPage*4+n-1)}));
+let skillGesture=null;
+[1,2,3,4].forEach(n=>{
+ const el=$('skill'+n);
+ el.addEventListener('pointerdown',e=>{e.preventDefault();skillGesture={id:e.pointerId,x:e.clientX,y:e.clientY,slot:n-1};el.setPointerCapture(e.pointerId)});
+ el.addEventListener('pointerup',e=>{
+  if(!skillGesture||e.pointerId!==skillGesture.id)return;
+  const dx=e.clientX-skillGesture.x,dy=e.clientY-skillGesture.y;
+  if(dx>28&&dy< -24&&Math.hypot(dx,dy)>42)toggleSkillPage();
+  else attack(true,skillPage*4+n-1);
+  skillGesture=null;
+ });
+ el.addEventListener('pointercancel',()=>{skillGesture=null});
+});
 $('skillPageToggle').addEventListener('pointerdown',e=>{e.preventDefault();toggleSkillPage()});
 const swipeArea=$('skillSwipeArea');let swipeStart=null;
 swipeArea.addEventListener('pointerdown',e=>{e.preventDefault();swipeStart={x:e.clientX,y:e.clientY,id:e.pointerId};swipeArea.setPointerCapture(e.pointerId)});
