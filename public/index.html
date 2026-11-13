@@ -110,7 +110,7 @@ input,select{width:100%;padding:9px}
 'use strict';
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});
 ctx.imageSmoothingEnabled=false;
-const W=320,H=240,T=16,MW=72,MH=56;
+const W=320,H=240,T=16;let MW=40,MH=30;
 const $=id=>document.getElementById(id);
 const jobs={
  sword:{name:'劍道部',hp:120,mp:45,power:20,range:30,color:'#d34d45',skill:'拔刀斬'},
@@ -148,6 +148,7 @@ function updateSkillCooldownUI(){
  }
 }
 let map=[],obstacles=[],decor=[],mobs=[],drops=[],remotes=new Map(),keys={},touch={x:0,y:0},player=null,socket=null,playerId=null;
+const mapNames=['學園廣場','劍道館','社團森林','後山修練場'];let currentMap=0,transitionLock=0;
 const skillCooldownDuration=[1.1,1.8,2.8,4.2,1.4,2.1,3.1,4.6];\nlet last=0,attackCooldown=0,skillCooldown=Array(8).fill(0),toastTimer=0,logLines=[],camera={x:0,y:0},quest=0;
 let save={level:1,xp:0,gold:0,hp:100,mp:50};
 let particles=[],pendingCombat=null,pendingPickup=null;
@@ -155,39 +156,39 @@ const rand=(x,y)=>{let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floo
 function tile(x,y,v){if(x>=0&&y>=0&&x<MW&&y<MH)map[y][x]=v}
 function rectTiles(x,y,w,h,v){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)tile(i,j,v)}
 function block(x,y,w,h){obstacles.push({x:x*T,y:y*T,w:w*T,h:h*T})}
-function initMap(){
- map=Array.from({length:MH},(_,y)=>Array.from({length:MW},(_,x)=>0));
- // Central courtyard and crossing paths.
- rectTiles(4,4,64,48,0);
- rectTiles(5,25,62,5,1);rectTiles(33,5,6,45,1);
- rectTiles(8,13,56,2,1);rectTiles(8,41,56,2,1);
- // School buildings, with doors facing the courtyard.
- rectTiles(9,6,17,7,2);rectTiles(46,6,17,7,2);
- rectTiles(9,43,17,8,2);rectTiles(46,43,17,8,2);
- block(9*T,6*T,17*T,7*T);block(46*T,6*T,17*T,7*T);
- block(9*T,43*T,17*T,8*T);block(46*T,43*T,17*T,8*T);
- // Open door gaps at the building fronts.
- for(let x=16;x<19;x++){tile(x,13,1);tile(x,42,1)}
- for(let x=52;x<55;x++)tile(x,13,1);
- // Small garden ponds and flower beds.
- rectTiles(5,17,5,4,4);rectTiles(62,17,5,4,4);
- rectTiles(5,35,5,4,5);rectTiles(62,35,5,4,5);
- // Border trees and scattered campus landscaping.
- for(let x=4;x<68;x+=2){tile(x,4,3);tile(x,51,3)}
- for(let y=6;y<51;y+=3){tile(4,y,3);tile(67,y,3)}
- for(let x=12;x<61;x+=6){tile(x,22,3);tile(x,33,3)}
- // Keep central paths open.
- rectTiles(29,23,14,10,1);
- // Decorations.
- decor=[];
- for(let y=6;y<51;y++)for(let x=5;x<67;x++){
-  if(map[y][x]===0&&rand(x,y)>.975)decor.push({x:x*T+8,y:y*T+8,type:'flower',c:rand(x+5,y)>0.5?'#f4d47a':'#eaa0a4'});
+function initMap(zone=currentMap){
+ currentMap=zone;MW=40;MH=30;map=Array.from({length:MH},()=>Array(MW).fill(0));obstacles=[];decor=[];
+ rectTiles(0,0,MW,1,3);rectTiles(0,MH-1,MW,1,3);rectTiles(0,0,1,MH,3);rectTiles(MW-1,0,1,MH,3);
+ if(zone===0){
+  rectTiles(2,2,36,26,0);rectTiles(2,13,36,4,1);rectTiles(18,2,4,26,1);
+  [[5,4,9,6],[26,4,9,6],[5,20,9,6],[26,20,9,6]].forEach(q=>{rectTiles(q[0],q[1],q[2],q[3],2);block(q[0]*T,q[1]*T,q[2]*T,q[3]*T)});
+  decor.push({x:9*T,y:7*T,type:'sign',text:'劍道館'},{x:30*T,y:7*T,type:'sign',text:'社團大樓'},{x:9*T,y:23*T,type:'sign',text:'教學大樓'},{x:30*T,y:23*T,type:'sign',text:'圖書館'});
+  rectTiles(3,5,3,3,4);rectTiles(34,20,3,3,5);
+ }else if(zone===1){
+  rectTiles(2,2,36,26,0);rectTiles(3,4,34,22,1);
+  [[5,6,7,5],[28,6,7,5],[5,19,7,5],[28,19,7,5]].forEach(q=>{rectTiles(q[0],q[1],q[2],q[3],2);block(q[0]*T,q[1]*T,q[2]*T,q[3]*T)});
+  decor.push({x:20*T,y:8*T,type:'sign',text:'劍道修練場'});
+ }else if(zone===2){
+  rectTiles(2,2,36,26,5);rectTiles(4,13,32,4,1);rectTiles(18,3,4,24,1);
+  for(let y=4;y<26;y+=4)for(let x=4+(y%8);x<36;x+=7)if(x<17||x>22)tile(x,y,3);
+  rectTiles(6,5,4,3,4);rectTiles(29,21,4,3,4);decor.push({x:20*T,y:10*T,type:'sign',text:'森林深處'});
+ }else{
+  rectTiles(2,2,36,26,0);rectTiles(3,4,34,22,1);rectTiles(7,6,5,4,4);rectTiles(28,20,5,4,4);
+  for(let x=6;x<35;x+=5){tile(x,7,3);tile(x,22,3)}decor.push({x:20*T,y:9*T,type:'sign',text:'後山修練場'});
  }
- // Building signs and benches are drawn as scenery, not collision.
- decor.push({x:17*T,y:10*T,type:'sign',text:'劍道館'});
- decor.push({x:54*T,y:10*T,type:'sign',text:'社團大樓'});
- decor.push({x:17*T,y:47*T,type:'sign',text:'教學大樓'});
- decor.push({x:54*T,y:47*T,type:'sign',text:'圖書館'});
+ if(zone===0){tile(38,14,6);tile(1,14,6);tile(20,1,6);tile(20,28,6)}
+ else if(zone===1)tile(20,1,6);else if(zone===2)tile(1,14,6);else tile(20,28,6);
+ for(let y=2;y<MH-2;y++)for(let x=2;x<MW-2;x++)if(map[y][x]===0&&rand(x,y+zone*100)>.985)decor.push({x:x*T+8,y:y*T+8,type:'flower',c:rand(x+5,y)>0.5?'#f4d47a':'#eaa0a4'});
+}
+function enterMap(zone,sx,sy){
+ if(transitionLock>0)return;initMap(zone);initMobs();drops=[];pendingCombat=null;pendingPickup=null;
+ player.x=sx*T+8;player.y=sy*T+8;player.dir='down';camera.x=player.x;camera.y=player.y;
+ $('right').querySelector('strong').textContent=mapNames[zone];say('進入地圖：'+mapNames[zone]);toast('抵達 '+mapNames[zone]);transitionLock=.8;updateUI();
+}
+function checkMapGate(){
+ if(!player||transitionLock>0)return;const x=Math.floor(player.x/T),y=Math.floor(player.y/T);if((map[y]||[])[x]!==6)return;
+ if(currentMap===0){if(x>=37)enterMap(2,3,14);else if(x<=2)enterMap(1,20,3);else if(y<=2)enterMap(3,20,26);else if(y>=27)enterMap(3,20,3)}
+ else if(currentMap===1)enterMap(0,4,14);else if(currentMap===2)enterMap(0,36,14);else enterMap(0,20,4);
 }
 function say(s){logLines.unshift(s);logLines=logLines.slice(0,5);$('log').innerHTML=logLines.map(x=>'› '+x).join('<br>')}
 function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTimer=1.6}
@@ -206,7 +207,7 @@ function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({leve
 function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
  loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
- player={id:'local',name,job,gender,x:MW*T/2,y:29*T,dir:'down',frame:0,walk:0,flash:0};applySkillArt();
+ player={id:'local',name,job,gender,x:20*T+8,y:16*T,dir:'down',frame:0,walk:0,flash:0};applySkillArt();
  save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
  $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
  try{
@@ -220,8 +221,8 @@ function start(){
  }catch(e){$('net').textContent='離線單人模式'}
 }
 function initMobs(){
- mobs=[];const pts=[[25,20],[28,30],[44,20],[46,31],[19,37],[55,37],[37,17]];
- pts.forEach((p,i)=>mobs.push({x:p[0]*T+8,y:p[1]*T+8,hp:55,max:55,alive:true,dir:'down',hit:0,phase:i*.7}));
+ mobs=[];const sets=[[[12,11],[15,19],[25,11],[29,19],[20,22]],[[10,10],[29,10],[10,20],[29,20],[20,14]],[[8,9],[13,20],[26,9],[31,20],[20,23],[20,8]],[[8,8],[12,21],[27,8],[31,21],[20,12],[20,23]]];
+ const pts=sets[currentMap],base=[55,70,85,110][currentMap];pts.forEach((p,i)=>mobs.push({x:p[0]*T+8,y:p[1]*T+8,hp:base,max:base,alive:true,dir:'down',hit:0,phase:i*.7}));
 }
 function syncPlayers(list){
  const seen=new Set();
@@ -232,6 +233,7 @@ function syncPlayers(list){
 }
 function collides(x,y){
  const r={x:x-5,y:y-5,w:10,h:10};
+ if(x<T+5||y<T+5||x>(MW-1)*T-5||y>(MH-1)*T-5)return true;
  for(const b of obstacles)if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)return true;
  for(let yy=Math.floor((y-5)/T);yy<=Math.floor((y+5)/T);yy++)for(let xx=Math.floor((x-5)/T);xx<=Math.floor((x+5)/T);xx++){
   const v=(map[yy]||[])[xx];if(v===3||v===4||v===5)return true;
@@ -250,6 +252,7 @@ function drawTile(v,x,y,tx,ty){
  else if(v===3){ctx.fillStyle='#477c4e';ctx.fillRect(x,y,T,T);ctx.fillStyle='#2d603f';ctx.fillRect(x+2,y+5,12,8);ctx.fillStyle='#5e9b5c';ctx.fillRect(x+4,y+2,8,9)}
  else if(v===4){ctx.fillStyle='#438fa0';ctx.fillRect(x,y,T,T);ctx.fillStyle='#8bc6bd';ctx.fillRect(x+2,y+4,6,1);ctx.fillRect(x+9,y+11,5,1)}
  else if(v===5){ctx.fillStyle='#6b9e59';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e0c57f';ctx.fillRect(x+3,y+3,10,10);ctx.fillStyle='#477b4a';ctx.fillRect(x+5,y+2,7,8)}
+ else if(v===6){ctx.fillStyle='#243e50';ctx.fillRect(x,y,T,T);ctx.fillStyle='#f5d477';ctx.fillRect(x+3,y+2,10,12);ctx.fillStyle='#fff1b0';ctx.fillRect(x+6,y+4,4,8)}
 }
 function drawBuildingSign(d,sx,sy){
  ctx.fillStyle='#63452f';ctx.fillRect(sx-18,sy-7,36,12);ctx.fillStyle='#f4df9c';ctx.fillRect(sx-17,sy-6,34,9);ctx.fillStyle='#57422f';ctx.font='6px monospace';ctx.textAlign='center';ctx.fillText(d.text,sx,sy+1)
@@ -353,12 +356,13 @@ function pickup(target=null){
 function rest(){if(!player)return;let m=statMax();save.hp=Math.min(m.hp,save.hp+25);save.mp=Math.min(m.mp,save.mp+20);say('原地調息，恢復生命與法力。');updateUI()}
 function update(dt){
  if(!player)return;
+ if(transitionLock>0)transitionLock=Math.max(0,transitionLock-dt);
  let dx=touch.x,dy=touch.y;
  if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;
  // 僅允許四方向：選擇輸入較大的軸，絕不斜向移動。
  if(Math.abs(dx)>Math.abs(dy))dy=0;else dx=0;
  const magnitude=Math.min(1,Math.hypot(dx,dy));
- if(magnitude>.12){pendingCombat=null;pendingPickup=null;let l=Math.hypot(dx,dy);move(dx/l*48*magnitude*dt,dy/l*48*magnitude*dt)}
+ if(magnitude>.12){pendingCombat=null;pendingPickup=null;let l=Math.hypot(dx,dy);move(dx/l*48*magnitude*dt,dy/l*48*magnitude*dt);checkMapGate()}
  if(pendingCombat){
   const p=pendingCombat,t=p.target;
   if(!t||!t.alive){pendingCombat=null}
@@ -398,7 +402,7 @@ function render(){
  ctx.clearRect(0,0,W,H);drawWorld();
  // GBC-style bottom location plaque
  ctx.fillStyle='#18333cdd';ctx.fillRect(112,220,96,14);ctx.strokeStyle='#d5c18a';ctx.strokeRect(112.5,220.5,95,13);
- ctx.fillStyle='#f6e7b7';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText('學園中央廣場',160,230);
+ ctx.fillStyle='#f6e7b7';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText(mapNames[currentMap],160,230);
 }
 function loop(t){let dt=Math.min(.05,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
 function bindHold(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();fn(false)}))}
@@ -443,7 +447,7 @@ $('start').onclick=start;
 addEventListener('keydown',e=>{keys[e.key]=true;keys[e.key.toLowerCase()]=true;if(e.key==='j'||e.key===' '){e.preventDefault();attack(false)}if(e.key==='k')attack(true,skillPage*4);if(e.key==='e')pickup()});
 addEventListener('keyup',e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
 document.addEventListener('contextmenu',e=>e.preventDefault());
-initMap();requestAnimationFrame(loop);
+initMap(0);$('right').querySelector('strong').textContent=mapNames[0];requestAnimationFrame(loop);
 })();
 </script>
 </body>
