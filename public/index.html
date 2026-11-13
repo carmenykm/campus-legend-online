@@ -121,7 +121,7 @@ const jobs={
 };
 const trainerStyles={red:{hair:'#30241f',shirt:'#f0e4c0',pants:'#31527a',accent:'#bd4540',hat:'#bd4540',name:'紅帽少年'},green:{hair:'#4b3527',shirt:'#e8d9a7',pants:'#456b43',accent:'#6e9b58',hat:'#527d4b',name:'森林旅人'},blue:{hair:'#263b55',shirt:'#e5e8df',pants:'#344e72',accent:'#d7a64c',hat:'#344e72',name:'金版冒險家'},violet:{hair:'#573c66',shirt:'#e7d9e9',pants:'#56446d',accent:'#d6a6cf',hat:'#76517f',name:'水晶旅者'}};
 let selectedStyle='red';
-function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const rows=['...KKKKKK...','..KHHHHHHK..','.KHHHHHHHHK.','.HHHHHHHHHH.','.HHSSSSSSHH.','.HSWIIWSSSH.','.HSSSSSSSSH.','..HHSSSSHH..','...TTTTTT...','..TTCTCTTT..','..TTTTTTTT..','...PP..PP...','...PP..PP...','...BB..BB...'];const colors={K:'#26333b',H:p.hair,S:'#e9b98d',W:'#fff1d9',I:'#28303a',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch]){g.fillStyle=colors[ch];g.fillRect(6+x*3,6+y*4,3,4)}}));if(styleKey==='red'||styleKey==='green'||styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(12,4,24,6);g.fillRect(6,10,36,4);g.fillStyle=p.accent;g.fillRect(21,6,6,3);}else{g.fillStyle=p.hair;g.fillRect(6,19,5,19);g.fillRect(37,19,5,19);g.fillStyle=p.accent;g.fillRect(33,10,9,5);}}
+function paintStylePreview(canvas,styleKey){const g=canvas.getContext('2d'),p=trainerStyles[styleKey];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,54,48,18);const rows=['...KKKKKK...','..KHHHHHHK..','.KHHHHHHHHK.','.HHHHHHHHHH.','.HHSSSSSSHH.','.HSWIIWSSSH.','.HSSSSSSSSH.','..HHSSSSHH..','...TTTTTT...','..TTCTCTTT..','..TTTTTTTT..','...PP..PP...','...PP..PP...','...BB..BB...'];const colors={K:'#26333b',H:p.hair,S:'#e9b98d',W:'#fff1d9',I:'#28303a',T:p.shirt,C:p.accent,P:p.pants,B:'#292b35'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'&&colors[ch]){g.fillStyle=colors[ch];g.fillRect(6+x*3,6+y*4,3,4)}}));g.fillStyle='#3a2927';g.fillRect(15,25,6,2);g.fillRect(24,25,6,2);g.fillStyle='#fff8df';g.fillRect(15,27,3,3);g.fillRect(24,27,3,3);g.fillStyle='#26303a';g.fillRect(18,27,2,3);g.fillRect(27,27,2,3);g.fillStyle='#d88e7c';g.fillRect(12,32,3,2);g.fillRect(30,32,3,2);g.fillStyle='#75433d';g.fillRect(21,35,3,2);if(styleKey==='red'||styleKey==='green'||styleKey==='blue'){g.fillStyle=p.hat;g.fillRect(12,4,24,6);g.fillRect(6,10,36,4);g.fillStyle=p.accent;g.fillRect(21,6,6,3);}else{g.fillStyle=p.hair;g.fillRect(6,19,5,19);g.fillRect(37,19,5,19);g.fillStyle=p.accent;g.fillRect(33,10,9,5);}}
 function refreshStyleChoices(){document.querySelectorAll('.style-choice').forEach(b=>{b.classList.toggle('active',b.dataset.style===selectedStyle);paintStylePreview(b.querySelector('canvas'),b.dataset.style)})}
 const skillArt={
  sword:[['⚔','拔刀斬'],['✦','連環斬'],['➤','劍氣波'],['✹','破空斬'],['▣','格擋'],['➶','突進斬'],['✧','劍影'],['☄','劍舞']],
@@ -423,6 +423,14 @@ function drawAvatar(a,sx,sy,local){
   if(ch==='C'&&a.job==='fighter')color='#cf8745';
   pixel(rx,ry,color);
  }});
+ // Facial features: defined brows, bright pupils, a tiny mouth and warm cheek pixels.
+ if(dir==='down'){
+  pixel(3,4,'#47302b');pixel(6,4,'#47302b');
+  pixel(3,5,'#fff8e6');pixel(6,5,'#fff8e6');
+  pixel(4,5,'#252b32');pixel(7,5,'#252b32');
+  pixel(2,6,'#df927f');pixel(9,6,'#df927f');
+  pixel(5,7,'#75433d');pixel(6,7,'#75433d');
+ }
  // Distinct GBC trainer caps and hair details, kept crisp on the pixel grid.
  if(a.styleKey==='red'||a.styleKey==='green'||a.styleKey==='blue'){
   ctx.fillStyle=look.hat;ctx.fillRect(sx-8,sy-25,16,4);ctx.fillRect(sx-12,sy-21,24,3);
