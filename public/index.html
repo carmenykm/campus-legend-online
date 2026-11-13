@@ -208,7 +208,7 @@ function persist(){try{localStorage.setItem('campus2d-save',JSON.stringify({leve
 function loadSave(){try{let s=JSON.parse(localStorage.getItem('campus2d-save')||'{}');save.level=Math.max(1,s.level||1);save.xp=s.xp||0;save.gold=s.gold||0;quest=s.quest||0}catch(e){}}
 function start(){
  loadSave();const job=$('class').value,gender=$('gender').value,name=$('name').value.trim()||'新生玩家',c=jobs[job];
- player={id:'local',name,job,gender,x:20*T+8,y:16*T,dir:'down',frame:0,walk:0,flash:0};applySkillArt();
+ player={id:'local',name,job,gender,x:20*T+8,y:16*T,dir:'down',frame:0,walk:0,flash:0};camera.x=player.x;camera.y=player.y;applySkillArt();
  save.hp=c.hp+(save.level-1)*8;save.mp=c.mp+(save.level-1)*5;
  $('login').style.display='none';initMobs();updateUI();say('歡迎 '+name+' 加入'+c.name+'！');say('任務開始：擊倒 3 個訓練假人。');
  try{
