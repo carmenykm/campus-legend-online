@@ -127,16 +127,62 @@ trainerAtlas.src='/assets/school_uniform_atlas.png?v=1';
 const trainerSpriteRows={m1:0,m2:1,m3:2,m4:3,f1:4,f2:5,f3:6,f4:7,m5:8,m6:9,m7:10,m8:11,f5:12,f6:13,f7:14,f8:15};
 function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')}
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
- if(!trainerAtlas.complete||!trainerAtlas.naturalWidth)return;
- const index=trainerSpriteRows[p.key]??0;
- // New school-uniform atlas: 16 transparent 48x56 character cells in one row.
- const sw=48,sh=56,sx=index*sw,sy=0;
- const dw=32*z,dh=40*z;
- const dx=Math.round(x),dy=Math.round(y);
- g.save();
- g.imageSmoothingEnabled=false;
- if(dir==='right'){g.translate(dx+dw,dy);g.scale(-1,1);g.drawImage(trainerAtlas,sx,sy,sw,sh,0,0,dw,dh)}
- else g.drawImage(trainerAtlas,sx,sy,sw,sh,dx,dy,dw,dh);
+ // Crisp native-pixel school uniform sprite. Draw at 16x20 then scale only by integer pixels.
+ const S=2,ox=Math.round(x),oy=Math.round(y);
+ const C={outline:'#172332',skin:'#f1c6a0',skinShade:'#d99779',white:'#f4f0df',navy:'#263f63',navy2:'#182d4b',tie:p.gender==='female'?'#bd4c62':'#c84e4b',shoe:'#242936',gold:'#e6c36e',hair:p.hair||'#49352e'};
+ const px=(xx,yy,w,h,color)=>{g.fillStyle=color;g.fillRect(ox+xx*S,oy+yy*S,w*S,h*S)};
+ const side=dir==='left'||dir==='right',back=dir==='up';
+ const flip=dir==='left';
+ g.save();g.imageSmoothingEnabled=false;
+ if(flip){g.translate(ox+16*S,oy);g.scale(-1,1)}
+ const X=flip?0:ox;
+ // local painter uses a translated origin so all details remain crisp.
+ if(flip){g.translate(-ox,0)}
+ const q=(xx,yy,w,h,c)=>px(xx,yy,w,h,c);
+ // shadow and shoes
+ q(4,18,8,1,'#152d35');q(4,17,3,2,C.shoe);q(9,17,3,2,C.shoe);
+ // legs and lower uniform
+ q(5,14,2,4,C.navy2);q(9,14,2,4,C.navy2);
+ if(p.gender==='female'){q(4,13,8,3,'#344d73');q(5,14,6,1,'#536d91')}
+ else {q(5,13,6,2,C.navy)}
+ // torso / blazer
+ q(4,9,8,5,C.navy);q(3,10,2,4,C.navy2);q(11,10,2,4,C.navy2);
+ q(6,9,4,4,C.white);q(7,10,2,3,C.tie);q(6,9,1,1,C.gold);q(9,9,1,1,C.gold);
+ // collar and school crest
+ q(5,9,2,1,C.white);q(9,9,2,1,C.white);q(10,11,1,1,C.gold);
+ // head silhouette, side/back profiles
+ q(4,3,8,6,C.outline);q(5,2,6,7,C.outline);q(5,3,6,5,C.skin);
+ q(4,4,1,3,C.skinShade);q(11,4,1,3,C.skinShade);
+ // hair cap and hairstyle silhouette
+ q(4,2,8,3,C.hair);q(5,1,6,2,C.hair);q(4,3,2,2,C.hair);q(10,3,2,2,C.hair);
+ const ht=(p.hairType||0)%4;
+ if(ht===0){q(4,1,2,2,C.hair);q(9,0,2,2,C.hair);q(6,0,2,2,C.hair)}
+ if(ht===1){q(3,2,2,3,C.hair);q(11,2,2,3,C.hair);q(5,0,2,2,C.hair)}
+ if(ht===2){q(4,0,2,2,C.hair);q(8,0,3,2,C.hair);q(10,3,2,3,C.hair)}
+ if(ht===3){q(3,3,2,3,C.hair);q(11,3,2,3,C.hair);q(6,0,3,2,C.hair)}
+ if(back){q(4,3,8,5,C.hair);q(5,7,6,2,C.hair);q(4,5,2,3,C.hair);q(10,5,2,3,C.hair)}
+ else if(side){
+   q(5,4,6,4,C.skin);q(4,4,3,4,C.hair);q(8,3,4,3,C.hair);
+   q(8,5,1,1,C.outline);q(10,6,1,1,C.skinShade);
+   q(4,7,2,2,C.hair);
+ }else{
+   q(5,5,1,1,C.outline);q(10,5,1,1,C.outline);
+   q(6,7,4,1,C.skinShade);
+   q(5,4,2,1,C.hair);q(9,4,2,1,C.hair);
+ }
+ if(p.gender==='female'&&!back){q(3,6,2,5,C.hair);q(11,6,2,5,C.hair)}
+ if(p.gender==='female'&&ht===1){q(11,0,2,2,p.accent||C.gold)}
+ // class equipment, drawn as separate high-contrast pixel props
+ const weapon=job||'sword';
+ if(weapon==='sword'){
+   q(13,9,1,5,'#b9d5e7');q(13,8,1,1,'#f4f2df');q(12,13,3,1,'#9b7448');q(13,14,1,2,'#68452f');
+ }else if(weapon==='archer'){
+   q(13,7,1,8,'#9b7047');q(12,8,1,1,'#e3c47c');q(14,8,1,1,'#e3c47c');q(12,12,1,1,'#e3c47c');q(14,12,1,1,'#e3c47c');q(13,6,1,1,'#e3c47c');
+ }else if(weapon==='fighter'){
+   q(2,11,2,2,'#bd4e4b');q(12,11,2,2,'#bd4e4b');q(2,10,2,1,'#e6c36e');q(12,10,2,1,'#e6c36e');
+ }else{
+   q(13,7,1,9,'#8762b5');q(12,6,3,2,'#63bce7');q(13,5,1,1,'#d7f4ff');q(12,16,3,1,'#8762b5');
+ }
  g.restore();
 }function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,-1,4,1)}
 function refreshStyleChoices(){
