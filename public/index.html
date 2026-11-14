@@ -56,6 +56,27 @@ input,select{width:100%;padding:9px}
 #help{position:fixed;right:8px;bottom:8px;font-size:10px;color:#fff0c9;z-index:2;text-align:right;pointer-events:none}
 @media(min-width:800px){#joystick{left:22px;bottom:22px;width:148px;height:148px}#stick{width:60px;height:60px}#combatCluster{right:22px;bottom:22px}#log{left:12px;bottom:12px}#hud{left:12px;top:12px}#right{right:12px;top:12px}}
 @media(max-width:520px){#right{width:130px;font-size:10px}#hud{width:59vw;padding:6px 8px}#brand{font-size:12px}#log{width:58vw;height:58px;font-size:9px;bottom:155px}#combatCluster{right:4px;bottom:5px;width:204px;height:220px}#combatCluster button b{font-size:17px}#combatCluster button span{font-size:7px}#attack{left:133px;bottom:50px;width:66px;height:66px}#attack b{font-size:25px!important}.skill{width:46px;height:46px}#skill1{left:40px;bottom:60px}#skill2{left:52px;bottom:118px}#skill3{left:96px;bottom:166px}#skill4{left:153px;bottom:168px}.utility{width:36px;height:36px}#rest{left:96px;bottom:8px}#pickup{left:166px;bottom:112px}#skillPageToggle{left:3px;top:3px;width:54px;height:21px;font-size:8px}#combatCluster .skill.cooling:after{font-size:13px}#joystick{left:9px;bottom:13px;width:104px;height:104px}#stick{width:44px;height:44px}#help{display:none}}
+
+:root{color-scheme:dark;--ink:#f8f0c8;--panel:#294b45;--edge:#e5cf88;--gold:#f5d77d}
+html,body{background:#182f35;color:var(--ink);font-family:"Courier New",monospace}
+#stage{background:#14282d}.panel{background:#294b45;border:3px solid #e5cf88;border-radius:0;box-shadow:inset 0 0 0 2px #172f35,4px 4px 0 #102127}
+#hud,#right,#log{background:#294b45;border-radius:0}#brand{font-family:"Courier New",monospace;letter-spacing:0;color:#ffe7a0;text-shadow:1px 1px #6a4937}
+.bar{height:8px;border:2px solid #152d32;background:#13272c}#hp{background:#e75c5c}#mp{background:#65b7d1}#xp{background:#f1cd5d}
+button,select,input{font-family:"Courier New",monospace;border-radius:0;border:2px solid #e5cf88;background:#355e55;box-shadow:2px 2px 0 #142a30}
+button:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #102630}
+#login{background:rgba(15,35,38,.88)}#login .card{background:#31574d;border:4px solid #ead393;border-radius:0;box-shadow:inset 0 0 0 3px #183b3c,6px 6px 0 #10252a}
+h1{font-family:"Courier New",monospace;font-size:22px;letter-spacing:-1px;text-shadow:2px 2px #624a39}
+.style-choice{background:#31564d;border:2px solid #789b7a;border-radius:0;box-shadow:2px 2px 0 #172e32}
+.style-choice.active{background:#607b4b;border-color:#ffe29a;box-shadow:inset 0 0 0 1px #fff0b2,2px 2px 0 #172e32}
+.style-choice canvas{width:42px;height:63px;background:#8db36c;border:1px solid #e6d39a}
+#start{background:#a35e42;color:#fff1c8;border:3px solid #f1d58c;box-shadow:3px 3px 0 #442e2a}
+#joystick{border-radius:4px;border:3px solid #e5cf88;background:#294b45;box-shadow:inset 0 0 0 3px #172f35,4px 4px 0 #10232b}
+#joystick:before,#joystick:after{background:#e5cf8844}
+#stick{border-radius:4px;background:#d8b66c;border:3px solid #fff0bd;box-shadow:2px 2px 0 #172f35,inset 0 0 0 2px #8d6745}
+#combatCluster button{border-radius:4px}#attack{background:#b95643;border-radius:4px;box-shadow:3px 4px 0 #492d2b,inset 0 0 0 3px #e7b36e}
+.skill{background:#416b79;border-radius:4px;box-shadow:3px 3px 0 #172f35,inset 0 0 0 2px #a8c7df55}
+.skill:before{border-radius:0}.utility{background:#47735b;border-radius:4px;box-shadow:3px 3px 0 #172f35}
+#skillPageToggle{border-radius:0;background:#203f42}#toast{border-radius:0;background:#203f42;border:3px solid #f0d68d;font-family:"Courier New",monospace}
 </style>
 </head>
 <body>
@@ -121,70 +142,43 @@ const jobs={
 };
 const trainerStyles={m1:{"key":"m1","gender":"male","name":"赤焰","mood":"自信","hair":"#30241f","shirt":"#d94d45","pants":"#31527a","accent":"#f2cf78","hairType":0,"expression":0},m2:{"key":"m2","gender":"male","name":"陽光","mood":"開朗","hair":"#76502f","shirt":"#e9c66c","pants":"#527d4b","accent":"#fff0b0","hairType":1,"expression":1},m3:{"key":"m3","gender":"male","name":"冷峻","mood":"嚴肅","hair":"#263b55","shirt":"#526d91","pants":"#293d58","accent":"#d7a64c","hairType":2,"expression":2},m4:{"key":"m4","gender":"male","name":"頑皮","mood":"調皮","hair":"#4b3527","shirt":"#67a6a0","pants":"#475a72","accent":"#f2d47b","hairType":3,"expression":3},m5:{"key":"m5","gender":"male","name":"害羞","mood":"害羞","hair":"#684a43","shirt":"#d9b4a0","pants":"#61516f","accent":"#e98f91","hairType":4,"expression":4},m6:{"key":"m6","gender":"male","name":"疑惑","mood":"困惑","hair":"#353b43","shirt":"#8c9aab","pants":"#3f5260","accent":"#d7e0dc","hairType":5,"expression":5},m7:{"key":"m7","gender":"male","name":"熱血","mood":"憤怒","hair":"#3d2924","shirt":"#c65b35","pants":"#4c3b3b","accent":"#f0b44f","hairType":6,"expression":6},m8:{"key":"m8","gender":"male","name":"沉穩","mood":"冷靜","hair":"#51443b","shirt":"#718b65","pants":"#394f43","accent":"#d8c995","hairType":7,"expression":7},f1:{"key":"f1","gender":"female","name":"星晴","mood":"自信","hair":"#382a35","shirt":"#d95b78","pants":"#51446e","accent":"#f4d18a","hairType":0,"expression":0},f2:{"key":"f2","gender":"female","name":"甜心","mood":"開朗","hair":"#8a593c","shirt":"#e9bd65","pants":"#6c7650","accent":"#fff0b0","hairType":1,"expression":1},f3:{"key":"f3","gender":"female","name":"冰羽","mood":"嚴肅","hair":"#293d5c","shirt":"#6688b5","pants":"#34475f","accent":"#d5e6ed","hairType":2,"expression":2},f4:{"key":"f4","gender":"female","name":"莓果","mood":"調皮","hair":"#63384b","shirt":"#b86e91","pants":"#594866","accent":"#f2c2d2","hairType":3,"expression":3},f5:{"key":"f5","gender":"female","name":"櫻雪","mood":"害羞","hair":"#754b54","shirt":"#e5b4b9","pants":"#78627c","accent":"#fff0df","hairType":4,"expression":4},f6:{"key":"f6","gender":"female","name":"知性","mood":"困惑","hair":"#34394a","shirt":"#8296a8","pants":"#455a70","accent":"#dce5ec","hairType":5,"expression":5},f7:{"key":"f7","gender":"female","name":"烈陽","mood":"憤怒","hair":"#4a3028","shirt":"#d66b4e","pants":"#57414b","accent":"#f5c56d","hairType":6,"expression":6},f8:{"key":"f8","gender":"female","name":"月影","mood":"冷靜","hair":"#50415d","shirt":"#8878a7","pants":"#49435d","accent":"#e5d8f1","hairType":7,"expression":7}};
 let selectedStyle='m1';
-const trainerAtlas=new Image();
-trainerAtlas.onload=()=>{refreshStyleChoices()};
-trainerAtlas.src='/assets/school_uniform_atlas.png?v=1';
-const trainerSpriteRows={m1:0,m2:1,m3:2,m4:3,f1:4,f2:5,f3:6,f4:7,m5:8,m6:9,m7:10,m8:11,f5:12,f6:13,f7:14,f8:15};
 function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')}
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
- // Crisp native-pixel school uniform sprite. Draw at 16x20 then scale only by integer pixels.
- const S=2,ox=Math.round(x),oy=Math.round(y);
- const C={outline:'#172332',skin:'#f1c6a0',skinShade:'#d99779',white:'#f4f0df',navy:'#263f63',navy2:'#182d4b',tie:p.gender==='female'?'#bd4c62':'#c84e4b',shoe:'#242936',gold:'#e6c36e',hair:p.hair||'#49352e'};
- const px=(xx,yy,w,h,color)=>{g.fillStyle=color;g.fillRect(ox+xx*S,oy+yy*S,w*S,h*S)};
- const side=dir==='left'||dir==='right',back=dir==='up';
- const flip=dir==='left';
- g.save();g.imageSmoothingEnabled=false;
- if(flip){g.translate(ox+16*S,oy);g.scale(-1,1)}
- const X=flip?0:ox;
- // local painter uses a translated origin so all details remain crisp.
- if(flip){g.translate(-ox,0)}
- const q=(xx,yy,w,h,c)=>px(xx,yy,w,h,c);
- // shadow and shoes
- q(4,18,8,1,'#152d35');q(4,17,3,2,C.shoe);q(9,17,3,2,C.shoe);
- // legs and lower uniform
- q(5,14,2,4,C.navy2);q(9,14,2,4,C.navy2);
- if(p.gender==='female'){q(4,13,8,3,'#344d73');q(5,14,6,1,'#536d91')}
- else {q(5,13,6,2,C.navy)}
- // torso / blazer
- q(4,9,8,5,C.navy);q(3,10,2,4,C.navy2);q(11,10,2,4,C.navy2);
- q(6,9,4,4,C.white);q(7,10,2,3,C.tie);q(6,9,1,1,C.gold);q(9,9,1,1,C.gold);
- // collar and school crest
- q(5,9,2,1,C.white);q(9,9,2,1,C.white);q(10,11,1,1,C.gold);
- // head silhouette, side/back profiles
- q(4,3,8,6,C.outline);q(5,2,6,7,C.outline);q(5,3,6,5,C.skin);
- q(4,4,1,3,C.skinShade);q(11,4,1,3,C.skinShade);
- // hair cap and hairstyle silhouette
- q(4,2,8,3,C.hair);q(5,1,6,2,C.hair);q(4,3,2,2,C.hair);q(10,3,2,2,C.hair);
- const ht=(p.hairType||0)%4;
- if(ht===0){q(4,1,2,2,C.hair);q(9,0,2,2,C.hair);q(6,0,2,2,C.hair)}
- if(ht===1){q(3,2,2,3,C.hair);q(11,2,2,3,C.hair);q(5,0,2,2,C.hair)}
- if(ht===2){q(4,0,2,2,C.hair);q(8,0,3,2,C.hair);q(10,3,2,3,C.hair)}
- if(ht===3){q(3,3,2,3,C.hair);q(11,3,2,3,C.hair);q(6,0,3,2,C.hair)}
- if(back){q(4,3,8,5,C.hair);q(5,7,6,2,C.hair);q(4,5,2,3,C.hair);q(10,5,2,3,C.hair)}
- else if(side){
-   q(5,4,6,4,C.skin);q(4,4,3,4,C.hair);q(8,3,4,3,C.hair);
-   q(8,5,1,1,C.outline);q(10,6,1,1,C.skinShade);
-   q(4,7,2,2,C.hair);
- }else{
-   q(5,5,1,1,C.outline);q(10,5,1,1,C.outline);
-   q(6,7,4,1,C.skinShade);
-   q(5,4,2,1,C.hair);q(9,4,2,1,C.hair);
- }
- if(p.gender==='female'&&!back){q(3,6,2,5,C.hair);q(11,6,2,5,C.hair)}
- if(p.gender==='female'&&ht===1){q(11,0,2,2,p.accent||C.gold)}
- // class equipment, drawn as separate high-contrast pixel props
- const weapon=job||'sword';
- if(weapon==='sword'){
-   q(13,9,1,5,'#b9d5e7');q(13,8,1,1,'#f4f2df');q(12,13,3,1,'#9b7448');q(13,14,1,2,'#68452f');
- }else if(weapon==='archer'){
-   q(13,7,1,8,'#9b7047');q(12,8,1,1,'#e3c47c');q(14,8,1,1,'#e3c47c');q(12,12,1,1,'#e3c47c');q(14,12,1,1,'#e3c47c');q(13,6,1,1,'#e3c47c');
- }else if(weapon==='fighter'){
-   q(2,11,2,2,'#bd4e4b');q(12,11,2,2,'#bd4e4b');q(2,10,2,1,'#e6c36e');q(12,10,2,1,'#e6c36e');
- }else{
-   q(13,7,1,9,'#8762b5');q(12,6,3,2,'#63bce7');q(13,5,1,1,'#d7f4ff');q(12,16,3,1,'#8762b5');
- }
+ const scale=2*Math.max(1,Math.round(z||1)),ox=Math.round(x),oy=Math.round(y);
+ const C={ink:'#182532',skin:'#f5cba5',shade:'#d99b7c',light:'#fff0cf',white:'#f4f0df',coat:'#29496b',coatDark:'#1b3554',coatLight:'#456b8b',tie:p.gender==='female'?'#c85b70':'#c94e4b',gold:'#f0cf79',shoe:'#29303a',hair:p.hair||'#49352e'};
+ const flip=dir==='left';g.save();g.imageSmoothingEnabled=false;g.translate(ox+(flip?16*scale:0),oy);if(flip)g.scale(-1,1);
+ const q=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(a*scale,b*scale,w*scale,h*scale)};
+ const back=dir==='up',side=dir==='left'||dir==='right';
+ q(3,19,10,1,'#31513e');q(4,17,3,2,C.shoe);q(9,17,3,2,C.shoe);
+ if(p.gender==='female'){q(4,13,8,3,'#344d70');q(5,14,6,1,'#607da0');q(5,16,2,1,C.light);q(9,16,2,1,C.light)}
+ else{q(5,13,2,4,C.coatDark);q(9,13,2,4,C.coatDark);q(5,16,2,1,'#71849a');q(9,16,2,1,'#71849a')}
+ q(3,9,10,5,C.ink);q(4,9,8,5,C.coat);q(5,10,6,3,C.coatLight);q(6,9,4,4,C.white);q(5,9,2,1,C.light);q(9,9,2,1,C.light);q(7,10,2,3,C.tie);q(10,11,1,1,C.gold);q(3,10,2,3,C.coatDark);q(11,10,2,3,C.coatDark);
+ q(4,2,8,7,C.ink);q(5,2,6,7,C.skin);q(7,8,2,2,C.shade);q(4,2,8,3,C.hair);q(5,1,6,2,C.hair);
+ const h=(p.hairType||0)%8;
+ if(h===0){q(4,1,2,2,C.hair);q(6,0,3,2,C.hair);q(10,1,2,2,C.hair)}
+ if(h===1){q(3,2,2,4,C.hair);q(11,2,2,4,C.hair);q(6,0,4,2,C.hair)}
+ if(h===2){q(4,0,3,3,C.hair);q(8,0,4,2,C.hair);q(10,3,2,3,C.hair)}
+ if(h===3){q(3,3,2,4,C.hair);q(11,3,2,4,C.hair);q(5,0,2,2,C.hair);q(9,0,2,2,C.hair)}
+ if(h===4){q(4,0,2,3,C.hair);q(6,0,2,1,C.hair);q(10,0,2,3,C.hair)}
+ if(h===5){q(4,1,2,3,C.hair);q(6,0,4,2,C.hair);q(10,1,2,3,C.hair);q(3,5,2,5,C.hair)}
+ if(h===6){q(4,0,2,3,C.hair);q(6,0,2,2,C.hair);q(8,0,3,3,C.hair);q(11,2,2,5,C.hair)}
+ if(h===7){q(3,2,2,5,C.hair);q(5,0,6,2,C.hair);q(11,2,2,5,C.hair);q(5,7,2,2,C.hair)}
+ if(back){q(4,3,8,5,C.hair);q(5,7,6,2,C.hair);q(4,5,2,4,C.hair);q(10,5,2,4,C.hair);q(6,8,4,1,C.hair)}
+ else if(side){q(4,4,3,4,C.hair);q(7,4,4,3,C.skin);q(8,5,1,1,C.ink);q(10,6,1,1,C.shade);q(4,7,2,3,C.hair);q(8,3,4,2,C.hair)}
+ else{q(5,5,1,1,C.ink);q(10,5,1,1,C.ink);q(6,7,4,1,C.shade);if(p.expression===3){q(5,5,2,1,C.ink);q(9,5,2,1,C.ink)}if(p.expression===4){q(5,5,1,1,'#9d6470');q(10,5,1,1,'#9d6470')}q(5,4,2,1,C.hair);q(9,4,2,1,C.hair)}
+ if(p.gender==='female'&&!back){q(3,6,2,5,C.hair);q(11,6,2,5,C.hair);if(h===4||h===5){q(3,10,2,2,C.hair);q(11,10,2,2,C.hair)}}
+ if(p.gender==='female'&&h===1){q(11,0,2,2,p.accent||C.gold);q(12,1,1,1,'#fff1c7')}
+ if(back){q(6,10,4,4,'#8c6949');q(7,10,2,3,'#c39a5e')}
+ const w=job||'sword';
+ if(w==='sword'){q(14,8,1,7,'#c9e0e8');q(14,7,1,1,'#fff5d8');q(13,13,3,1,'#e3c477');q(14,14,1,2,'#80553a')}
+ else if(w==='fighter'){q(2,11,2,2,'#b94e4b');q(12,11,2,2,'#b94e4b');q(2,10,2,1,'#f0cf79');q(12,10,2,1,'#f0cf79')}
+ else if(w==='archer'){q(14,7,1,9,'#9a7047');q(13,8,1,1,'#e9d18d');q(15,8,1,1,'#e9d18d');q(13,12,1,1,'#e9d18d');q(15,12,1,1,'#e9d18d')}
+ else{q(14,7,1,9,'#8465b5');q(13,6,3,2,'#63bce7');q(14,5,1,1,'#e1f7ff');q(13,16,3,1,'#8465b5')}
+ if(frame%2===1){q(4,18,3,1,C.shoe);q(9,17,3,1,C.shoe)}
  g.restore();
-}function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,-1,4,1)}
+}
+
+function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,-1,4,1)}
 function refreshStyleChoices(){
  const gender=$('gender').value,root=$('styleChoices');root.innerHTML='';
  const choices=Object.values(trainerStyles).filter(p=>p.gender===gender);
@@ -340,62 +334,23 @@ function move(dx,dy){
 }
 function drawTile(v,x,y,tx,ty){
  const n=rand(tx+31,ty+17);
- if(v===0){
-  ctx.fillStyle=(tx+ty)%2?'#78ad62':'#72a45b';ctx.fillRect(x,y,T,T);
-  ctx.fillStyle='#91bd70';if(n>.34){ctx.fillRect(x+2+(n*7|0),y+3,2,1);ctx.fillRect(x+10,y+10+(n*4|0),2,1)}
-  ctx.fillStyle='#527f4b';if(n>.66){ctx.fillRect(x+5,y+12,1,2);ctx.fillRect(x+12,y+3,1,1)}
-  if(n>.91){ctx.fillStyle='#f3d77d';ctx.fillRect(x+7,y+6,2,2);ctx.fillStyle='#fff0b4';ctx.fillRect(x+7,y+6,1,1)}
- }else if(v===1){
-  ctx.fillStyle='#c9b987';ctx.fillRect(x,y,T,T);ctx.fillStyle='#ddcda0';ctx.fillRect(x,y,16,2);ctx.fillRect(x+1,y+7,5,1);ctx.fillRect(x+9,y+12,6,1);
-  ctx.fillStyle='#b2a174';ctx.fillRect(x+4,y+4,2,1);ctx.fillRect(x+12,y+8,2,1);
- }else if(v===2){
-  ctx.fillStyle='#a87950';ctx.fillRect(x,y,T,T);ctx.fillStyle='#d5a66d';ctx.fillRect(x,y,16,3);ctx.fillRect(x+2,y+4,12,2);
-  ctx.fillStyle='#76513a';ctx.fillRect(x+1,y+7,14,8);ctx.fillStyle='#c99a68';ctx.fillRect(x+3,y+8,10,5);
-  ctx.fillStyle='#e6c18a';ctx.fillRect(x+4,y+9,2,2);ctx.fillRect(x+10,y+9,2,2);
- }else if(v===3){
-  ctx.fillStyle='#376d45';ctx.fillRect(x,y,T,T);ctx.fillStyle='#2c5e3c';ctx.fillRect(x+1,y+5,14,10);
-  ctx.fillStyle='#4c8950';ctx.fillRect(x+3,y+2,10,10);ctx.fillStyle='#68a65c';ctx.fillRect(x+5,y+1,6,7);
-  ctx.fillStyle='#8dbd6b';ctx.fillRect(x+6,y+3,3,2);ctx.fillStyle='#234f39';ctx.fillRect(x+2,y+12,3,2);
- }else if(v===4){
-  ctx.fillStyle='#438fa0';ctx.fillRect(x,y,T,T);ctx.fillStyle='#65b1b1';ctx.fillRect(x+1,y+3,6,2);ctx.fillRect(x+9,y+10,6,2);
-  ctx.fillStyle='#b1ded0';ctx.fillRect(x+3,y+4,3,1);ctx.fillRect(x+11,y+11,3,1);ctx.fillStyle='#347889';ctx.fillRect(x+7,y+7,2,1);
- }else if(v===5){
-  ctx.fillStyle='#689b56';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e0c77e';ctx.fillRect(x+2,y+2,12,12);
-  ctx.fillStyle='#477b49';ctx.fillRect(x+4,y+3,8,9);ctx.fillStyle='#7eaf5d';ctx.fillRect(x+5,y+2,6,6);
-  ctx.fillStyle='#a9c66c';ctx.fillRect(x+6,y+4,3,2);
- }else if(v===6){
-  ctx.fillStyle='#294b58';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e6c46e';ctx.fillRect(x+2,y+1,12,14);
-  ctx.fillStyle='#fff0ad';ctx.fillRect(x+5,y+3,6,10);ctx.fillStyle='#9b7447';ctx.fillRect(x+7,y+5,2,8);
-  ctx.fillStyle='#fff8d6';ctx.fillRect(x+6,y+3,4,1);
- }
+ if(v===0){ctx.fillStyle=(tx+ty)%2?'#79ad62':'#72a45b';ctx.fillRect(x,y,T,T);ctx.fillStyle='#91bd70';if(n>.28){ctx.fillRect(x+2+(n*7|0),y+3,2,1);ctx.fillRect(x+10,y+10+(n*4|0),2,1)}ctx.fillStyle='#527f4b';if(n>.58){ctx.fillRect(x+5,y+12,1,2);ctx.fillRect(x+12,y+3,1,1)}if(n>.93){ctx.fillStyle='#f3d77d';ctx.fillRect(x+7,y+6,2,2);ctx.fillStyle='#fff0b4';ctx.fillRect(x+7,y+6,1,1)}}
+ else if(v===1){ctx.fillStyle='#c9b987';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e5d5aa';ctx.fillRect(x,y,16,2);ctx.fillRect(x+1,y+7,5,1);ctx.fillRect(x+9,y+12,6,1);ctx.fillStyle='#b2a174';ctx.fillRect(x+4,y+4,2,1);ctx.fillRect(x+12,y+8,2,1);ctx.fillRect(x,y+15,16,1)}
+ else if(v===2){ctx.fillStyle='#9d704c';ctx.fillRect(x,y,T,T);ctx.fillStyle='#d5a66d';ctx.fillRect(x,y,16,3);ctx.fillRect(x+2,y+4,12,2);ctx.fillStyle='#76513a';ctx.fillRect(x+1,y+7,14,8);ctx.fillStyle='#c99a68';ctx.fillRect(x+3,y+8,10,5);ctx.fillStyle='#e6c18a';ctx.fillRect(x+4,y+9,2,2);ctx.fillRect(x+10,y+9,2,2);ctx.fillStyle='#60432f';ctx.fillRect(x,y+15,16,1)}
+ else if(v===3){ctx.fillStyle='#376d45';ctx.fillRect(x,y,T,T);ctx.fillStyle='#2c5e3c';ctx.fillRect(x+1,y+5,14,10);ctx.fillStyle='#4c8950';ctx.fillRect(x+3,y+2,10,10);ctx.fillStyle='#68a65c';ctx.fillRect(x+5,y+1,6,7);ctx.fillStyle='#8dbd6b';ctx.fillRect(x+6,y+3,3,2);ctx.fillStyle='#234f39';ctx.fillRect(x+2,y+12,3,2)}
+ else if(v===4){ctx.fillStyle='#438fa0';ctx.fillRect(x,y,T,T);ctx.fillStyle='#65b1b1';ctx.fillRect(x+1,y+3,6,2);ctx.fillRect(x+9,y+10,6,2);ctx.fillStyle='#b1ded0';ctx.fillRect(x+3,y+4,3,1);ctx.fillRect(x+11,y+11,3,1);ctx.fillStyle='#347889';ctx.fillRect(x+7,y+7,2,1)}
+ else if(v===5){ctx.fillStyle='#689b56';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e0c77e';ctx.fillRect(x+2,y+2,12,12);ctx.fillStyle='#477b49';ctx.fillRect(x+4,y+3,8,9);ctx.fillStyle='#7eaf5d';ctx.fillRect(x+5,y+2,6,6);ctx.fillStyle='#a9c66c';ctx.fillRect(x+6,y+4,3,2)}
+ else if(v===6){ctx.fillStyle='#294b58';ctx.fillRect(x,y,T,T);ctx.fillStyle='#e6c46e';ctx.fillRect(x+2,y+1,12,14);ctx.fillStyle='#fff0ad';ctx.fillRect(x+5,y+3,6,10);ctx.fillStyle='#9b7447';ctx.fillRect(x+7,y+5,2,8);ctx.fillStyle='#fff8d6';ctx.fillRect(x+6,y+3,4,1)}
 }
+
 function drawCampusBuilding(d,sx,sy){
- const w=d.w,h=d.h,pal=[
-  ['#d8c49a','#9b6246','#754733','#f1dfb8'],
-  ['#d5d9d1','#637b80','#405b64','#e8f0dc'],
-  ['#dfc49a','#a77b4c','#785536','#f4e1b6'],
-  ['#c8d0d8','#65758b','#414e69','#e8edf4']
- ][d.style%4];
- // building shadow and stone foundation
- ctx.fillStyle='#263c32';ctx.fillRect(sx+3,sy+5,w,h);
- ctx.fillStyle=pal[0];ctx.fillRect(sx,sy+10,w,h-10);
- ctx.fillStyle=pal[3];ctx.fillRect(sx+3,sy+13,w-6,h-16);
- // broad layered roof
- ctx.fillStyle=pal[2];ctx.fillRect(sx-3,sy+5,w+6,9);
- ctx.fillStyle=pal[1];ctx.fillRect(sx-1,sy,w+2,8);
- ctx.fillStyle=pal[2];ctx.fillRect(sx+3,sy+8,w-6,3);
- // windows and central entrance
- for(let wx=sx+9;wx<sx+w-7;wx+=18){
-  ctx.fillStyle='#394e5b';ctx.fillRect(wx,sy+25,9,12);
-  ctx.fillStyle='#a9d2cf';ctx.fillRect(wx+2,sy+27,5,8);
-  ctx.fillStyle='#f5e5b6';ctx.fillRect(wx+4,sy+27,1,8);
- }
- const door=sx+w/2-5;
- ctx.fillStyle='#594536';ctx.fillRect(door,sy+h-19,10,19);
- ctx.fillStyle='#d6b77c';ctx.fillRect(door+2,sy+h-17,6,15);
- ctx.fillStyle='#fff0bd';ctx.fillRect(door+7,sy+h-10,1,2);
- ctx.fillStyle='#e8d5a5';ctx.fillRect(sx+4,sy+h-4,w-8,3);
+ const w=d.w,h=d.h,pal=[['#d8c49a','#9b6246','#754733','#f1dfb8'],['#d5d9d1','#637b80','#405b64','#e8f0dc'],['#dfc49a','#a77b4c','#785536','#f4e1b6'],['#c8d0d8','#65758b','#414e69','#e8edf4']][d.style%4];
+ ctx.fillStyle='#263c32';ctx.fillRect(sx+3,sy+7,w,h);ctx.fillStyle=pal[2];ctx.fillRect(sx-4,sy+7,w+8,8);ctx.fillStyle=pal[1];ctx.fillRect(sx-2,sy+1,w+4,8);ctx.fillStyle=pal[2];ctx.fillRect(sx+2,sy+8,w-4,3);
+ ctx.fillStyle=pal[0];ctx.fillRect(sx,sy+13,w,h-13);ctx.fillStyle=pal[3];ctx.fillRect(sx+3,sy+16,w-6,h-20);ctx.fillStyle=pal[1];ctx.fillRect(sx+2,sy+13,w-4,2);
+ for(let wx=sx+8;wx<sx+w-6;wx+=16){ctx.fillStyle='#263d4b';ctx.fillRect(wx,sy+24,8,12);ctx.fillStyle='#8fc2c0';ctx.fillRect(wx+1,sy+25,6,9);ctx.fillStyle='#d6e7c8';ctx.fillRect(wx+3,sy+25,1,9);ctx.fillStyle='#394d55';ctx.fillRect(wx,sy+29,8,1)}
+ const door=sx+w/2-5;ctx.fillStyle='#594536';ctx.fillRect(door-1,sy+h-20,12,20);ctx.fillStyle='#d6b77c';ctx.fillRect(door+1,sy+h-18,8,18);ctx.fillStyle='#fff0bd';ctx.fillRect(door+7,sy+h-10,1,2);ctx.fillStyle='#e8d5a5';ctx.fillRect(sx+3,sy+h-3,w-6,3);ctx.fillStyle='#fff0bd';ctx.fillRect(sx+w/2-1,sy+14,2,2);
 }
+
 function drawCampusGate(d,sx,sy){
  ctx.fillStyle='#263a36';ctx.fillRect(sx+4,sy+3,d.w-8,8);
  ctx.fillStyle='#a87945';ctx.fillRect(sx+4,sy+1,7,d.h-1);
