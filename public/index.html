@@ -123,23 +123,20 @@ const trainerStyles={m1:{"key":"m1","gender":"male","name":"赤焰","mood":"自�
 let selectedStyle='m1';
 const trainerAtlas=new Image();
 trainerAtlas.onload=()=>{refreshStyleChoices()};
-trainerAtlas.src='/assets/emerald_trainers.png';
-const trainerSpriteRows={m1:0,m2:1,m3:2,m4:3,m5:4,m6:5,m7:6,m8:7,f1:8,f2:9,f3:10,f4:11,f5:12,f6:8,f7:9,f8:10};
+trainerAtlas.src='/assets/school_uniform_atlas.png?v=1';
+const trainerSpriteRows={m1:0,m2:1,m3:2,m4:3,f1:4,f2:5,f3:6,f4:7,m5:8,m6:9,m7:10,m8:11,f5:12,f6:13,f7:14,f8:15};
 function drawTrainerMini(g,p,x,y,z){drawPixelTrainer(g,p,x,y,z,'down',0,'sword')}
 function drawPixelTrainer(g,p,x,y,z,dir,frame,job){
  if(!trainerAtlas.complete||!trainerAtlas.naturalWidth)return;
- const row=trainerSpriteRows[p.key]??0;
- // Native-sized 2x atlas cells; keep integer destination dimensions for crisp pixels.
- const col=dir==='up'?4:((dir==='left'||dir==='right')?7:1);
- // Original atlas is 118x208: 9 columns x 13 rows of 13x16 pixel cels.
- // Draw at exact integer 2x scale with smoothing disabled.
- const sw=13,sh=16;
- const dw=26*z,dh=32*z;
+ const index=trainerSpriteRows[p.key]??0;
+ // New school-uniform atlas: 16 transparent 48x56 character cells in one row.
+ const sw=48,sh=56,sx=index*sw,sy=0;
+ const dw=32*z,dh=40*z;
  const dx=Math.round(x),dy=Math.round(y);
  g.save();
  g.imageSmoothingEnabled=false;
- if(dir==='right'){g.translate(dx+dw,dy);g.scale(-1,1);g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,0,0,dw,dh)}
- else g.drawImage(trainerAtlas,col*sw,row*sh,sw,sh,dx,dy,dw,dh);
+ if(dir==='right'){g.translate(dx+dw,dy);g.scale(-1,1);g.drawImage(trainerAtlas,sx,sy,sw,sh,0,0,dw,dh)}
+ else g.drawImage(trainerAtlas,sx,sy,sw,sh,dx,dy,dw,dh);
  g.restore();
 }function paintStylePreview(cv,key){const g=cv.getContext('2d'),p=trainerStyles[key];g.clearRect(0,0,48,72);g.fillStyle='#8cae72';g.fillRect(0,0,48,72);g.fillStyle='#a6c584';g.fillRect(0,56,48,16);drawTrainerMini(g,p,-1,4,1)}
 function refreshStyleChoices(){
@@ -373,7 +370,7 @@ function drawAvatar(a,sx,sy,local){
  const dir=a.dir||'down';
  const look=trainerStyles[a.styleKey]||trainerStyles.m1;
  // Anchor sprite by its feet: center on the character's ground position.
- drawPixelTrainer(ctx,look,sx-13,sy-32,1,dir,0,a.job||'sword');
+ drawPixelTrainer(ctx,look,sx-16,sy-40,1,dir,0,a.job||'sword');
  if(local){ctx.fillStyle='#fff0a2';ctx.fillRect(sx-1,sy-36,2,2);ctx.fillStyle='#e9c75f';ctx.fillRect(sx-4,sy-34,8,1)}
 }function drawMob(m,sx,sy){
  // Training dummy: outlined straw body, tied headband, wooden arms and feet.
