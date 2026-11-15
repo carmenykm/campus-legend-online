@@ -238,43 +238,78 @@ const mapNames=['學院門口','學院','學習1館','學習2館'];let currentMa
   block(tx*T,ty*T,tw*T,th*T);
   decor.push({type:'building',x:tx*T,y:ty*T,w:tw*T,h:th*T,style});
  }
- function initMap(zone=currentMap){
+ 
+// Original FireRed/LeafGreen building sheet supplied by the project owner.
+// The sheet is drawn with multiply compositing so its white background blends into the map.
+const campusBuildingsImage=new Image();
+campusBuildingsImage.src='https://www.spriters-resource.com/media/assets/4/3849.png?updated=1755472417';
+const campusBuildingRects={
+ house:[20,20,85,68],mart:[416,235,73,72],center:[499,235,85,72],
+ fanclub:[618,239,120,69],lab:[526,340,115,76],bike:[675,339,68,91],
+ mansion:[296,126,113,126],gym:[435,130,97,81],rocket:[560,135,178,83],
+ museum:[136,337,256,119],tower:[7,138,111,232]
+};
+function addSpriteBuilding(tx,ty,sprite,tw=5,th=5,scale=.88){
+ const r=campusBuildingRects[sprite];if(!r)return;
+ const dw=Math.round(r[2]*scale),dh=Math.round(r[3]*scale);
+ block(tx*T+4,ty*T+dh-18,Math.min(tw*T-4,dw-8),18);
+ decor.push({type:'building',sprite,x:tx*T,y:ty*T,w:dw,h:dh});
+}
+
+function initMap(zone=currentMap){
   currentMap=zone;MW=20;MH=20;map=Array.from({length:MH},()=>Array(MW).fill(0));obstacles=[];decor=[];
+  // Outer campus greenery and natural borders.
   rectTiles(0,0,MW,1,3);rectTiles(0,MH-1,MW,1,3);rectTiles(0,0,1,MH,3);rectTiles(MW-1,0,1,MH,3);
   if(zone===0){
-   // 校門廣場：中央十字道路，左右分流至兩棟學習館
-   rectTiles(8,1,4,18,1);rectTiles(1,8,18,4,1);
-   addBuilding(2,3,5,4,0);addBuilding(13,3,5,4,1);
-   addBuilding(2,13,5,4,2);addBuilding(13,13,5,4,3);
-   rectTiles(1,3,1,4,5);rectTiles(18,3,1,4,5);rectTiles(1,13,1,4,5);rectTiles(18,13,1,4,5);
-   decor.push({type:'gate',x:7*T,y:0,w:6*T,h:3*T});
+   // 校門廣場：原作寶可夢建築素材組成校園入口街區。
+   rectTiles(8,0,4,20,1);rectTiles(0,8,20,4,1);
+   rectTiles(6,6,8,8,1);
+   addSpriteBuilding(1,1,'house',5,5,.88);
+   addSpriteBuilding(14,1,'fanclub',7,5,.82);
+   addSpriteBuilding(1,14,'mart',5,5,.92);
+   addSpriteBuilding(14,14,'center',5,5,.88);
+   // Main campus laboratory / administration building just north of the plaza.
+   addSpriteBuilding(7,1,'lab',6,5,.82);
+   decor.push({type:'gate',x:7*T,y:0,w:6*T,h:2*T});
   }else if(zone===1){
-   // 學院中庭與教學主樓
-   rectTiles(8,2,4,16,1);rectTiles(2,8,16,4,1);
-   addBuilding(2,2,5,5,1);addBuilding(13,2,5,5,0);
-   addBuilding(2,13,5,5,2);addBuilding(13,13,5,5,3);
-   rectTiles(9,18,2,1,6);
+   // 學院：主樓面向大型庭園，左右配置附屬教學建築。
+   rectTiles(8,0,4,20,1);rectTiles(5,7,10,4,1);rectTiles(8,11,4,9,1);
+   rectTiles(3,5,14,8,1);
+   addSpriteBuilding(5,1,'museum',9,7,.52);
+   addSpriteBuilding(1,12,'house',5,5,.88);
+   addSpriteBuilding(14,12,'lab',6,5,.82);
+   addSpriteBuilding(1,1,'bike',4,6,.78);
+   tile(10,18,6);
   }else if(zone===2){
-   // 學習1館：課室、走廊與明亮的教學空間
-   rectTiles(2,8,16,4,1);rectTiles(8,2,4,16,1);
-   addBuilding(2,2,5,5,0);addBuilding(13,2,5,5,1);
-   addBuilding(2,13,5,5,2);addBuilding(13,13,5,5,0);
-   rectTiles(18,9,1,2,6);
+   // 學習1館：長廊式教學區，右側出口接回校門廣場。
+   rectTiles(2,8,16,4,1);rectTiles(10,2,4,16,1);
+   rectTiles(2,3,8,3,1);rectTiles(2,13,8,4,1);
+   addSpriteBuilding(1,1,'gym',6,6,.82);
+   addSpriteBuilding(1,13,'mansion',6,7,.58);
+   addSpriteBuilding(13,2,'house',5,5,.88);
+   addSpriteBuilding(13,13,'lab',6,5,.82);
+   tile(18,10,6);
   }else{
-   // 學習2館：實習教室與圖書空間
-   rectTiles(2,8,16,4,1);rectTiles(8,2,4,16,1);
-   addBuilding(2,2,5,5,2);addBuilding(13,2,5,5,3);
-   addBuilding(2,13,5,5,1);addBuilding(13,13,5,5,0);
-   rectTiles(1,9,1,2,6);
+   // 學習2館：圖書與實習空間，採不對稱庭院配置。
+   rectTiles(1,8,18,4,1);rectTiles(8,2,4,16,1);
+   rectTiles(4,4,12,3,1);rectTiles(4,13,12,3,1);
+   addSpriteBuilding(2,1,'tower',5,9,.34);
+   addSpriteBuilding(13,1,'rocket',6,5,.72);
+   addSpriteBuilding(2,13,'department',6,7,.50);
+   addSpriteBuilding(13,13,'bike',4,6,.78);
+   tile(1,10,6);
   }
-  // 門口上方進學院，左右兩側分別通往學習1館與學習2館
+  // Recessed flower beds and small garden details.
+  for(let y=2;y<MH-2;y++)for(let x=2;x<MW-2;x++){
+   if(map[y][x]===0&&rand(x,y+zone*100)>.965)decor.push({x:x*T+8,y:y*T+8,type:'flower',c:rand(x+5,y)>0.5?'#f4d47a':'#eaa0a4'});
+   if(map[y][x]===0&&rand(x+51,y+zone*200)>.988)map[y][x]=5;
+  }
   if(zone===0){tile(10,1,6);tile(1,10,6);tile(18,10,6)}
   else if(zone===1)tile(10,18,6);
   else if(zone===2)tile(18,10,6);
   else tile(1,10,6);
-  for(let y=2;y<MH-2;y++)for(let x=2;x<MW-2;x++)if(map[y][x]===0&&rand(x,y+zone*100)>.985)decor.push({x:x*T+8,y:y*T+8,type:'flower',c:rand(x+5,y)>0.5?'#f4d47a':'#eaa0a4'});
  }
- function enterMap(zone,sx,sy){
+  function enterMap(zone,sx,sy){
   if(transitionLock>0)return;initMap(zone);initMobs();drops=[];pendingCombat=null;pendingPickup=null;
   player.x=sx*T+8;player.y=sy*T+8;player.dir='down';camera.x=player.x;camera.y=player.y;
   $('right').querySelector('strong').textContent=mapNames[zone];say('進入地圖：'+mapNames[zone]);toast('抵達 '+mapNames[zone]);transitionLock=.8;updateUI();
@@ -386,6 +421,13 @@ function drawTile(v,x,y,tx,ty){
 }
 
 function drawCampusBuilding(d,sx,sy){
+ if(d.sprite&&campusBuildingsImage.complete&&campusBuildingsImage.naturalWidth){
+  const r=campusBuildingRects[d.sprite];
+  ctx.save();ctx.globalCompositeOperation='multiply';
+  ctx.drawImage(campusBuildingsImage,r[0],r[1],r[2],r[3],sx,sy,d.w,d.h);
+  ctx.restore();return;
+ }
+
  const w=d.w,h=d.h;
  const palettes=[
   {wall:'#e9d6a8',light:'#f7e9c5',shade:'#b58a5b',roof:'#b65346',roof2:'#783d3a',dark:'#51413b',glass:'#75b6bd'},
